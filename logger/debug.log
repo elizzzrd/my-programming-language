@@ -1,0 +1,338 @@
+source/load_expression.cpp:64:load_expression(): [DEBUG]: expression has been loaded to buffer
+
+source/load_expression.cpp:65:load_expression(): [DEBUG] buffer:
+
+source/load_expression.cpp:66:load_expression(): (*(*(x nil nil)(+(y nil nil)(6 nil nil)))(arccos(y nil nil)(x nil nil)))
+
+source/load_expression.cpp:100:read_node(): [DEBUG] pos = 0
+
+source/load_expression.cpp:105:read_node(): [DEBUG] pos = 0
+
+source/load_expression.cpp:111:read_node(): [DEBUG] pos = 1
+
+source/load_expression.cpp:115:read_node(): [DEBUG] pos = 1
+
+source/load_expression.cpp:223:define_token_type(): [DEBUG] in define_token_type
+
+source/load_expression.cpp:224:define_token_type(): [DEBUG] pos = 1
+
+source/load_expression.cpp:233:define_token_type(): [DEBUG] get_token return: *
+
+source/node_values.cpp:81:check_for_variable(): [DEBUG] in check_for_variable with token: *
+
+source/node_values.cpp:94:check_for_variable(): [DEBUG] in check_for_variable returns: ROOT
+
+source/node_values.cpp:122:check_for_operator(): [DEBUG] in check_for_operator with token: *
+
+source/node_values.cpp:131:check_for_operator(): [DEBUG] in check_for_operator found: *
+
+source/node_values.cpp:134:check_for_operator(): [DEBUG] in check_for_operator returns: OPERATOR
+
+source/load_expression.cpp:255:define_token_type(): [DEBUG] token type was found: OPERATOR
+
+source/load_expression.cpp:126:read_node(): [DEBUG] in read_node: define_token_type return: OPERATOR
+
+source/load_expression.cpp:170:read_node(): [DEBUG] node has been succesfully created: OPERATOR
+
+source/load_expression.cpp:179:read_node(): [DEBUG] started processing left subtree
+
+source/load_expression.cpp:100:read_node(): [DEBUG] pos = 2
+
+source/load_expression.cpp:105:read_node(): [DEBUG] pos = 2
+
+source/load_expression.cpp:111:read_node(): [DEBUG] pos = 3
+
+source/load_expression.cpp:115:read_node(): [DEBUG] pos = 3
+
+source/load_expression.cpp:223:define_token_type(): [DEBUG] in define_token_type
+
+source/load_expression.cpp:224:define_token_type(): [DEBUG] pos = 3
+
+source/load_expression.cpp:233:define_token_type(): [DEBUG] get_token return: *
+
+source/node_values.cpp:81:check_for_variable(): [DEBUG] in check_for_variable with token: *
+
+source/node_values.cpp:94:check_for_variable(): [DEBUG] in check_for_variable returns: ROOT
+
+source/node_values.cpp:122:check_for_operator(): [DEBUG] in check_for_operator with token: *
+
+source/node_values.cpp:131:check_for_operator(): [DEBUG] in check_for_operator found: *
+
+source/node_values.cpp:134:check_for_operator(): [DEBUG] in check_for_operator returns: OPERATOR
+
+source/load_expression.cpp:255:define_token_type(): [DEBUG] token type was found: OPERATOR
+
+source/load_expression.cpp:126:read_node(): [DEBUG] in read_node: define_token_type return: OPERATOR
+
+source/load_expression.cpp:170:read_node(): [DEBUG] node has been succesfully created: OPERATOR
+
+source/load_expression.cpp:179:read_node(): [DEBUG] started processing left subtree
+
+source/load_expression.cpp:100:read_node(): [DEBUG] pos = 4
+
+source/load_expression.cpp:105:read_node(): [DEBUG] pos = 4
+
+source/load_expression.cpp:111:read_node(): [DEBUG] pos = 5
+
+source/load_expression.cpp:115:read_node(): [DEBUG] pos = 5
+
+source/load_expression.cpp:223:define_token_type(): [DEBUG] in define_token_type
+
+source/load_expression.cpp:224:define_token_type(): [DEBUG] pos = 5
+
+source/load_expression.cpp:233:define_token_type(): [DEBUG] get_token return: x
+
+source/node_values.cpp:81:check_for_variable(): [DEBUG] in check_for_variable with token: x
+
+source/node_values.cpp:90:check_for_variable(): [DEBUG] in check_for_variable found: x
+
+source/load_expression.cpp:255:define_token_type(): [DEBUG] token type was found: VARIABLE
+
+source/load_expression.cpp:126:read_node(): [DEBUG] in read_node: define_token_type return: VARIABLE
+
+source/load_expression.cpp:170:read_node(): [DEBUG] node has been succesfully created: VARIABLE
+
+source/load_expression.cpp:179:read_node(): [DEBUG] started processing left subtree
+
+source/load_expression.cpp:100:read_node(): [DEBUG] pos = 6
+
+source/load_expression.cpp:105:read_node(): [DEBUG] pos = 7
+
+source/load_expression.cpp:182:read_node(): [DEBUG] started processing right subtree
+
+source/load_expression.cpp:100:read_node(): [DEBUG] pos = 10
+
+source/load_expression.cpp:105:read_node(): [DEBUG] pos = 11
+
+source/load_expression.cpp:182:read_node(): [DEBUG] started processing right subtree
+
+source/load_expression.cpp:100:read_node(): [DEBUG] pos = 15
+
+source/load_expression.cpp:105:read_node(): [DEBUG] pos = 15
+
+source/load_expression.cpp:111:read_node(): [DEBUG] pos = 16
+
+source/load_expression.cpp:115:read_node(): [DEBUG] pos = 16
+
+source/load_expression.cpp:223:define_token_type(): [DEBUG] in define_token_type
+
+source/load_expression.cpp:224:define_token_type(): [DEBUG] pos = 16
+
+source/load_expression.cpp:233:define_token_type(): [DEBUG] get_token return: +
+
+source/node_values.cpp:81:check_for_variable(): [DEBUG] in check_for_variable with token: +
+
+source/node_values.cpp:94:check_for_variable(): [DEBUG] in check_for_variable returns: ROOT
+
+source/node_values.cpp:122:check_for_operator(): [DEBUG] in check_for_operator with token: +
+
+source/node_values.cpp:131:check_for_operator(): [DEBUG] in check_for_operator found: +
+
+source/node_values.cpp:134:check_for_operator(): [DEBUG] in check_for_operator returns: OPERATOR
+
+source/load_expression.cpp:255:define_token_type(): [DEBUG] token type was found: OPERATOR
+
+source/load_expression.cpp:126:read_node(): [DEBUG] in read_node: define_token_type return: OPERATOR
+
+source/load_expression.cpp:170:read_node(): [DEBUG] node has been succesfully created: OPERATOR
+
+source/load_expression.cpp:179:read_node(): [DEBUG] started processing left subtree
+
+source/load_expression.cpp:100:read_node(): [DEBUG] pos = 17
+
+source/load_expression.cpp:105:read_node(): [DEBUG] pos = 17
+
+source/load_expression.cpp:111:read_node(): [DEBUG] pos = 18
+
+source/load_expression.cpp:115:read_node(): [DEBUG] pos = 18
+
+source/load_expression.cpp:223:define_token_type(): [DEBUG] in define_token_type
+
+source/load_expression.cpp:224:define_token_type(): [DEBUG] pos = 18
+
+source/load_expression.cpp:233:define_token_type(): [DEBUG] get_token return: y
+
+source/node_values.cpp:81:check_for_variable(): [DEBUG] in check_for_variable with token: y
+
+source/node_values.cpp:90:check_for_variable(): [DEBUG] in check_for_variable found: y
+
+source/load_expression.cpp:255:define_token_type(): [DEBUG] token type was found: VARIABLE
+
+source/load_expression.cpp:126:read_node(): [DEBUG] in read_node: define_token_type return: VARIABLE
+
+source/load_expression.cpp:170:read_node(): [DEBUG] node has been succesfully created: VARIABLE
+
+source/load_expression.cpp:179:read_node(): [DEBUG] started processing left subtree
+
+source/load_expression.cpp:100:read_node(): [DEBUG] pos = 19
+
+source/load_expression.cpp:105:read_node(): [DEBUG] pos = 20
+
+source/load_expression.cpp:182:read_node(): [DEBUG] started processing right subtree
+
+source/load_expression.cpp:100:read_node(): [DEBUG] pos = 23
+
+source/load_expression.cpp:105:read_node(): [DEBUG] pos = 24
+
+source/load_expression.cpp:182:read_node(): [DEBUG] started processing right subtree
+
+source/load_expression.cpp:100:read_node(): [DEBUG] pos = 28
+
+source/load_expression.cpp:105:read_node(): [DEBUG] pos = 28
+
+source/load_expression.cpp:111:read_node(): [DEBUG] pos = 29
+
+source/load_expression.cpp:115:read_node(): [DEBUG] pos = 29
+
+source/load_expression.cpp:223:define_token_type(): [DEBUG] in define_token_type
+
+source/load_expression.cpp:224:define_token_type(): [DEBUG] pos = 29
+
+source/load_expression.cpp:233:define_token_type(): [DEBUG] get_token return: 6
+
+source/node_values.cpp:81:check_for_variable(): [DEBUG] in check_for_variable with token: 6
+
+source/node_values.cpp:94:check_for_variable(): [DEBUG] in check_for_variable returns: ROOT
+
+source/node_values.cpp:122:check_for_operator(): [DEBUG] in check_for_operator with token: 6
+
+source/node_values.cpp:134:check_for_operator(): [DEBUG] in check_for_operator returns: ROOT
+
+source/node_values.cpp:102:check_for_number(): [DEBUG] in check_for_number with token: 6
+
+source/node_values.cpp:112:check_for_number(): [DEBUG] in check_for_number found: 6
+
+source/node_values.cpp:114:check_for_number(): [DEBUG] in check_for_number returns: NUMBER
+
+source/load_expression.cpp:255:define_token_type(): [DEBUG] token type was found: NUMBER
+
+source/load_expression.cpp:126:read_node(): [DEBUG] in read_node: define_token_type return: NUMBER
+
+source/load_expression.cpp:170:read_node(): [DEBUG] node has been succesfully created: NUMBER
+
+source/load_expression.cpp:179:read_node(): [DEBUG] started processing left subtree
+
+source/load_expression.cpp:100:read_node(): [DEBUG] pos = 30
+
+source/load_expression.cpp:105:read_node(): [DEBUG] pos = 31
+
+source/load_expression.cpp:182:read_node(): [DEBUG] started processing right subtree
+
+source/load_expression.cpp:100:read_node(): [DEBUG] pos = 34
+
+source/load_expression.cpp:105:read_node(): [DEBUG] pos = 35
+
+source/load_expression.cpp:182:read_node(): [DEBUG] started processing right subtree
+
+source/load_expression.cpp:100:read_node(): [DEBUG] pos = 41
+
+source/load_expression.cpp:105:read_node(): [DEBUG] pos = 41
+
+source/load_expression.cpp:111:read_node(): [DEBUG] pos = 42
+
+source/load_expression.cpp:115:read_node(): [DEBUG] pos = 42
+
+source/load_expression.cpp:223:define_token_type(): [DEBUG] in define_token_type
+
+source/load_expression.cpp:224:define_token_type(): [DEBUG] pos = 42
+
+source/load_expression.cpp:233:define_token_type(): [DEBUG] get_token return: arccos
+
+source/node_values.cpp:81:check_for_variable(): [DEBUG] in check_for_variable with token: arccos
+
+source/node_values.cpp:94:check_for_variable(): [DEBUG] in check_for_variable returns: ROOT
+
+source/node_values.cpp:122:check_for_operator(): [DEBUG] in check_for_operator with token: arccos
+
+source/node_values.cpp:131:check_for_operator(): [DEBUG] in check_for_operator found: arccos
+
+source/node_values.cpp:134:check_for_operator(): [DEBUG] in check_for_operator returns: OPERATOR
+
+source/load_expression.cpp:255:define_token_type(): [DEBUG] token type was found: OPERATOR
+
+source/load_expression.cpp:126:read_node(): [DEBUG] in read_node: define_token_type return: OPERATOR
+
+source/load_expression.cpp:170:read_node(): [DEBUG] node has been succesfully created: OPERATOR
+
+source/load_expression.cpp:179:read_node(): [DEBUG] started processing left subtree
+
+source/load_expression.cpp:100:read_node(): [DEBUG] pos = 48
+
+source/load_expression.cpp:105:read_node(): [DEBUG] pos = 48
+
+source/load_expression.cpp:111:read_node(): [DEBUG] pos = 49
+
+source/load_expression.cpp:115:read_node(): [DEBUG] pos = 49
+
+source/load_expression.cpp:223:define_token_type(): [DEBUG] in define_token_type
+
+source/load_expression.cpp:224:define_token_type(): [DEBUG] pos = 49
+
+source/load_expression.cpp:233:define_token_type(): [DEBUG] get_token return: y
+
+source/node_values.cpp:81:check_for_variable(): [DEBUG] in check_for_variable with token: y
+
+source/node_values.cpp:90:check_for_variable(): [DEBUG] in check_for_variable found: y
+
+source/load_expression.cpp:255:define_token_type(): [DEBUG] token type was found: VARIABLE
+
+source/load_expression.cpp:126:read_node(): [DEBUG] in read_node: define_token_type return: VARIABLE
+
+source/load_expression.cpp:170:read_node(): [DEBUG] node has been succesfully created: VARIABLE
+
+source/load_expression.cpp:179:read_node(): [DEBUG] started processing left subtree
+
+source/load_expression.cpp:100:read_node(): [DEBUG] pos = 50
+
+source/load_expression.cpp:105:read_node(): [DEBUG] pos = 51
+
+source/load_expression.cpp:182:read_node(): [DEBUG] started processing right subtree
+
+source/load_expression.cpp:100:read_node(): [DEBUG] pos = 54
+
+source/load_expression.cpp:105:read_node(): [DEBUG] pos = 55
+
+source/load_expression.cpp:182:read_node(): [DEBUG] started processing right subtree
+
+source/load_expression.cpp:100:read_node(): [DEBUG] pos = 59
+
+source/load_expression.cpp:105:read_node(): [DEBUG] pos = 59
+
+source/load_expression.cpp:111:read_node(): [DEBUG] pos = 60
+
+source/load_expression.cpp:115:read_node(): [DEBUG] pos = 60
+
+source/load_expression.cpp:223:define_token_type(): [DEBUG] in define_token_type
+
+source/load_expression.cpp:224:define_token_type(): [DEBUG] pos = 60
+
+source/load_expression.cpp:233:define_token_type(): [DEBUG] get_token return: x
+
+source/node_values.cpp:81:check_for_variable(): [DEBUG] in check_for_variable with token: x
+
+source/node_values.cpp:90:check_for_variable(): [DEBUG] in check_for_variable found: x
+
+source/load_expression.cpp:255:define_token_type(): [DEBUG] token type was found: VARIABLE
+
+source/load_expression.cpp:126:read_node(): [DEBUG] in read_node: define_token_type return: VARIABLE
+
+source/load_expression.cpp:170:read_node(): [DEBUG] node has been succesfully created: VARIABLE
+
+source/load_expression.cpp:179:read_node(): [DEBUG] started processing left subtree
+
+source/load_expression.cpp:100:read_node(): [DEBUG] pos = 61
+
+source/load_expression.cpp:105:read_node(): [DEBUG] pos = 62
+
+source/load_expression.cpp:182:read_node(): [DEBUG] started processing right subtree
+
+source/load_expression.cpp:100:read_node(): [DEBUG] pos = 65
+
+source/load_expression.cpp:105:read_node(): [DEBUG] pos = 66
+
+source/load_expression.cpp:87:load_expression(): [DEBUG] root->value.root after loading: tree_size = 9
+
+main.cpp:24:main(): [DEBUG] root->value.root in main: tree_size = 9
+
+source/tree_operations.cpp:116:destroy_tree(): [DEBUG] root->value.root before destroy: tree_size = 9
+

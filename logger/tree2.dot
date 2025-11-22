@@ -1,0 +1,29 @@
+// Graphiz was called from source/tree_operations.cpp:117
+digraph TreeGraph {
+    rankdir=TB    bgcolor="#ffffff";
+    fontname="Consolas";
+    nodesep=0.6;
+    node [shape=record, style=filled, fontname="Consolas", margin=0.1, width=1.3, height=0.8];
+    edge [fontname="Consolas", arrowsize=0.8];
+
+
+    node_0x504000000010 [fillcolor = "#afdeedff", label="{ <t> ROOT | <v> tree_size = 9}"];
+    node_0x504000000050 [fillcolor = "#d460aeff", label="{ <t> OPERATOR | <v> *}"];
+    node_0x504000000090 [fillcolor = "#d460aeff", label="{ <t> OPERATOR | <v> *}"];
+    node_0x5040000000d0 [fillcolor = "#f7d598ff", label="{ <t> VARIABLE | <v> x | { <l> 0 | <r> 0}}"];
+    node_0x504000000110 [fillcolor = "#d460aeff", label="{ <t> OPERATOR | <v> +}"];
+    node_0x504000000150 [fillcolor = "#f7d598ff", label="{ <t> VARIABLE | <v> y | { <l> 0 | <r> 0}}"];
+    node_0x504000000190 [fillcolor = "#98f7aaff", label="{ <t> NUMBER | <v> 6.000000 | { <l> 0 | <r> 0}}"];
+    node_0x5040000001d0 [fillcolor = "#d460aeff", label="{ <t> OPERATOR | <v> arccos}"];
+    node_0x504000000210 [fillcolor = "#f7d598ff", label="{ <t> VARIABLE | <v> y | { <l> 0 | <r> 0}}"];
+    node_0x504000000250 [fillcolor = "#f7d598ff", label="{ <t> VARIABLE | <v> x | { <l> 0 | <r> 0}}"];
+    node_0x504000000010 -> node_0x504000000050 [color="#0e0246ff", penwidth=1];
+    node_0x504000000050 -> node_0x504000000090 [color="#0e0246ff", penwidth=1];
+    node_0x504000000050 -> node_0x5040000001d0 [color="#0e0246ff", penwidth=1];
+    node_0x504000000090 -> node_0x5040000000d0 [color="#0e0246ff", penwidth=1];
+    node_0x504000000090 -> node_0x504000000110 [color="#0e0246ff", penwidth=1];
+    node_0x504000000110 -> node_0x504000000150 [color="#0e0246ff", penwidth=1];
+    node_0x504000000110 -> node_0x504000000190 [color="#0e0246ff", penwidth=1];
+    node_0x5040000001d0 -> node_0x504000000210 [color="#0e0246ff", penwidth=1];
+    node_0x5040000001d0 -> node_0x504000000250 [color="#0e0246ff", penwidth=1];
+}

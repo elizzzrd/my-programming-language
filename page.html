@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Struct of data: trees</title>
+	<style>
+	body {
+		font-family: Consolas, monospace;
+		background-color: #f4f4f8;
+		margin: 0;
+		padding: 20px;
+		color: #333;
+	}
+	h1 {
+		text-align: center;
+		color: #222;
+		margin-bottom: 30px;
+	}
+	.container {
+	display: flex;
+flex-direction: column;
+align-items: center;
+gap: 20px;
+	}
+	.card {
+		background: #fff;
+		border-radius: 10px;
+		box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+		padding: 15px;
+		width: 100%;
+		max-width: 600px;
+		text-align: center;
+		transition: transform 0.2s ease-in-out;
+	}
+	.card:hover { transform: scale(1.02); }
+	img {
+		width: 100%;
+		height: auto;
+		max-height: 600px;
+		object-fit: contain;
+		background-color: #fafafa;
+		border: 1px solid #ddd;
+		border-radius: 6px;
+	}
+	p {
+		font-size: 14px;
+		color: #555;
+		margin: 10px 0;
+	}
+	</style>
+</head>
+<body>
+	<h1>Debug page</h1>
+	<div class="container">
+		<div class="card">
+			<p>Dump call: 1</p>
+			<img src="logger/graph1.png" alt="graph1">
+		</div>
+		<div class="card">
+			<p>Dump call: 2</p>
+			<img src="logger/graph2.png" alt="graph2">
+		</div>
+	</div>
+</body>
+</html>

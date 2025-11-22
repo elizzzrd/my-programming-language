@@ -1,0 +1,171 @@
+#include <stdio.h>
+#include <stdbool.h>
+#include <assert.h>
+#include <string.h>
+#include <stdlib.h>
+
+#include "tree_structure.h"
+#include "tree_operations.h"
+#include "errors.h"
+#include "utils.h"
+
+int graph_dump_count = 0;
+int graph_dump_count_node = 0;
+
+
+ErrorCode init_tree(Tree_t * tree)
+{
+    assert(tree);
+
+    Node_result_t root = create_node(tree, ROOT);
+    if (root.error != SUCCESS)
+        return root.error;  
+
+    tree->root = root.node;
+    tree -> tree_size = 1;
+
+    //GRAPH_DUMP(tree);
+    return SUCCESS;
+}
+
+Node_result_t create_node(Tree_t * tree, type_t type)
+{
+    assert(tree && (type >= ROOT || type <= NUMBER));
+    Node_result_t res = {.node = NULL, .error = SUCCESS};
+
+    Node_t * new_node = (Node_t *) calloc(1, sizeof(Node_t));
+    if (!new_node) 
+    {
+        ERROR_MESSAGE(TREE_MEMORY_ALLOCATION_ERROR, res.error); 
+        return res;
+    }
+    
+    new_node->type = type;
+    new_node->value = {};
+    new_node->left = NULL;
+    new_node->right = NULL;
+    new_node->prev = NULL;
+
+    //GRAPH_DUMP_NODE(new_node);
+    res.error = SUCCESS; res.node = new_node;
+    return res;
+}
+
+
+Node_result_t create_operator_node(Tree_t * tree, operator_t op)
+{
+    assert(tree);
+    
+    Node_result_t res = create_node(tree, OPERATOR);
+    if (res.error != SUCCESS)
+        return res;
+    
+    res.node->value.op = op;
+    GRAPH_DUMP_NODE(res.node);    
+    return res;
+}
+
+Node_result_t create_number_node(Tree_t * tree, double number)
+{
+    assert(tree);
+
+    Node_result_t res = create_node(tree, NUMBER);
+    if (res.error != SUCCESS)
+        return res;
+    
+    res.node->value.number = number;
+    GRAPH_DUMP_NODE(res.node); 
+    return res;
+}
+
+Node_result_t create_variable_node(Tree_t * tree, int var_index)
+{
+    assert(tree);
+
+    Node_result_t res = create_node(tree, VARIABLE);
+    if (res.error != SUCCESS)
+        return res;
+    
+    res.node->value.var_index = var_index;
+    GRAPH_DUMP_NODE(res.node); 
+    return res;
+}
+
+
+void destroy_node(Node_t * node) 
+{
+    assert(node);
+
+    if (node->left)     destroy_node(node->left);
+    if (node->right)    destroy_node(node->right);
+    
+    node->left = NULL;
+    node->right = NULL;
+    node->prev = NULL;  
+
+    if (node->type == ROOT && node->value.root)
+        free(node->value.root);
+
+    free(node);
+    return;
+}
+
+void destroy_tree(Tree_t * tree)
+{
+    assert(tree);
+    DEBUG_PRINT("[DEBUG] root->value.root before destroy: %s\n", tree->root->value.root);
+    GRAPH_DUMP(tree);
+
+    
+    destroy_node(tree->root);
+    tree->tree_size = 0;
+    return;
+}
+
+ErrorCode build_parent_links(Tree_t * tree)
+{
+    assert(tree);
+    ErrorCode error = SUCCESS;
+    
+    if (!tree->root)
+    {
+        return TREE_EMPTY_TREE;
+    }
+    
+    tree->root->prev = NULL;
+    error = build_parent_links_recursive(tree->root, tree);
+    if (error != SUCCESS)
+        return error;
+    
+    char tree_size[40] = {};   
+    sprintf(tree_size, "tree_size = %d", (tree->tree_size) - 1);
+    tree->root->value.root = strdup(tree_size);
+
+    return SUCCESS;
+}
+
+ErrorCode build_parent_links_recursive(Node_t * node, Tree_t * tree)
+{
+    if (!node)
+        return SUCCESS;
+    
+    if (node->left)
+    {
+        node->left->prev = node;
+        ErrorCode error = build_parent_links_recursive(node->left, tree);
+        if (error != SUCCESS)
+            return error;
+    }
+    
+    if (node->right)
+    {
+        node->right->prev = node;
+        ErrorCode error = build_parent_links_recursive(node->right, tree);
+        if (error != SUCCESS)
+            return error;
+    }
+    
+    return SUCCESS;
+}
+
+
