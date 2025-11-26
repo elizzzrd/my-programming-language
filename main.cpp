@@ -11,8 +11,13 @@
 int main(void)
 {
     Tree_t tree = {};
-    init_tree(&tree);
     ErrorCode error = SUCCESS;
+    error = init_tree(&tree);
+    if (error != SUCCESS)
+    {
+        destroy_tree(&tree);
+        return 1;
+    }
 
     error = load_expression(&tree, EXPRESSION_INPUT);
     if (error != SUCCESS)
@@ -21,7 +26,6 @@ int main(void)
         return 1;
     }
 
-    DEBUG_PRINT("[DEBUG] root->value.root in main: %s\n", tree.root->value.root);    
     destroy_tree(&tree);
     make_html();
     printf("Programm is finished\n");

@@ -34,7 +34,6 @@ typedef enum
     OP_TANH,
     OP_CTGH,
 
-    OP_LOG,
     OP_EXP,
     OP_LN,
 

@@ -25,9 +25,10 @@ const char * tree_error_string(ErrorCode error)
         "Error during loading expression",              // [9] LOADING_EXPRESSION_ERROR
         "Error during saving expression to latex",      // [10] SAVING_LATEX_ERROR
         "Graph_dump failed"                             // [11] GRAPH_DUMP_ERROR
+        "Error during differentiation"                 // [12] DIFFERENTIATION_ERROR    
     };
     
-    if (error < SUCCESS || error > GRAPH_DUMP_ERROR) 
+    if (error < SUCCESS || error > DIFFERENTIATION_ERROR) 
         return "Unknown error";
     
     return tree_error_strings[error];
@@ -138,6 +139,66 @@ ErrorCode tree_graph_dump(Tree_t * tree, const char * filename_dot, const char *
 
     return error;
 }
+
+
+ErrorCode tree_graph_dump_diff(Tree_t * source_tree, Tree_t * diff_tree, const char * filename_dot, const char * filename_png, const char * file_called, int line_called)
+{
+    assert(filename_dot && filename_png && source_tree && diff_tree); ;
+
+    ErrorCode error = SUCCESS;
+    
+    FILE * dot_fp = fopen(filename_dot, "w");
+    if (!dot_fp)
+    {
+        ERROR_MESSAGE(OPENING_FILE_ERROR, error);
+        return error;
+    }
+
+    fprintf(dot_fp, "// Graphiz was called from %s:%d\n", file_called, line_called);
+    fprintf(dot_fp,
+        "digraph DiffTreeGraph {\n"
+        "    bgcolor=\"#ffffff\";\n"
+        "    fontname=\"Consolas\";\n"
+        "    nodesep=0.6;\n"
+        "    node [shape=record, style=filled, fontname=\"Consolas\", margin=0.1, width=1.3, height=0.8];\n"
+        "    edge [fontname=\"Consolas\", arrowsize=0.8];\n\n");
+    fprintf(dot_fp, "\n");
+
+    fprintf(dot_fp, "subgraph cluster_source_tree {\n");
+    fprintf(dot_fp, "label = \"Source Tree\";\n");
+    if (source_tree -> root)
+    {
+        tree_graph_dump_nodes(dot_fp, source_tree->root);
+        tree_graph_dump_edges(dot_fp, source_tree->root);
+    }
+    fprintf(dot_fp, "}\n");
+
+
+    fprintf(dot_fp, "subgraph cluster_diff_tree {\n");
+    fprintf(dot_fp, "label = \"Derivative Tree\";\n");
+    if (diff_tree -> root)
+    {
+        tree_graph_dump_nodes(dot_fp, source_tree->root);
+        tree_graph_dump_edges(dot_fp, source_tree->root);
+    }
+    fprintf(dot_fp, "}\n");
+
+    fclose(dot_fp);
+
+    char cmd[512];
+    snprintf(cmd, sizeof(cmd), "dot -Tpng \"%s\" -o \"%s\"", filename_dot, filename_png);
+    int ret = system(cmd);
+    if (ret != 0) 
+    {
+        ERROR_MESSAGE(GRAPH_DUMP_ERROR, error);
+        return error;
+    }
+
+    return error;
+}
+
+
+
 
 void define_node_type_for_dump(type_t type, const char ** fillcolor, const char ** value_str, const Node_t * node)
 {

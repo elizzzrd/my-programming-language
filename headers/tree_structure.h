@@ -1,5 +1,6 @@
 #pragma once
 
+#include <stdbool.h>
 #include "node_values.h"
 
 typedef enum 
@@ -18,6 +19,7 @@ typedef enum
     LOADING_EXPRESSION_ERROR,
     SAVING_LATEX_ERROR,
     GRAPH_DUMP_ERROR,
+    DIFFERENTIATION_ERROR
 } ErrorCode;
 
 
@@ -27,6 +29,8 @@ typedef struct treenode
     type_t type;
     
     value_t value;
+
+    bool is_unary;
 
     struct treenode * left; 
     struct treenode * right;

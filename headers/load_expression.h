@@ -7,7 +7,6 @@
 typedef token_res (*check_func_t)(const char * token);
     
 
-Node_result_t fill_new_node(char * new_object, char * new_question, Node_t * current, Tree_t * tree);
 
 Node_t * find_node_by_name(Node_t * node, const char * target, int * count);
 Node_result_t seek_item(const char * data, const Tree_t * tree,  int * count);

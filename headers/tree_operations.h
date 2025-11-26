@@ -5,6 +5,7 @@
 
 
 ErrorCode init_tree(Tree_t * tree);
+Node_t * copy_subtree(Node_t * node, Tree_t * tree);
 
 Node_result_t create_node(Tree_t * tree, type_t type);
 Node_result_t create_operator_node(Tree_t * tree, operator_t op);

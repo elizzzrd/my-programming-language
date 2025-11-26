@@ -176,11 +176,18 @@ Node_t * read_node(char * buffer, size_t * pos, Tree_t * tree)
             return NULL;
         }
 
-        DEBUG_PRINT("[DEBUG] started processing left subtree\n");
-        current.node->left = read_node(buffer, pos, tree);
-
-        DEBUG_PRINT("[DEBUG] started processing right subtree\n");
-        current.node->right = read_node(buffer, pos, tree);
+        if (current.node->is_unary)
+        {
+            current.node->left = read_node(buffer, pos, tree);
+            current.node->right = NULL;
+        }
+        else
+        {
+            DEBUG_PRINT("[DEBUG] started processing left subtree\n");
+            current.node->left = read_node(buffer, pos, tree);
+            DEBUG_PRINT("[DEBUG] started processing right subtree\n");
+            current.node->right = read_node(buffer, pos, tree);
+        }
         
         while (isspace(buffer[*pos]))                             // пробелы перед закрывающей скобкой
             (*pos)++;

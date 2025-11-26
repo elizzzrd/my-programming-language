@@ -16,11 +16,8 @@
             fclose(dbg_fp);                                                 \
         }                                                                   \
     } while (0)
-
 #else
-
-#define DEBUG_PRINT(fmt, ...) do {} while(0)
-
+#define DEBUG_PRINT(fmt, ...)  
 #endif
 
 

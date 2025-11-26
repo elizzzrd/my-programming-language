@@ -4,6 +4,7 @@
 #include <string.h>
 #include <stdlib.h>
 
+#define DEBUG
 #include "tree_structure.h"
 #include "tree_operations.h"
 #include "errors.h"
@@ -11,6 +12,7 @@
 
 int graph_dump_count = 0;
 int graph_dump_count_node = 0;
+int graph_dump_diff = 0;
 
 
 ErrorCode init_tree(Tree_t * tree)
@@ -61,6 +63,8 @@ Node_result_t create_operator_node(Tree_t * tree, operator_t op)
         return res;
     
     res.node->value.op = op;
+    if ((res.node->is_unary = is_unary_operator(op)))
+        res.node->right = NULL;
     GRAPH_DUMP_NODE(res.node);    
     return res;
 }
@@ -169,3 +173,43 @@ ErrorCode build_parent_links_recursive(Node_t * node, Tree_t * tree)
 }
 
 
+
+Node_t * copy_subtree(Node_t * node, Tree_t * tree)
+{
+    assert(tree);
+    if (!node) return NULL;
+
+    type_t type = node ->type;
+    Node_result_t new_node = {};
+
+    switch (type)
+    {
+        case NUMBER: 
+        {   
+            new_node = create_number_node(tree, node -> value.number);
+            break;
+        }
+        case VARIABLE:
+        {
+            new_node = create_variable_node(tree, node ->value.var_index);
+            break;
+        }
+        case OPERATOR:
+        {
+            new_node = create_operator_node(tree, node -> value.op);
+            new_node.node -> left  = copy_subtree(node -> left, tree);
+            new_node.node -> right = copy_subtree(node -> right, tree);
+            break;
+        }
+        default:
+        {
+            ERROR_MESSAGE(TREE_INVALID_NODE_TYPE, new_node.error);
+            return NULL;
+        }
+    }
+
+    if (new_node.error != SUCCESS)
+        return NULL;
+
+    return new_node.node;
+}
