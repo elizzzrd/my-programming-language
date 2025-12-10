@@ -41,15 +41,16 @@ int main(void)
     }
     GRAPH_DUMP(&tree);
     
-    
-    // error = load_expression_prefix(&tree, EXPRESSION_INPUT);
-    // if (error != SUCCESS)
-    // {
-    //     destroy_tree(&tree);
-    //     return 1;
-    // }
-        
-        
+    TokenList token_list = {};
+    DEBUG_PRINT("[INFO] LEXICAL_ANALYSIS START");
+    error = lexicalAnalysis(&token_list);
+    if (error != SUCCESS)
+    {
+        DEBUG_PRINT("error during lexical analysis");
+    }
+    else
+        lexer_dump(&token_list);
+    destroy_tokens(&token_list);
         
     DEBUG_PRINT("expression has been loaded successfully\n");
     /*

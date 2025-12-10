@@ -17,75 +17,32 @@ source/frontend/build_tree.cpp:630:GetNumber(): Node with number was created
 source/frontend/build_tree.cpp:137:GetProgram(): all expression was parsed in tree
 source/common/errors.cpp:111:tree_graph_dump(): Starting graph dump to logger/tree1.dot and logger/graph_tree1.png
 
-source/common/errors.cpp:57:tree_graph_dump_nodes(): in graph_dump: type = ROOT
-source/common/errors.cpp:61:tree_graph_dump_nodes(): define_node_type_for_dump: type = ROOT, value_str = tree_size = 0
-source/common/errors.cpp:77:tree_graph_dump_nodes(): node with type ROOT drawn
-source/common/errors.cpp:57:tree_graph_dump_nodes(): in graph_dump: type = STATEMENT
-source/common/errors.cpp:61:tree_graph_dump_nodes(): define_node_type_for_dump: type = STATEMENT, value_str = op_end
-source/common/errors.cpp:77:tree_graph_dump_nodes(): node with type STATEMENT drawn
-source/common/errors.cpp:57:tree_graph_dump_nodes(): in graph_dump: type = STATEMENT
-source/common/errors.cpp:61:tree_graph_dump_nodes(): define_node_type_for_dump: type = STATEMENT, value_str = assignment
-source/common/errors.cpp:77:tree_graph_dump_nodes(): node with type STATEMENT drawn
-source/common/errors.cpp:57:tree_graph_dump_nodes(): in graph_dump: type = IDENTIFIER
-source/common/errors.cpp:61:tree_graph_dump_nodes(): define_node_type_for_dump: type = IDENTIFIER, value_str = x
-source/common/errors.cpp:77:tree_graph_dump_nodes(): node with type IDENTIFIER drawn
-source/common/errors.cpp:57:tree_graph_dump_nodes(): in graph_dump: type = OPERATOR
-source/common/errors.cpp:61:tree_graph_dump_nodes(): define_node_type_for_dump: type = OPERATOR, value_str = *
-source/common/errors.cpp:77:tree_graph_dump_nodes(): node with type OPERATOR drawn
-source/common/errors.cpp:57:tree_graph_dump_nodes(): in graph_dump: type = IDENTIFIER
-source/common/errors.cpp:61:tree_graph_dump_nodes(): define_node_type_for_dump: type = IDENTIFIER, value_str = x
-source/common/errors.cpp:77:tree_graph_dump_nodes(): node with type IDENTIFIER drawn
-source/common/errors.cpp:57:tree_graph_dump_nodes(): in graph_dump: type = NUMBER
-source/common/errors.cpp:61:tree_graph_dump_nodes(): define_node_type_for_dump: type = NUMBER, value_str = 2
-source/common/errors.cpp:77:tree_graph_dump_nodes(): node with type NUMBER drawn
-source/common/errors.cpp:57:tree_graph_dump_nodes(): in graph_dump: type = OPERATOR
-source/common/errors.cpp:61:tree_graph_dump_nodes(): define_node_type_for_dump: type = OPERATOR, value_str = +
-source/common/errors.cpp:77:tree_graph_dump_nodes(): node with type OPERATOR drawn
-source/common/errors.cpp:57:tree_graph_dump_nodes(): in graph_dump: type = NUMBER
-source/common/errors.cpp:61:tree_graph_dump_nodes(): define_node_type_for_dump: type = NUMBER, value_str = 1
-source/common/errors.cpp:77:tree_graph_dump_nodes(): node with type NUMBER drawn
-source/common/errors.cpp:57:tree_graph_dump_nodes(): in graph_dump: type = NUMBER
-source/common/errors.cpp:61:tree_graph_dump_nodes(): define_node_type_for_dump: type = NUMBER, value_str = 2
-source/common/errors.cpp:77:tree_graph_dump_nodes(): node with type NUMBER drawn
 source/common/errors.cpp:155:tree_graph_dump(): Graph dump completed: logger/tree1.dot and logger/graph_tree1.png have been created
 
-main.cpp:54:main(): expression has been loaded successfully
+main.cpp:45:main(): [INFO] LEXICAL_ANALYSIS START
+source/frontend/lexer.cpp:131:lexicalAnalysis(): buffer: x = x * 2;
+1 + 2;$
+source/frontend/lexer.cpp:284:lexer_dump(): [LEXER DUMP]
+source/frontend/lexer.cpp:285:lexer_dump(): token_list.count = 12, token_list->capacity = 16
+source/frontend/lexer.cpp:288:lexer_dump(): token_0, TOK_IDENTIFIER, 0, x
+source/frontend/lexer.cpp:288:lexer_dump(): token_1, TOK_ASSIGN, 0, =
+source/frontend/lexer.cpp:288:lexer_dump(): token_2, TOK_IDENTIFIER, 0, x
+source/frontend/lexer.cpp:288:lexer_dump(): token_3, TOK_MULTIPLY, 0, *
+source/frontend/lexer.cpp:288:lexer_dump(): token_4, TOK_NUMBER, 2, 2
+source/frontend/lexer.cpp:288:lexer_dump(): token_5, TOK_SEMICOLON, 0, ;
+source/frontend/lexer.cpp:288:lexer_dump(): token_6, TOK_NUMBER, 1, 1
+source/frontend/lexer.cpp:288:lexer_dump(): token_7, TOK_PLUS, 0, +
+source/frontend/lexer.cpp:288:lexer_dump(): token_8, TOK_NUMBER, 2, 2
+source/frontend/lexer.cpp:288:lexer_dump(): token_9, TOK_SEMICOLON, 0, ;
+source/frontend/lexer.cpp:288:lexer_dump(): token_10, TOK_END, 0, $
+source/frontend/lexer.cpp:288:lexer_dump(): token_11, TOK_EOF, 0, 
+main.cpp:55:main(): expression has been loaded successfully
 
-main.cpp:87:main(): Everything is good before deletion
+main.cpp:88:main(): Everything is good before deletion
 source/common/tree_operations.cpp:159:destroy_tree(): [DEBUG] root->value.root before destroy: tree_size = 0
 
 source/common/errors.cpp:111:tree_graph_dump(): Starting graph dump to logger/tree2.dot and logger/graph_tree2.png
 
-source/common/errors.cpp:57:tree_graph_dump_nodes(): in graph_dump: type = ROOT
-source/common/errors.cpp:61:tree_graph_dump_nodes(): define_node_type_for_dump: type = ROOT, value_str = tree_size = 0
-source/common/errors.cpp:77:tree_graph_dump_nodes(): node with type ROOT drawn
-source/common/errors.cpp:57:tree_graph_dump_nodes(): in graph_dump: type = STATEMENT
-source/common/errors.cpp:61:tree_graph_dump_nodes(): define_node_type_for_dump: type = STATEMENT, value_str = op_end
-source/common/errors.cpp:77:tree_graph_dump_nodes(): node with type STATEMENT drawn
-source/common/errors.cpp:57:tree_graph_dump_nodes(): in graph_dump: type = STATEMENT
-source/common/errors.cpp:61:tree_graph_dump_nodes(): define_node_type_for_dump: type = STATEMENT, value_str = assignment
-source/common/errors.cpp:77:tree_graph_dump_nodes(): node with type STATEMENT drawn
-source/common/errors.cpp:57:tree_graph_dump_nodes(): in graph_dump: type = IDENTIFIER
-source/common/errors.cpp:61:tree_graph_dump_nodes(): define_node_type_for_dump: type = IDENTIFIER, value_str = x
-source/common/errors.cpp:77:tree_graph_dump_nodes(): node with type IDENTIFIER drawn
-source/common/errors.cpp:57:tree_graph_dump_nodes(): in graph_dump: type = OPERATOR
-source/common/errors.cpp:61:tree_graph_dump_nodes(): define_node_type_for_dump: type = OPERATOR, value_str = *
-source/common/errors.cpp:77:tree_graph_dump_nodes(): node with type OPERATOR drawn
-source/common/errors.cpp:57:tree_graph_dump_nodes(): in graph_dump: type = IDENTIFIER
-source/common/errors.cpp:61:tree_graph_dump_nodes(): define_node_type_for_dump: type = IDENTIFIER, value_str = x
-source/common/errors.cpp:77:tree_graph_dump_nodes(): node with type IDENTIFIER drawn
-source/common/errors.cpp:57:tree_graph_dump_nodes(): in graph_dump: type = NUMBER
-source/common/errors.cpp:61:tree_graph_dump_nodes(): define_node_type_for_dump: type = NUMBER, value_str = 2
-source/common/errors.cpp:77:tree_graph_dump_nodes(): node with type NUMBER drawn
-source/common/errors.cpp:57:tree_graph_dump_nodes(): in graph_dump: type = OPERATOR
-source/common/errors.cpp:61:tree_graph_dump_nodes(): define_node_type_for_dump: type = OPERATOR, value_str = +
-source/common/errors.cpp:77:tree_graph_dump_nodes(): node with type OPERATOR drawn
-source/common/errors.cpp:57:tree_graph_dump_nodes(): in graph_dump: type = NUMBER
-source/common/errors.cpp:61:tree_graph_dump_nodes(): define_node_type_for_dump: type = NUMBER, value_str = 1
-source/common/errors.cpp:77:tree_graph_dump_nodes(): node with type NUMBER drawn
-source/common/errors.cpp:57:tree_graph_dump_nodes(): in graph_dump: type = NUMBER
-source/common/errors.cpp:61:tree_graph_dump_nodes(): define_node_type_for_dump: type = NUMBER, value_str = 2
-source/common/errors.cpp:77:tree_graph_dump_nodes(): node with type NUMBER drawn
 source/common/errors.cpp:155:tree_graph_dump(): Graph dump completed: logger/tree2.dot and logger/graph_tree2.png have been created
 
 source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000050, type=IDENTIFIER
@@ -98,4 +55,4 @@ source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x50400000
 source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000210, type=OPERATOR
 source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000250, type=STATEMENT
 source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000010, type=ROOT
-main.cpp:92:main(): tree deleted succefully
+main.cpp:93:main(): tree deleted succefully

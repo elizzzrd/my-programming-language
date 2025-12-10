@@ -54,11 +54,11 @@ void tree_graph_dump_nodes(FILE * dot_fp, const Node_t * node)
         type_str = "UNKNOWN";
     }
 
-    DEBUG_PRINT("in graph_dump: type = %s", type_str);
+    //DEBUG_PRINT("in graph_dump: type = %s", type_str);
     define_node_type_for_dump(type, &fillcolor, &value_str, (const Node_t *)node);
     if (!fillcolor) fillcolor = "#ffffff";
     if (!value_str) value_str = "NULL";
-    DEBUG_PRINT("define_node_type_for_dump: type = %s, value_str = %s", type_str, value_str);
+    //DEBUG_PRINT("define_node_type_for_dump: type = %s, value_str = %s", type_str, value_str);
 
 
     if (node->left == NULL && node->right == NULL && type != STRING)
@@ -74,7 +74,7 @@ void tree_graph_dump_nodes(FILE * dot_fp, const Node_t * node)
         "    node_%p [fillcolor = \"%s\", label=\"{ <t> %s | <v> %s}\"];\n", 
         (const void*)node, fillcolor, type_str, value_str);
     
-    DEBUG_PRINT("node with type %s drawn", type_str);
+    //DEBUG_PRINT("node with type %s drawn", type_str);
 
     if (node -> left)
         tree_graph_dump_nodes(dot_fp, node -> left);
