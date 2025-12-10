@@ -5,6 +5,8 @@
 
 #include "tree_structure.h"
 #include "errors.h"
+#include "lexer.h"
+#include "utils.h"
 
 #define HTML_FILE "page.html"
 
@@ -24,8 +26,8 @@ const char * tree_error_string(ErrorCode error)
         "Can not open the file",                        // [8] OPENING_FILE_ERROR
         "Error during loading expression",              // [9] LOADING_EXPRESSION_ERROR
         "Error during saving expression to latex",      // [10] SAVING_LATEX_ERROR
-        "Graph_dump failed"                             // [11] GRAPH_DUMP_ERROR
-        "Error during differentiation"                 // [12] DIFFERENTIATION_ERROR    
+        "Graph_dump failed",                            // [11] GRAPH_DUMP_ERROR
+        "Error during differentiation"                  // [12] DIFFERENTIATION_ERROR    
     };
     
     if (error < SUCCESS || error > DIFFERENTIATION_ERROR) 
@@ -46,22 +48,33 @@ void tree_graph_dump_nodes(FILE * dot_fp, const Node_t * node)
     const char * value_str = NULL;
     const char * type_str = get_string_type(type);
 
-    define_node_type_for_dump(type, &fillcolor, &value_str, (const Node_t *)node);
-        
+    if (!type_str) 
+    {
+        DEBUG_PRINT("WARNING: Unknown node type: %d\n", type);
+        type_str = "UNKNOWN";
+    }
 
-    if (node->left == NULL && node->right == NULL)
+    DEBUG_PRINT("in graph_dump: type = %s", type_str);
+    define_node_type_for_dump(type, &fillcolor, &value_str, (const Node_t *)node);
+    if (!fillcolor) fillcolor = "#ffffff";
+    if (!value_str) value_str = "NULL";
+    DEBUG_PRINT("define_node_type_for_dump: type = %s, value_str = %s", type_str, value_str);
+
+
+    if (node->left == NULL && node->right == NULL && type != STRING)
         fprintf(dot_fp, 
         "    node_%p [fillcolor = \"%s\", label=\"{ <t> %s | <v> %s | { <l> %s | <r> %s}}\"];\n", 
         (const void*)node, fillcolor, type_str, value_str, "0", "0");
     else if (type == ROOT)
         fprintf(dot_fp, 
-        "    node_%p [fillcolor = \"%s\", label=\"{ <t> %s | <v> %s}\"];\n", 
-        (const void*)node, fillcolor, type_str, value_str);
+        "    node_%p [fillcolor = \"%s\", label=\"{ <t> %s }\"];\n", 
+        (const void*)node, fillcolor, get_statement_name(OP_PROGRAM));
     else
         fprintf(dot_fp, 
         "    node_%p [fillcolor = \"%s\", label=\"{ <t> %s | <v> %s}\"];\n", 
         (const void*)node, fillcolor, type_str, value_str);
     
+    DEBUG_PRINT("node with type %s drawn", type_str);
 
     if (node -> left)
         tree_graph_dump_nodes(dot_fp, node -> left);
@@ -95,6 +108,8 @@ ErrorCode tree_graph_dump(Tree_t * tree, const char * filename_dot, const char *
 {
     assert(filename_dot && filename_png && tree); ;
 
+    DEBUG_PRINT("Starting graph dump to %s and %s\n", filename_dot, filename_png);
+
     ErrorCode error = SUCCESS;
     if (!tree)
     {
@@ -111,7 +126,7 @@ ErrorCode tree_graph_dump(Tree_t * tree, const char * filename_dot, const char *
     fprintf(dot_fp, "// Graphiz was called from %s:%d\n", file_called, line_called);
     fprintf(dot_fp,
         "digraph TreeGraph {\n"
-        "    rankdir=TB"
+        "    rankdir=TB;"
         "    bgcolor=\"#ffffff\";\n"
         "    fontname=\"Consolas\";\n"
         "    nodesep=0.6;\n"
@@ -137,6 +152,8 @@ ErrorCode tree_graph_dump(Tree_t * tree, const char * filename_dot, const char *
         return error;
     }
 
+    DEBUG_PRINT("Graph dump completed: %s and %s have been created\n", filename_dot, filename_png);
+
     return error;
 }
 
@@ -144,6 +161,8 @@ ErrorCode tree_graph_dump(Tree_t * tree, const char * filename_dot, const char *
 ErrorCode tree_graph_dump_diff(Tree_t * source_tree, Tree_t * diff_tree, const char * filename_dot, const char * filename_png, const char * file_called, int line_called)
 {
     assert(filename_dot && filename_png && source_tree && diff_tree); ;
+
+    DEBUG_PRINT("Starting graph dump of source and diff trees to %s and %s\n", filename_dot, filename_png);
 
     ErrorCode error = SUCCESS;
     
@@ -178,10 +197,12 @@ ErrorCode tree_graph_dump_diff(Tree_t * source_tree, Tree_t * diff_tree, const c
     fprintf(dot_fp, "label = \"Derivative Tree\";\n");
     if (diff_tree -> root)
     {
-        tree_graph_dump_nodes(dot_fp, source_tree->root);
-        tree_graph_dump_edges(dot_fp, source_tree->root);
+        tree_graph_dump_nodes(dot_fp, diff_tree->root);
+        tree_graph_dump_edges(dot_fp, diff_tree->root);
     }
     fprintf(dot_fp, "}\n");
+    fprintf(dot_fp, "}\n");
+
 
     fclose(dot_fp);
 
@@ -194,6 +215,8 @@ ErrorCode tree_graph_dump_diff(Tree_t * source_tree, Tree_t * diff_tree, const c
         return error;
     }
 
+    DEBUG_PRINT("Graph dump of source and diff trees completed: %s and %s have been created\n", filename_dot, filename_png);
+
     return error;
 }
 
@@ -203,6 +226,8 @@ ErrorCode tree_graph_dump_diff(Tree_t * source_tree, Tree_t * diff_tree, const c
 void define_node_type_for_dump(type_t type, const char ** fillcolor, const char ** value_str, const Node_t * node)
 {
     assert(fillcolor && value_str && node);
+    *fillcolor = "#ffffff";
+    *value_str = "ERROR";
 
     switch (type)
     {
@@ -212,29 +237,46 @@ void define_node_type_for_dump(type_t type, const char ** fillcolor, const char 
             *value_str = get_string_operator(node->value.op);
             break;
         }
-        case VARIABLE:
+        case IDENTIFIER:
         {
             *fillcolor = "#f7d598ff";
-            *value_str = get_var_name(node->value.var_index);
+            *value_str = get_id_name(node->value.id_index);
             break;
         }
         case NUMBER:
         {
-            *fillcolor = "#98f7aaff";
-            char buffer[64] = {};
-            sprintf(buffer, "%lf", node->value.number);
-            *value_str = buffer;
+             *fillcolor = "#98f7aaff";
+
+            static char buf[64];  
+
+            snprintf(buf, sizeof(buf), "%g", node->value.number);
+            *value_str = buf;
             break;
         }
         case ROOT:
         {
             *fillcolor = "#afdeedff";
-            *value_str = node->value.root;
+            *value_str = node->value.root ? node->value.root : "ROOT_NULL";
+            break;
+        }
+        case STATEMENT:
+        {
+            *fillcolor = "#d29bdaff";
+            *value_str = get_statement_name(node->value.stmt);
+            break;
+        }
+        case STRING:
+        {
+            *fillcolor = "#f7d598ff";
+            *value_str = node->value.string_value ? node->value.string_value : "STRING_NULL";
             break;
         }
         default:
         {
             *fillcolor = "#fefcfcff";
+            DEBUG_PRINT("WARNING: Unknown node type in define_node_type_for_dump: %d\n", type);
+            *fillcolor = "#fefcfcff";
+            *value_str = "UNKNOWN_TYPE";
             break;
         }
     }
@@ -296,6 +338,7 @@ ErrorCode graph_dump_node(const Node_t * node, const char * filename_dot, const 
         ERROR_MESSAGE(GRAPH_DUMP_ERROR, error);
         return error;
     }
+
 
     return error;
 }

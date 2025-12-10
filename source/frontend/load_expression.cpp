@@ -10,6 +10,7 @@
 #include "utils.h"
 #include "errors.h"
 
+
 /*
 void savenode(Node_t * node, FILE * file_ptr)
 {
@@ -51,7 +52,24 @@ ErrorCode save_database(Tree_t * tree)
 }
 */
 
-ErrorCode load_expression(Tree_t * tree, const char * filename)
+// ErrorCode load_expression(Tree_t * tree, const char * filename)
+// {
+//     assert(filename);
+
+//     ErrorCode error = SUCCESS;
+
+//     char * buffer = NULL;
+//     error = load_to_buffer(EXPRESSION_INPUT, &buffer);
+//     if (error != SUCCESS)
+//         return error;
+
+//     int result = GetG(&s);
+//     printf("Result: %d\n", result);
+
+
+
+
+ErrorCode load_expression_prefix(Tree_t * tree, const char * filename)
 {
     assert(tree && filename);
 
@@ -97,23 +115,15 @@ Node_t * read_node(char * buffer, size_t * pos, Tree_t * tree)
     assert(buffer && pos && tree);
     ErrorCode error = SUCCESS;
     
-    DEBUG_PRINT("[DEBUG] pos = %lu\n", *pos);
-
     while (isspace(buffer[*pos])) 
         (*pos)++;
-
-    DEBUG_PRINT("[DEBUG] pos = %lu\n", *pos);    
-    
+        
     if (buffer[*pos] == '(') 
     {
         (*pos)++;     
-                                                      // пропускаем '('
-        DEBUG_PRINT("[DEBUG] pos = %lu\n", *pos);
-
+                                                                    // пропускаем '('
         while (isspace(buffer[*pos])) (*pos)++;                     // пропускаем пробелы после '('
                                         
-        DEBUG_PRINT("[DEBUG] pos = %lu\n", *pos);
-
         token_res token = define_token_type(buffer, pos);
         if (token.type == ROOT)
         {
@@ -123,14 +133,12 @@ Node_t * read_node(char * buffer, size_t * pos, Tree_t * tree)
         
         type_t type = token.type;
 
-        DEBUG_PRINT("[DEBUG] in read_node: define_token_type return: %s\n", get_string_type(type));
-
         Node_result_t current = {.node = NULL, .error = SUCCESS};
         switch (type)
         {
-            case VARIABLE:  
+            case IDENTIFIER:  
             {
-                current = create_variable_node(tree, token.value.var_index);
+                current = create_identifier_node(tree, token.value.id_index);
                 if (current.error != SUCCESS)
                 {
                     ERROR_MESSAGE(TREE_CREATING_NODE_ERROR, error);
@@ -183,9 +191,7 @@ Node_t * read_node(char * buffer, size_t * pos, Tree_t * tree)
         }
         else
         {
-            DEBUG_PRINT("[DEBUG] started processing left subtree\n");
             current.node->left = read_node(buffer, pos, tree);
-            DEBUG_PRINT("[DEBUG] started processing right subtree\n");
             current.node->right = read_node(buffer, pos, tree);
         }
         
@@ -227,9 +233,6 @@ token_res define_token_type(char * buffer, size_t * pos)
 {
     assert(buffer && pos);
 
-    DEBUG_PRINT("[DEBUG] in define_token_type\n");
-    DEBUG_PRINT("[DEBUG] pos = %lu\n", *pos);
-
     token_res result = {.type = ROOT};
 
     while (isspace(buffer[*pos]))
@@ -237,7 +240,6 @@ token_res define_token_type(char * buffer, size_t * pos)
 
     char * token = get_token(buffer, pos);
 
-    DEBUG_PRINT("[DEBUG] get_token return: %s\n", token);
     size_t len = strlen(token);
 
     if (!token || token[0] == '\0')
@@ -248,7 +250,7 @@ token_res define_token_type(char * buffer, size_t * pos)
 
     static check_func_t check_functions[] = 
     {
-        check_for_variable,
+        check_for_identifier,
         check_for_operator,
         check_for_number,
         NULL
@@ -259,19 +261,14 @@ token_res define_token_type(char * buffer, size_t * pos)
         result = check_functions[i](token);
         if (result.type != ROOT)
         {
-            DEBUG_PRINT("[DEBUG] token type was found: %s\n", get_string_type(result.type));
             free(token);
             return result;
         }
     }
 
-
-    DEBUG_PRINT("[DEBUG] cycle check_function return: %s\n", get_string_type(result.type));
     *(pos) += len;
-    DEBUG_PRINT("[DEBUG] pos = %lu\n", *pos);
 
     free(token);
     return result;
 }
-
 

@@ -1,1 +1,2 @@
-(*(*(x nil nil)(+(y nil nil)(6 nil nil)))(arccos(y nil nil)))
+x = x * 2;
+1 + 2;$

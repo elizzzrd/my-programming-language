@@ -1,6 +1,9 @@
 #pragma once
 
 #include <stdio.h>
+#include <math.h>
+#include <assert.h>
+#include <stdbool.h>
 #include "errors.h"
 
 #ifdef DEBUG
@@ -20,6 +23,9 @@
 #define DEBUG_PRINT(fmt, ...)  
 #endif
 
+
+bool IS_ZERO(Node_t * node); 
+bool IS_ONE(Node_t * node); 
 
 
 char * read_line(void);

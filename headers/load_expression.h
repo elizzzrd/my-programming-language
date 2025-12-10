@@ -15,7 +15,7 @@ char ** collect_path(Node_t * node, size_t tree_size, size_t * path_size, Tree_t
 ErrorCode save_database(Tree_t * tree);
 void savenode(Node_t * node, FILE * file_ptr);
 
-ErrorCode load_expression(Tree_t * tree, const char * filename);
+ErrorCode load_expression_prefix(Tree_t * tree, const char * filename);
 Node_t * read_node(char * buffer, size_t * pos, Tree_t * tree);
 
 token_res define_token_type(char * buffer, size_t * pos);

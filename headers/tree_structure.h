@@ -26,7 +26,7 @@ typedef enum
 
 typedef struct treenode
 {
-    type_t type;
+    type_t type;        // NUMBER, VARIABLE, OPERATOR, STATEMENT, BLOCK
     
     value_t value;
 

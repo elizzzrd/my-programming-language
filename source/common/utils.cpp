@@ -105,3 +105,16 @@ ErrorCode load_to_buffer(const char * filename, char ** buffer)
     return SUCCESS;
 }
 
+bool IS_ONE(Node_t * node) 
+{
+    if (!node) return false;
+
+    return (node->type == NUMBER && fabs(node->value.number - 1) < 1e-9);
+}
+
+bool IS_ZERO(Node_t * node) 
+{
+    if (!node) return false;
+
+    return (node->type == NUMBER && fabs(node->value.number) < 1e-9);
+}

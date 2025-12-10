@@ -6,121 +6,102 @@
 
 #include "node_values.h"
 #include "utils.h"
+#include "lexer.h"
 
 
 const char * type_strings[] =
 {
     "ROOT",
     "OPERATOR",
-    "VARIABLE",
-    "NUMBER"
+    "IDENTIFIER",
+    "NUMBER",
+    "STATEMENT",
+    "STRING"
 };
 
 const char * get_string_type(type_t type)
 {
-    if (type >= ROOT && type <= NUMBER)
-    return type_strings[type];
+    if (type >= ROOT && type <= STRING)
+        return type_strings[type];
     else
-    return "Unknown type";
+        return "Unknown type";
 }
 
 
-const char * var_names[] = 
-{
-    "x",
-    "y",
-    "z",
-    "v",
-    "w",
-};
 
 const char * operator_strings[] = 
 {
-    "+",        // OP_ADD
-    "/",        // OP_DIV  
-    "*",        // OP_MUL
-    "-",        // OP_SUB
-    "^",        // OP_POW
+    "+",            // OP_ADD
+    "/",            // OP_DIV  
+    "*",            // OP_MUL
+    "-",            // OP_SUB
+    "^",            // OP_POW
 
-    "sin",      // OP_SIN
-    "cos",      // OP_COS
-    "tan",      // OP_TAN
-    "ctg",      // OP_CTG
-    "arcsin",   // OP_ARCSIN
-    "arccos",   // OP_ARCCOS
-    "arctan",   // OP_ARCTAN
-    "arcctg",   // OP_ARCCTG
+    "sin",          // OP_SIN
+    "cos",          // OP_COS
+    "tan",          // OP_TAN
+    "ctg",          // OP_CTG
+    "arcsin",       // OP_ARCSIN
+    "arccos",       // OP_ARCCOS
+    "arctan",       // OP_ARCTAN
+    "arcctg",       // OP_ARCCTG
 
-    "sinh",     // OP_SINH
-    "cosh",     // OP_COSH
-    "tanh",     // OP_TANH
-    "ctgh",     // OP_CTGH
+    "sinh",         // OP_SINH
+    "cosh",         // OP_COSH
+    "tanh",         // OP_TANH
+    "ctgh",         // OP_CTGH
 
-    "log",      // OP_LOG
-    "exp",      // OP_EXP
-    "ln",       // OP_LN
+    "exp",          // OP_EXP
+    "ln",           // OP_LN
 
-    "sqrt",     // OP_SQRT
-    "abs",      // OP_ABS
-    "-"         // OP_UNARY_MINUS
+    "sqrt",         // OP_SQRT
+    "abs",          // OP_ABS
+    "-"             // OP_UNARY_MINUS
+};
+   
+const char * statement_strings[] =
+{
+    "program",      // OP_PROGRAMM
+    "op_statement", // OP_STATEMENT
+    "op_end",       // OP_END
+    "print",        // PRINT
+    "assignment",   // ASSIGNMENT
+    "if",           // IF
+    "while",        // WHILE
+    "block"         // BLOCK
 };
 
 
-const char * get_var_name(int var_index)
+const char * get_statement_name(statement_t op)
 {
-    if (var_index >= 0 && var_index < MAX_VARIABLES)
-        return var_names[var_index];
-    else    
-        return NULL;
+    if (op >= OP_PROGRAM && op <= OP_BLOCK)
+    return statement_strings[op];
+    else
+    return "Unknown statement";
 }
 
-token_res check_for_variable(const char * token)
-{
-    assert(token);
 
-    DEBUG_PRINT("[DEBUG] in check_for_variable with token: %s\n", token);
-
-    token_res result = {.type = ROOT};
-    for (int i = 0; i < MAX_VARIABLES; i++)
-    {
-        if (strcmp(token, var_names[i]) == 0)
-        {
-            result.type = VARIABLE;
-            result.value.var_index = i;
-            DEBUG_PRINT("[DEBUG] in check_for_variable found: %s\n", token);
-            return result;
-        }
-    }
-    DEBUG_PRINT("[DEBUG] in check_for_variable returns: %s\n", get_string_type(result.type));
-    return result;
-}
 
 token_res check_for_number(const char * token) 
 {
     assert(token);
-
-    DEBUG_PRINT("[DEBUG] in check_for_number with token: %s\n", token);
-
+    
     token_res result = {.type = ROOT};
     char * endptr = NULL;
     double number = strtod(token, &endptr);
-
+    
     if (endptr != token && *endptr == '\0')
     {
         result.type = NUMBER;
         result.value.number = number;
-        DEBUG_PRINT("[DEBUG] in check_for_number found: %s\n", token);
     }
-    DEBUG_PRINT("[DEBUG] in check_for_number returns: %s\n", get_string_type(result.type));
     return result;
 }
 
 token_res check_for_operator(const char * token)
 {
     assert(token);
-
-    DEBUG_PRINT("[DEBUG] in check_for_operator with token: %s\n", token);
-
+    
     token_res result = {.type = ROOT};
     for (int i = OP_ADD; i <= OP_UNARY_MINUS; i++)
     {
@@ -128,15 +109,45 @@ token_res check_for_operator(const char * token)
         {
             result.type = OPERATOR;
             result.value.op = get_enum_operator_from_string(operator_strings[i]);
-            DEBUG_PRINT("[DEBUG] in check_for_operator found: %s\n", token);
         }
     }
-    DEBUG_PRINT("[DEBUG] in check_for_operator returns: %s\n", get_string_type(result.type));
     return result;
 }
 
 
+// const char * var_names[] = 
+// {
+//     "x",
+//     "y",
+//     "z",
+//     "v",
+//     "w",
+// };
 
+// const char * get_var_name(int var_index)
+// {
+//     if (var_index >= 0 && var_index < MAX_VARIABLES)
+//         return var_names[var_index];
+//     else    
+//         return NULL;
+// }
+
+token_res check_for_identifier(const char * token)
+{
+    assert(token);
+    
+    token_res result = {.type = ROOT};
+    int id_index = symbol_table_find(token);
+    if (id_index == -1)
+        return result;
+    else
+    {
+        result.type = IDENTIFIER;
+        result.value.id_index = id_index;
+    }
+        
+    return result;
+}
 
 const char* get_string_operator(operator_t op) 
 {
@@ -180,9 +191,10 @@ operator_t get_enum_operator_from_string(const char* str)
     if (strcmp(str, "arctan") == 0)     return OP_ARCTAN;
     if (strcmp(str, "exp") == 0)        return OP_EXP;
     if (strcmp(str, "ln") == 0)         return OP_LN;
-    if (strcmp(str, "log") == 0)        return OP_LOG;
     if (strcmp(str, "sqrt") == 0)       return OP_SQRT;
     if (strcmp(str, "abs") == 0)        return OP_ABS;
     
     return OP_ADD; // default
 }
+
+

@@ -15,13 +15,22 @@ CXXFLAGS := -g -DDEBUG -ggdb3 -std=c++17 -O0 -Wall -Wextra -Weffc++ -Waggressive
 INCLUDES = -I headers/ 
 
 SRC_DIR := source
+FRONTEND_DIR := $(SRC_DIR)/frontend
+BACKEND_DIR := $(SRC_DIR)/backend
+MIDDLEEND_DIR := $(SRC_DIR)/middleend
+COMMON_DIR := $(SRC_DIR)/common
+
 HEADERS_DIR := headers
 BUILD_DIR := build
 BIN_DIR := $(BUILD_DIR)/bin
 OBJ_DIR := $(BUILD_DIR)/obj
 
 SOURCES := main.cpp \
-          $(wildcard $(SRC_DIR)/*.cpp) 
+          $(wildcard $(FRONTEND_DIR)/*.cpp) \
+		  $(wildcard $(BACKEND_DIR)/*.cpp) \
+		  $(wildcard $(MIDDLEEND_DIR)/*.cpp) \
+		  $(wildcard $(COMMON_DIR)/*.cpp)  \
+
 OBJECTS := $(SOURCES:%.cpp=$(OBJ_DIR)/%.o)
 
 TARGET := $(BIN_DIR)/main

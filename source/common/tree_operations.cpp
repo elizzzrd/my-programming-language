@@ -4,7 +4,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#define DEBUG
+
 #include "tree_structure.h"
 #include "tree_operations.h"
 #include "errors.h"
@@ -32,7 +32,7 @@ ErrorCode init_tree(Tree_t * tree)
 
 Node_result_t create_node(Tree_t * tree, type_t type)
 {
-    assert(tree && (type >= ROOT || type <= NUMBER));
+    assert(tree && (type >= ROOT && type <= STRING));
     Node_result_t res = {.node = NULL, .error = SUCCESS};
 
     Node_t * new_node = (Node_t *) calloc(1, sizeof(Node_t));
@@ -69,6 +69,20 @@ Node_result_t create_operator_node(Tree_t * tree, operator_t op)
     return res;
 }
 
+Node_result_t create_statement_node(Tree_t * tree, statement_t stmt_op)
+{
+    assert(tree);
+    
+    Node_result_t res = create_node(tree, STATEMENT);
+    if (res.error != SUCCESS)
+        return res;
+    
+    res.node->value.stmt = stmt_op;
+    
+    GRAPH_DUMP_NODE(res.node);   
+    return res;
+}
+
 Node_result_t create_number_node(Tree_t * tree, double number)
 {
     assert(tree);
@@ -82,15 +96,37 @@ Node_result_t create_number_node(Tree_t * tree, double number)
     return res;
 }
 
-Node_result_t create_variable_node(Tree_t * tree, int var_index)
+Node_result_t create_identifier_node(Tree_t * tree, int id_index)
 {
     assert(tree);
 
-    Node_result_t res = create_node(tree, VARIABLE);
+    Node_result_t res = create_node(tree, IDENTIFIER);
     if (res.error != SUCCESS)
         return res;
     
-    res.node->value.var_index = var_index;
+    res.node->value.id_index = id_index;
+    GRAPH_DUMP_NODE(res.node); 
+    return res;
+}
+
+
+Node_result_t create_string_node(Tree_t * tree, const char * str)
+{
+    assert(tree && str);
+
+    Node_result_t res = create_node(tree, STRING);
+    if (res.error != SUCCESS)
+        return res;
+    
+    DEBUG_PRINT("in create_string_node, str = %s", str);
+    res.node->value.string_value = strdup(str);
+    if (!res.node->value.string_value)
+    {
+        res.error = TREE_MEMORY_ALLOCATION_ERROR;
+        destroy_node(res.node);
+        res.node = NULL;
+        return res;
+    }
     GRAPH_DUMP_NODE(res.node); 
     return res;
 }
@@ -109,7 +145,10 @@ void destroy_node(Node_t * node)
 
     if (node->type == ROOT && node->value.root)
         free(node->value.root);
+    if (node->type == STRING && node->value.string_value)
+        free(node->value.string_value);
 
+    DEBUG_PRINT("Destroying node %p, type=%s", (void*)node, get_string_type(node->type));
     free(node);
     return;
 }
@@ -189,9 +228,9 @@ Node_t * copy_subtree(Node_t * node, Tree_t * tree)
             new_node = create_number_node(tree, node -> value.number);
             break;
         }
-        case VARIABLE:
+        case IDENTIFIER:
         {
-            new_node = create_variable_node(tree, node ->value.var_index);
+            new_node = create_identifier_node(tree, node ->value.id_index);
             break;
         }
         case OPERATOR:
@@ -199,6 +238,24 @@ Node_t * copy_subtree(Node_t * node, Tree_t * tree)
             new_node = create_operator_node(tree, node -> value.op);
             new_node.node -> left  = copy_subtree(node -> left, tree);
             new_node.node -> right = copy_subtree(node -> right, tree);
+            break;
+        }
+        case STATEMENT:
+        {
+            new_node = create_statement_node(tree, node -> value.stmt);
+            statement_t stmt = node -> value.stmt;
+            if (stmt == OP_PROGRAM || stmt == OP_PRINT || stmt == OP_END || stmt == OP_BLOCK)
+                new_node.node -> right = copy_subtree(node ->right, tree);
+            else
+            {
+                new_node.node -> left  = copy_subtree(node -> left, tree);
+                new_node.node -> right = copy_subtree(node -> right, tree);
+            }
+            break;
+        }
+        case STRING:
+        {
+            new_node = create_string_node(tree, node -> value.string_value);
             break;
         }
         default:
@@ -213,3 +270,4 @@ Node_t * copy_subtree(Node_t * node, Tree_t * tree)
 
     return new_node.node;
 }
+    
