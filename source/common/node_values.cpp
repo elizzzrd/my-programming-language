@@ -114,7 +114,37 @@ token_res check_for_operator(const char * token)
     return result;
 }
 
+token_res check_for_statement(const char * token)
+{
+    assert(token);
 
+    token_res res = {.type = ROOT};
+    if      (strcmp(token, "program") == 0)    { res.type = STATEMENT; res.value.stmt = OP_PROGRAM; }
+    else if (strcmp(token, "print") == 0) { res.type = STATEMENT; res.value.stmt = OP_PRINT; }
+    else if (strcmp(token, "assignment") == 0) { res.type = STATEMENT; res.value.stmt = OP_ASSIGNMENT; }
+    else if (strcmp(token, "if") == 0)    { res.type = STATEMENT; res.value.stmt = OP_IF; }
+    else if (strcmp(token, "while") == 0) { res.type = STATEMENT; res.value.stmt = OP_WHILE; }
+    else if (strcmp(token, "block") == 0) { res.type = STATEMENT; res.value.stmt = OP_BLOCK; }
+    else if (strcmp(token, "end") == 0)   { res.type = STATEMENT; res.value.stmt = OP_END; }
+
+    return res;
+}
+
+
+token_res check_for_string(const char * token)
+{
+    assert(token);
+
+    token_res res = {.type = ROOT};
+    size_t len = strlen(token);
+    if (len >= 2 && token[0] == '"' && token[len - 1] == '"')
+    {
+        res.type = STRING;
+        res.value.string_value = strdup(token + 1);
+        res.value.string_value[len - 2] = '\0';
+    }
+    return res;
+}
 // const char * var_names[] = 
 // {
 //     "x",

@@ -22,7 +22,7 @@ int symbol_table_find(const char * name)
     return -1;
 }
 
-const char * get_id_name(int id_index)
+const char * get_id_name(size_t id_index)
 {
     if (id_index >= 0 && id_index < symbols_table.count)
         return symbols_table.names[id_index];
@@ -66,11 +66,13 @@ int symbol_table_get_or_add(const char * name)
         return symbol_table_add(name);
 }
 
+
+
 void symbol_table_destroy(SymbolTable * sb)
 {
     assert(sb);
 
-    for (int i = 0; i < sb->count; i++)
+    for (size_t i = 0; i < sb->count; i++)
         free(sb->names[i]);
     free(sb->names);
 }
@@ -127,7 +129,6 @@ ErrorCode lexicalAnalysis(TokenList * token_list)
     ErrorCode error = load_to_buffer(EXPRESSION_INPUT, &buffer);
     if (error != SUCCESS)
         return error;
-    char * buffer_ptr = buffer;
     DEBUG_PRINT("buffer: %s", buffer);
 
     token_list->capasity = 0;
@@ -187,20 +188,20 @@ ErrorCode lexicalAnalysis(TokenList * token_list)
         // operators + punctuation
         switch (*p) 
         {
-        case ';': token_list_push(token_list, make_token(TOK_SEMICOLON, p++, 1)); continue;
-        case '{': token_list_push(token_list, make_token(TOK_LBRACE, p++, 1)); continue;
-        case '}': token_list_push(token_list, make_token(TOK_RBRACE, p++, 1)); continue;
-        case '(': token_list_push(token_list, make_token(TOK_LPAREN, p++, 1)); continue;
-        case ')': token_list_push(token_list, make_token(TOK_RPAREN, p++, 1)); continue;
-        case '+': token_list_push(token_list, make_token(TOK_PLUS, p++, 1)); continue;
-        case '-': token_list_push(token_list, make_token(TOK_MINUS, p++, 1)); continue;
-        case '*': token_list_push(token_list, make_token(TOK_MULTIPLY, p++, 1)); continue;
-        case '^': token_list_push(token_list, make_token(TOK_POW, p++, 1)); continue;
-        case '/': token_list_push(token_list, make_token(TOK_DIVIDE, p++, 1)); continue;
-        case '=': token_list_push(token_list, make_token(TOK_ASSIGN, p++, 1)); continue;
-        case '$': token_list_push(token_list, make_token(TOK_END, p++, 1)); continue;
+            case ';': token_list_push(token_list, make_token(TOK_SEMICOLON, p++, 1)); continue;
+            case '{': token_list_push(token_list, make_token(TOK_LBRACE, p++, 1)); continue;
+            case '}': token_list_push(token_list, make_token(TOK_RBRACE, p++, 1)); continue;
+            case '(': token_list_push(token_list, make_token(TOK_LPAREN, p++, 1)); continue;
+            case ')': token_list_push(token_list, make_token(TOK_RPAREN, p++, 1)); continue;
+            case '+': token_list_push(token_list, make_token(TOK_PLUS, p++, 1)); continue;
+            case '-': token_list_push(token_list, make_token(TOK_MINUS, p++, 1)); continue;
+            case '*': token_list_push(token_list, make_token(TOK_MULTIPLY, p++, 1)); continue;
+            case '^': token_list_push(token_list, make_token(TOK_POW, p++, 1)); continue;
+            case '/': token_list_push(token_list, make_token(TOK_DIVIDE, p++, 1)); continue;
+            case '=': token_list_push(token_list, make_token(TOK_ASSIGN, p++, 1)); continue;
+            case '$': token_list_push(token_list, make_token(TOK_END, p++, 1)); continue;
         }
-        printf("Unknown char: %c\n", *p);
+        printf("Unknown char: %d\n", *p); break;
         p++;
     }
 
@@ -285,7 +286,7 @@ void lexer_dump(const TokenList * token_list)
     DEBUG_PRINT("token_list.count = %lu, token_list->capacity = %lu", token_list->count, token_list->capasity);
     for (int i = 0; i < token_list->count; i ++)
     {
-        DEBUG_PRINT("token_%d, %s, %d, %s", i, get_string_token_type(token_list->data[i].type) ,token_list->data[i].int_value, token_list->data[i].string_value);
+        DEBUG_PRINT("token_%d, %s, %d, %s", i, get_string_token_type(token_list->data[i].type), token_list->data[i].int_value, token_list->data[i].string_value);
     }
 
 }

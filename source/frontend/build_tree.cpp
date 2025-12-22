@@ -7,6 +7,7 @@
 #include "build_tree.h"
 #include "lexer.h"
 
+
 void SyntaxError(int line, const char * func, char ch)
 {
     printf("[SYNTAX ERROR] from %s:%d with parsing %c\n", func, line, ch);
@@ -60,7 +61,7 @@ static void skip_spaces(char ** s)
         (*s)++;
 }
 
-#define REQUIRE_STR(str) \                    
+#define REQUIRE_STR(str) \
     do { \
         if (strncmp(*s, (str), strlen(str)) != 0) { \
             SyntaxError(__LINE__, __func__, **s); \
@@ -69,7 +70,7 @@ static void skip_spaces(char ** s)
         *s += strlen(str); \
     } while(0)
 
-#define REQUIRE_CHAR(ch) \                        
+#define REQUIRE_CHAR(ch) \
     do { \
         if (**s != ch) { \
             SyntaxError(__LINE__, __func__, **s); \

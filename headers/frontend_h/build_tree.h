@@ -1,3 +1,5 @@
+#pragma once
+
 #include "tree_structure.h"
 
 void SyntaxError(int line, const char * func, char ch);

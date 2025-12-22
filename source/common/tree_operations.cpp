@@ -170,6 +170,7 @@ ErrorCode build_parent_links(Tree_t * tree)
     assert(tree);
     ErrorCode error = SUCCESS;
     
+    DEBUG_PRINT("[INFO] start build parent links\n");
     if (!tree->root)
     {
         return TREE_EMPTY_TREE;
@@ -184,6 +185,7 @@ ErrorCode build_parent_links(Tree_t * tree)
     sprintf(tree_size, "tree_size = %d", (tree->tree_size) - 1);
     tree->root->value.root = strdup(tree_size);
 
+    DEBUG_PRINT("[INFO] end build parent links\n");
     return SUCCESS;
 }
 

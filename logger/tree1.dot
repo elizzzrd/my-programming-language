@@ -1,4 +1,4 @@
-// Graphiz was called from main.cpp:42
+// Graphiz was called from main.cpp:67
 digraph TreeGraph {
     rankdir=TB;    bgcolor="#ffffff";
     fontname="Consolas";
@@ -8,22 +8,20 @@ digraph TreeGraph {
 
 
     node_0x504000000010 [fillcolor = "#afdeedff", label="{ <t> program }"];
-    node_0x504000000250 [fillcolor = "#d29bdaff", label="{ <t> STATEMENT | <v> op_end}"];
-    node_0x504000000150 [fillcolor = "#d29bdaff", label="{ <t> STATEMENT | <v> assignment}"];
-    node_0x504000000050 [fillcolor = "#f7d598ff", label="{ <t> IDENTIFIER | <v> x | { <l> 0 | <r> 0}}"];
-    node_0x504000000110 [fillcolor = "#d460aeff", label="{ <t> OPERATOR | <v> *}"];
-    node_0x504000000090 [fillcolor = "#f7d598ff", label="{ <t> IDENTIFIER | <v> x | { <l> 0 | <r> 0}}"];
-    node_0x5040000000d0 [fillcolor = "#98f7aaff", label="{ <t> NUMBER | <v> 2 | { <l> 0 | <r> 0}}"];
-    node_0x504000000210 [fillcolor = "#d460aeff", label="{ <t> OPERATOR | <v> +}"];
-    node_0x504000000190 [fillcolor = "#98f7aaff", label="{ <t> NUMBER | <v> 1 | { <l> 0 | <r> 0}}"];
-    node_0x5040000001d0 [fillcolor = "#98f7aaff", label="{ <t> NUMBER | <v> 2 | { <l> 0 | <r> 0}}"];
-    node_0x504000000010 -> node_0x504000000250 [color="#0e0246ff", penwidth=1];
-    node_0x504000000250 -> node_0x504000000150 [color="#0e0246ff", penwidth=1];
-    node_0x504000000250 -> node_0x504000000210 [color="#0e0246ff", penwidth=1];
-    node_0x504000000150 -> node_0x504000000050 [color="#0e0246ff", penwidth=1];
-    node_0x504000000150 -> node_0x504000000110 [color="#0e0246ff", penwidth=1];
-    node_0x504000000110 -> node_0x504000000090 [color="#0e0246ff", penwidth=1];
-    node_0x504000000110 -> node_0x5040000000d0 [color="#0e0246ff", penwidth=1];
-    node_0x504000000210 -> node_0x504000000190 [color="#0e0246ff", penwidth=1];
+    node_0x504000000210 [fillcolor = "#d460aeff", label="{ <t> OPERATOR | <v> *}"];
+    node_0x504000000110 [fillcolor = "#d460aeff", label="{ <t> OPERATOR | <v> -}"];
+    node_0x5040000000d0 [fillcolor = "#d460aeff", label="{ <t> OPERATOR | <v> +}"];
+    node_0x504000000050 [fillcolor = "#f7d598ff", label="{ <t> IDENTIFIER | <v> a | { <l> 0 | <r> 0}}"];
+    node_0x504000000090 [fillcolor = "#f7d598ff", label="{ <t> IDENTIFIER | <v> b | { <l> 0 | <r> 0}}"];
+    node_0x5040000001d0 [fillcolor = "#d460aeff", label="{ <t> OPERATOR | <v> -}"];
+    node_0x504000000190 [fillcolor = "#d460aeff", label="{ <t> OPERATOR | <v> cos}"];
+    node_0x504000000150 [fillcolor = "#f7d598ff", label="{ <t> IDENTIFIER | <v> x | { <l> 0 | <r> 0}}"];
+    node_0x504000000010 -> node_0x504000000210 [color="#0e0246ff", penwidth=1];
+    node_0x504000000210 -> node_0x504000000110 [color="#0e0246ff", penwidth=1];
     node_0x504000000210 -> node_0x5040000001d0 [color="#0e0246ff", penwidth=1];
+    node_0x504000000110 -> node_0x5040000000d0 [color="#0e0246ff", penwidth=1];
+    node_0x5040000000d0 -> node_0x504000000050 [color="#0e0246ff", penwidth=1];
+    node_0x5040000000d0 -> node_0x504000000090 [color="#0e0246ff", penwidth=1];
+    node_0x5040000001d0 -> node_0x504000000190 [color="#0e0246ff", penwidth=1];
+    node_0x504000000190 -> node_0x504000000150 [color="#0e0246ff", penwidth=1];
 }

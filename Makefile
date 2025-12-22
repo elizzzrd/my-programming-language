@@ -12,7 +12,9 @@ CXXFLAGS := -g -DDEBUG -ggdb3 -std=c++17 -O0 -Wall -Wextra -Weffc++ -Waggressive
  -Wno-missing-field-initializers -Wno-narrowing -Wno-old-style-cast -Wno-varargs -Wstack-protector -fcheck-new \
  -fsized-deallocation -fstack-protector -fstrict-overflow -flto-odr-type-merging -fno-omit-frame-pointer -Wlarger-than=8192 \
  -Wstack-usage=8192 -pie -fPIE -Werror=vla 
-INCLUDES = -I headers/ 
+
+INC_DIRS := headers/backend_h headers/middleend_h headers/frontend_h headers/processor_h headers/common_h
+INCLUDES = $(addprefix -I,$(INC_DIRS))
 
 SRC_DIR := source
 FRONTEND_DIR := $(SRC_DIR)/frontend
@@ -58,7 +60,7 @@ logger-clean:
 rebuild: clean all
 
 
-check: $(TARGET)
+check: 
 	cd build/bin
 	./$(TARGET)
 

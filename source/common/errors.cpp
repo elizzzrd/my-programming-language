@@ -27,10 +27,12 @@ const char * tree_error_string(ErrorCode error)
         "Error during loading expression",              // [9] LOADING_EXPRESSION_ERROR
         "Error during saving expression to latex",      // [10] SAVING_LATEX_ERROR
         "Graph_dump failed",                            // [11] GRAPH_DUMP_ERROR
-        "Error during differentiation"                  // [12] DIFFERENTIATION_ERROR    
+        "Error during differentiation",                 // [12] DIFFERENTIATION_ERROR    
+        "Error during lexical analysis",                // [13] LEXER_ERROR
+        "Error during syntax analysis"                  // [14] PARSER_ERROR
     };
     
-    if (error < SUCCESS || error > DIFFERENTIATION_ERROR) 
+    if (error < SUCCESS || error > PARSER_ERROR) 
         return "Unknown error";
     
     return tree_error_strings[error];

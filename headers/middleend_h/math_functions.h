@@ -59,10 +59,10 @@ ErrorCode differentiate_tree(Tree_t * source_tree, Tree_t * diff_tree, int var_i
 
 ErrorCode evaluate_const_node(const Node_t * node, double * result);
 Node_result_t replace_node_by_number(Tree_t * tree, Node_t * old_node, double value);
-Node_t * optimize_const_node(Node_t * node, Tree_t * tree);
-Node_t * optimize_simple_arithmetic(Node_t * node, Tree_t * tree);
+//Node_t * optimize_const_node(Node_t * node, Tree_t * tree);
+//Node_t * optimize_simple_arithmetic(Node_t * node, Tree_t * tree);
 Node_t * optimize_const_node_recursive(Node_t * node, Tree_t * tree);
 Node_t * simplify_node(Node_t * node, Tree_t * tree);
-bool simplify_node_step_by_step(Node_t * node, Tree_t * tree);
+//bool simplify_node_step_by_step(Node_t * node, Tree_t * tree);
 Node_t * optimize_simple_arithmetic_recursive(Node_t * node, Tree_t * tree);
-ErrorCode optimize_tree(Tree_t * tree);
+ErrorCode optimize_tree_recursive(Tree_t * tree);

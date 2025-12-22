@@ -188,3 +188,127 @@ ErrorCode differentiate_tree(Tree_t * source_tree, Tree_t * diff_tree, int var_i
     return SUCCESS;
 }
 */
+
+
+
+
+// bool simplify_node_step_by_step(Node_t * node, Tree_t * tree)
+// {
+//     assert(tree);
+//     if (!node) return false;
+
+//     if (node->type != OPERATOR)
+//         return node;
+
+//     Node_t * res = NULL;
+//     Node_t * u = node->left;
+//     Node_t * v = node->right;
+//     operator_t op = node->value.op;
+
+//     // x * 0 or 0 * x → 0
+//     if (op == OP_MUL && (IS_ZERO(u) || IS_ZERO(v)))
+//     {
+//         res =  replace_node_by_number(tree, node, 0.0).node;
+//         return true;
+//     }
+
+//     // 1 * x → x
+//     if (op == OP_MUL && IS_ONE(u))
+//     {
+//         REPLACE_WITH(v);
+//         return true;
+//     }
+
+//     // x * 1 → x
+//     if (op == OP_MUL && IS_ONE(v))
+//     {
+//         REPLACE_WITH(u);
+//         return true;
+//     }
+
+//     // x + 0 → x
+//     if (op == OP_ADD && IS_ZERO(v))
+//     {
+//         REPLACE_WITH(u);
+//         return true;
+//     }
+
+//     // 0 + x → x
+//     if (op == OP_ADD && IS_ZERO(u))
+//     {
+//         REPLACE_WITH(v);
+//         return true;
+//     }
+
+//     // x - 0 → x
+//     if (op == OP_SUB && IS_ZERO(v))
+//     {
+//         REPLACE_WITH(u);
+//         return true;
+//     }
+
+//     // 0 - x → -x
+//     if (op == OP_SUB && IS_ZERO(u))
+//     {
+//         Node_result_t res = create_operator_node(tree, OP_UNARY_MINUS);
+//         if (res.error != SUCCESS) 
+//             return node;
+
+//         res.node->left  = copy_subtree(v, tree);
+//         res.node->right = NULL;
+
+//         if (!res.node->left)
+//             return node;
+//         res.node->prev = node->prev;
+//         destroy_node(node);
+//         return true;
+//     }
+
+//     // 0 / x → 0
+//     if (op == OP_DIV && IS_ZERO(u))
+//     {
+//         res = replace_node_by_number(tree, node, 0.0).node;
+//         return true;
+//     }
+
+//     // x / 1 → x
+//     if (op == OP_DIV && IS_ONE(v))
+//     {
+//         REPLACE_WITH(u);
+//         return true;
+//     }
+
+//     // x^0 → 1
+//     if (op == OP_POW && IS_ZERO(v))
+//     {
+//         res = replace_node_by_number(tree, node, 1.0).node;
+//         return true;
+//     }
+
+//     // x^1 → x
+//     if (op == OP_POW && IS_ONE(v))
+//     {
+//         REPLACE_WITH(u);
+//         return true;
+//     }
+
+//     return false;
+// }
+
+
+
+// // void optimize_tree_step_by_step(Tree_t * tree)
+// // {
+// //     int step = 0;
+
+// //     while (1)
+// //     {
+// //         bool changed = (optimize_const_once || optimize_simply_arith_once);
+
+// //         if (!changed)
+// //             break;
+        
+// //         latex_dump_step(LATEX_DUMP_FILE, tree);
+// //     }
+// // }
+

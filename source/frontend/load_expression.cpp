@@ -8,65 +8,77 @@
 #include "tree_operations.h"
 #include "load_expression.h"
 #include "utils.h"
+#include "lexer.h"
 #include "errors.h"
 
 
-/*
-void savenode(Node_t * node, FILE * file_ptr)
+void savenode(Node_t *node, FILE *f)
 {
-    assert(file_ptr);
+    if (!node)
+    {
+        fprintf(f, "nil");
+        return;
+    }
 
-    fprintf(file_ptr, "(");
-    if (node -> value)
-        fprintf(file_ptr, "\"%c\"", node->data);
+    fprintf(f, "(");
+
+    switch (node->type)
+    {
+        case NUMBER:
+            fprintf(f, "%g", node->value.number);
+            break;
+
+        case IDENTIFIER:
+            fprintf(f, "%s", get_id_name(node->value.id_index));
+            break;
+
+        case OPERATOR:
+            fprintf(f, "%s", get_string_operator(node->value.op));
+            break;
+
+        case STATEMENT:
+            fprintf(f, "%s", get_statement_name(node->value.stmt));
+            break;
+
+        case STRING:
+            fprintf(f, "\"%s\"", node->value.string_value);
+            break;
+
+        default:
+            fprintf(f, "UNKNOWN");
+    }
 
     if (!node -> left && !node -> right)
-        fprintf(file_ptr, " nil nil");
+        fprintf(f, " nil nil");
 
-    if (node -> left)    
-        savenode(node -> left, file_ptr);
+    if (node -> left)
+        savenode(node->left, f);
     if (node -> right)
-        savenode(node -> right, file_ptr);
+        savenode(node->right, f);
 
-    fprintf(file_ptr, ")");
+    fprintf(f, ")");
 }
 
-ErrorCode save_database(Tree_t * tree)
-{
-    assert(tree);
 
+
+ErrorCode save_tree(Tree_t * tree, const char * filename)
+{
+    assert(tree && filename);
     ErrorCode error = SUCCESS;
 
-    FILE * file_ptr = fopen(DATABASE_OUTPUT, "w");
+    FILE * file_ptr = fopen(filename, "w");
     if (!file_ptr)
     {
-        ERROR_MESSAGE(TREE_OPENING_FILE_ERROR, error);
+        ERROR_MESSAGE(OPENING_FILE_ERROR, error);
         return error;
     }
 
     savenode(tree->root->right, file_ptr);
 
-    //GRAPH_DUMP(tree);
+
     fclose(file_ptr);
     return error;
 }
-*/
-
-// ErrorCode load_expression(Tree_t * tree, const char * filename)
-// {
-//     assert(filename);
-
-//     ErrorCode error = SUCCESS;
-
-//     char * buffer = NULL;
-//     error = load_to_buffer(EXPRESSION_INPUT, &buffer);
-//     if (error != SUCCESS)
-//         return error;
-
-//     int result = GetG(&s);
-//     printf("Result: %d\n", result);
-
-
 
 
 ErrorCode load_expression_prefix(Tree_t * tree, const char * filename)
@@ -250,9 +262,11 @@ token_res define_token_type(char * buffer, size_t * pos)
 
     static check_func_t check_functions[] = 
     {
-        check_for_identifier,
+        check_for_statement,
         check_for_operator,
         check_for_number,
+        check_for_string,
+        check_for_identifier,
         NULL
     };
 

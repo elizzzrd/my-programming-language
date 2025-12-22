@@ -89,3 +89,5 @@ bool is_function_operator(operator_t op);
 token_res check_for_identifier(const char * token);
 token_res check_for_number(const char * token) ;
 token_res check_for_operator(const char * token);
+token_res check_for_string(const char * token);
+token_res check_for_statement(const char * token);

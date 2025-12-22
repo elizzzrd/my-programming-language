@@ -21,7 +21,8 @@ typedef enum
     GRAPH_DUMP_ERROR,
     DIFFERENTIATION_ERROR,
 
-    LEXER_ERROR
+    LEXER_ERROR,
+    PARSER_ERROR
 } ErrorCode;
 
 
