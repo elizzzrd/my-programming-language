@@ -1,53 +1,2810 @@
-main.cpp:35:main(): [INFO] LEXICAL_ANALYSIS START
-source/frontend/lexer.cpp:132:lexicalAnalysis(): buffer: -(a+b) * (-cos(x));$
-main.cpp:45:main(): [INFO] LEXICAL_ANALYSIS END
+main.cpp:37:main(): [INFO] LEXICAL_ANALYSIS START
+source/frontend/lexer.cpp:132:lexicalAnalysis(): buffer: a = 1;
+b = -5;
+c = 6;
+D = b*b - 4*a*c;
+
+sqrt_D = D*D;
+x1 = (-b + sqrt_D)/(2*a);
+x2 = (-b - sqrt_D)/(2*a); 
+print x1;
+print x2;$
+
+main.cpp:47:main(): [INFO] LEXICAL_ANALYSIS END
 source/frontend/lexer.cpp:285:lexer_dump(): [LEXER DUMP]
-source/frontend/lexer.cpp:286:lexer_dump(): token_list.count = 17, token_list->capacity = 32
-source/frontend/lexer.cpp:289:lexer_dump(): token_0, TOK_MINUS, 0, -
-source/frontend/lexer.cpp:289:lexer_dump(): token_1, TOK_LPAREN, 0, (
-source/frontend/lexer.cpp:289:lexer_dump(): token_2, TOK_IDENTIFIER, 0, a
-source/frontend/lexer.cpp:289:lexer_dump(): token_3, TOK_PLUS, 0, +
+source/frontend/lexer.cpp:286:lexer_dump(): token_list.count = 69, token_list->capacity = 128
+source/frontend/lexer.cpp:289:lexer_dump(): token_0, TOK_IDENTIFIER, 0, a
+source/frontend/lexer.cpp:289:lexer_dump(): token_1, TOK_ASSIGN, 0, =
+source/frontend/lexer.cpp:289:lexer_dump(): token_2, TOK_NUMBER, 1, 1
+source/frontend/lexer.cpp:289:lexer_dump(): token_3, TOK_SEMICOLON, 0, ;
 source/frontend/lexer.cpp:289:lexer_dump(): token_4, TOK_IDENTIFIER, 0, b
-source/frontend/lexer.cpp:289:lexer_dump(): token_5, TOK_RPAREN, 0, )
-source/frontend/lexer.cpp:289:lexer_dump(): token_6, TOK_MULTIPLY, 0, *
-source/frontend/lexer.cpp:289:lexer_dump(): token_7, TOK_LPAREN, 0, (
-source/frontend/lexer.cpp:289:lexer_dump(): token_8, TOK_MINUS, 0, -
-source/frontend/lexer.cpp:289:lexer_dump(): token_9, TOK_IDENTIFIER, 0, cos
-source/frontend/lexer.cpp:289:lexer_dump(): token_10, TOK_LPAREN, 0, (
-source/frontend/lexer.cpp:289:lexer_dump(): token_11, TOK_IDENTIFIER, 0, x
-source/frontend/lexer.cpp:289:lexer_dump(): token_12, TOK_RPAREN, 0, )
-source/frontend/lexer.cpp:289:lexer_dump(): token_13, TOK_RPAREN, 0, )
-source/frontend/lexer.cpp:289:lexer_dump(): token_14, TOK_SEMICOLON, 0, ;
-source/frontend/lexer.cpp:289:lexer_dump(): token_15, TOK_END, 0, $
-source/frontend/lexer.cpp:289:lexer_dump(): token_16, TOK_EOF, 0, 
-main.cpp:50:main(): 
+source/frontend/lexer.cpp:289:lexer_dump(): token_5, TOK_ASSIGN, 0, =
+source/frontend/lexer.cpp:289:lexer_dump(): token_6, TOK_MINUS, 0, -
+source/frontend/lexer.cpp:289:lexer_dump(): token_7, TOK_NUMBER, 5, 5
+source/frontend/lexer.cpp:289:lexer_dump(): token_8, TOK_SEMICOLON, 0, ;
+source/frontend/lexer.cpp:289:lexer_dump(): token_9, TOK_IDENTIFIER, 0, c
+source/frontend/lexer.cpp:289:lexer_dump(): token_10, TOK_ASSIGN, 0, =
+source/frontend/lexer.cpp:289:lexer_dump(): token_11, TOK_NUMBER, 6, 6
+source/frontend/lexer.cpp:289:lexer_dump(): token_12, TOK_SEMICOLON, 0, ;
+source/frontend/lexer.cpp:289:lexer_dump(): token_13, TOK_IDENTIFIER, 0, D
+source/frontend/lexer.cpp:289:lexer_dump(): token_14, TOK_ASSIGN, 0, =
+source/frontend/lexer.cpp:289:lexer_dump(): token_15, TOK_IDENTIFIER, 0, b
+source/frontend/lexer.cpp:289:lexer_dump(): token_16, TOK_MULTIPLY, 0, *
+source/frontend/lexer.cpp:289:lexer_dump(): token_17, TOK_IDENTIFIER, 0, b
+source/frontend/lexer.cpp:289:lexer_dump(): token_18, TOK_MINUS, 0, -
+source/frontend/lexer.cpp:289:lexer_dump(): token_19, TOK_NUMBER, 4, 4
+source/frontend/lexer.cpp:289:lexer_dump(): token_20, TOK_MULTIPLY, 0, *
+source/frontend/lexer.cpp:289:lexer_dump(): token_21, TOK_IDENTIFIER, 0, a
+source/frontend/lexer.cpp:289:lexer_dump(): token_22, TOK_MULTIPLY, 0, *
+source/frontend/lexer.cpp:289:lexer_dump(): token_23, TOK_IDENTIFIER, 0, c
+source/frontend/lexer.cpp:289:lexer_dump(): token_24, TOK_SEMICOLON, 0, ;
+source/frontend/lexer.cpp:289:lexer_dump(): token_25, TOK_IDENTIFIER, 0, sqrt_D
+source/frontend/lexer.cpp:289:lexer_dump(): token_26, TOK_ASSIGN, 0, =
+source/frontend/lexer.cpp:289:lexer_dump(): token_27, TOK_IDENTIFIER, 0, D
+source/frontend/lexer.cpp:289:lexer_dump(): token_28, TOK_MULTIPLY, 0, *
+source/frontend/lexer.cpp:289:lexer_dump(): token_29, TOK_IDENTIFIER, 0, D
+source/frontend/lexer.cpp:289:lexer_dump(): token_30, TOK_SEMICOLON, 0, ;
+source/frontend/lexer.cpp:289:lexer_dump(): token_31, TOK_IDENTIFIER, 0, x1
+source/frontend/lexer.cpp:289:lexer_dump(): token_32, TOK_ASSIGN, 0, =
+source/frontend/lexer.cpp:289:lexer_dump(): token_33, TOK_LPAREN, 0, (
+source/frontend/lexer.cpp:289:lexer_dump(): token_34, TOK_MINUS, 0, -
+source/frontend/lexer.cpp:289:lexer_dump(): token_35, TOK_IDENTIFIER, 0, b
+source/frontend/lexer.cpp:289:lexer_dump(): token_36, TOK_PLUS, 0, +
+source/frontend/lexer.cpp:289:lexer_dump(): token_37, TOK_IDENTIFIER, 0, sqrt_D
+source/frontend/lexer.cpp:289:lexer_dump(): token_38, TOK_RPAREN, 0, )
+source/frontend/lexer.cpp:289:lexer_dump(): token_39, TOK_DIVIDE, 0, /
+source/frontend/lexer.cpp:289:lexer_dump(): token_40, TOK_LPAREN, 0, (
+source/frontend/lexer.cpp:289:lexer_dump(): token_41, TOK_NUMBER, 2, 2
+source/frontend/lexer.cpp:289:lexer_dump(): token_42, TOK_MULTIPLY, 0, *
+source/frontend/lexer.cpp:289:lexer_dump(): token_43, TOK_IDENTIFIER, 0, a
+source/frontend/lexer.cpp:289:lexer_dump(): token_44, TOK_RPAREN, 0, )
+source/frontend/lexer.cpp:289:lexer_dump(): token_45, TOK_SEMICOLON, 0, ;
+source/frontend/lexer.cpp:289:lexer_dump(): token_46, TOK_IDENTIFIER, 0, x2
+source/frontend/lexer.cpp:289:lexer_dump(): token_47, TOK_ASSIGN, 0, =
+source/frontend/lexer.cpp:289:lexer_dump(): token_48, TOK_LPAREN, 0, (
+source/frontend/lexer.cpp:289:lexer_dump(): token_49, TOK_MINUS, 0, -
+source/frontend/lexer.cpp:289:lexer_dump(): token_50, TOK_IDENTIFIER, 0, b
+source/frontend/lexer.cpp:289:lexer_dump(): token_51, TOK_MINUS, 0, -
+source/frontend/lexer.cpp:289:lexer_dump(): token_52, TOK_IDENTIFIER, 0, sqrt_D
+source/frontend/lexer.cpp:289:lexer_dump(): token_53, TOK_RPAREN, 0, )
+source/frontend/lexer.cpp:289:lexer_dump(): token_54, TOK_DIVIDE, 0, /
+source/frontend/lexer.cpp:289:lexer_dump(): token_55, TOK_LPAREN, 0, (
+source/frontend/lexer.cpp:289:lexer_dump(): token_56, TOK_NUMBER, 2, 2
+source/frontend/lexer.cpp:289:lexer_dump(): token_57, TOK_MULTIPLY, 0, *
+source/frontend/lexer.cpp:289:lexer_dump(): token_58, TOK_IDENTIFIER, 0, a
+source/frontend/lexer.cpp:289:lexer_dump(): token_59, TOK_RPAREN, 0, )
+source/frontend/lexer.cpp:289:lexer_dump(): token_60, TOK_SEMICOLON, 0, ;
+source/frontend/lexer.cpp:289:lexer_dump(): token_61, TOK_PRINT, 0, print
+source/frontend/lexer.cpp:289:lexer_dump(): token_62, TOK_IDENTIFIER, 0, x1
+source/frontend/lexer.cpp:289:lexer_dump(): token_63, TOK_SEMICOLON, 0, ;
+source/frontend/lexer.cpp:289:lexer_dump(): token_64, TOK_PRINT, 0, print
+source/frontend/lexer.cpp:289:lexer_dump(): token_65, TOK_IDENTIFIER, 0, x2
+source/frontend/lexer.cpp:289:lexer_dump(): token_66, TOK_SEMICOLON, 0, ;
+source/frontend/lexer.cpp:289:lexer_dump(): token_67, TOK_END, 0, $
+source/frontend/lexer.cpp:289:lexer_dump(): token_68, TOK_EOF, 0, 
+main.cpp:52:main(): 
 [INFO] SYNTAX_ANALYSIS START
+source/frontend/syntax_analysis.cpp:212:GetAssignment_tokens(): assignment node created
+source/frontend/syntax_analysis.cpp:212:GetAssignment_tokens(): assignment node created
+source/frontend/syntax_analysis.cpp:212:GetAssignment_tokens(): assignment node created
+source/frontend/syntax_analysis.cpp:212:GetAssignment_tokens(): assignment node created
+source/frontend/syntax_analysis.cpp:212:GetAssignment_tokens(): assignment node created
+source/frontend/syntax_analysis.cpp:212:GetAssignment_tokens(): assignment node created
+source/frontend/syntax_analysis.cpp:212:GetAssignment_tokens(): assignment node created
 source/frontend/syntax_analysis.cpp:122:GetProgram_tokens(): all expression was parsed in tree
-source/common/tree_operations.cpp:173:build_parent_links(): [INFO] start build parent links
+source/common/tree_operations.cpp:172:build_parent_links(): [INFO] start build parent links
 
-source/common/tree_operations.cpp:188:build_parent_links(): [INFO] end build parent links
+source/common/tree_operations.cpp:187:build_parent_links(): [INFO] end build parent links
 
-source/common/errors.cpp:113:tree_graph_dump(): Starting graph dump to logger/tree1.dot and logger/graph_tree1.png
+source/common/errors.cpp:114:tree_graph_dump(): Starting graph dump to logger/tree1.dot and logger/graph_tree1.png
 
-source/common/errors.cpp:157:tree_graph_dump(): Graph dump completed: logger/tree1.dot and logger/graph_tree1.png have been created
+source/common/errors.cpp:158:tree_graph_dump(): Graph dump completed: logger/tree1.dot and logger/graph_tree1.png have been created
 
-main.cpp:68:main(): [INFO] SYNTAX_ANALYSIS END
-main.cpp:71:main(): expression has been loaded successfully
+main.cpp:70:main(): [INFO] SYNTAX_ANALYSIS END
+main.cpp:73:main(): expression has been loaded successfully
 
-main.cpp:75:main(): Everything is good before deletion
-source/common/tree_operations.cpp:159:destroy_tree(): [DEBUG] root->value.root before destroy: tree_size = 0
+main.cpp:75:main(): tree was saved successfully. trying to build it
+source/processor/assember.cpp:27:label_dump(): ============LABELS DUMB============
 
-source/common/errors.cpp:113:tree_graph_dump(): Starting graph dump to logger/tree2.dot and logger/graph_tree2.png
+source/processor/assember.cpp:28:label_dump(): 
+labels dump called from source/processor/assember.cpp assembler: 28
 
-source/common/errors.cpp:157:tree_graph_dump(): Graph dump completed: logger/tree2.dot and logger/graph_tree2.png have been created
+source/processor/assember.cpp:29:label_dump(): labels [0x5c9d057ee500]
+
+source/processor/assember.cpp:30:label_dump(): 
+	Size = 16
+
+source/processor/assember.cpp:31:label_dump(): {
+
+source/processor/assember.cpp:34:label_dump(): 	*[0] = (null) -- -1
+
+source/processor/assember.cpp:34:label_dump(): 	*[1] = (null) -- -1
+
+source/processor/assember.cpp:34:label_dump(): 	*[2] = (null) -- -1
+
+source/processor/assember.cpp:34:label_dump(): 	*[3] = (null) -- -1
+
+source/processor/assember.cpp:34:label_dump(): 	*[4] = (null) -- -1
+
+source/processor/assember.cpp:34:label_dump(): 	*[5] = (null) -- -1
+
+source/processor/assember.cpp:34:label_dump(): 	*[6] = (null) -- -1
+
+source/processor/assember.cpp:34:label_dump(): 	*[7] = (null) -- -1
+
+source/processor/assember.cpp:34:label_dump(): 	*[8] = (null) -- -1
+
+source/processor/assember.cpp:34:label_dump(): 	*[9] = (null) -- -1
+
+source/processor/assember.cpp:34:label_dump(): 	*[10] = (null) -- -1
+
+source/processor/assember.cpp:34:label_dump(): 	*[11] = (null) -- -1
+
+source/processor/assember.cpp:34:label_dump(): 	*[12] = (null) -- -1
+
+source/processor/assember.cpp:34:label_dump(): 	*[13] = (null) -- -1
+
+source/processor/assember.cpp:34:label_dump(): 	*[14] = (null) -- -1
+
+source/processor/assember.cpp:34:label_dump(): 	*[15] = (null) -- -1
+
+source/processor/assember.cpp:39:label_dump(): }
+
+source/processor/assember.cpp:40:label_dump(): ============END LABEL DUMP============
+
+source/processor/assember.cpp:27:label_dump(): ============LABELS DUMB============
+
+source/processor/assember.cpp:28:label_dump(): 
+labels dump called from source/processor/assember.cpp assembler: 28
+
+source/processor/assember.cpp:29:label_dump(): labels [0x5c9d057ee500]
+
+source/processor/assember.cpp:30:label_dump(): 
+	Size = 16
+
+source/processor/assember.cpp:31:label_dump(): {
+
+source/processor/assember.cpp:34:label_dump(): 	*[0] = (null) -- -1
+
+source/processor/assember.cpp:34:label_dump(): 	*[1] = (null) -- -1
+
+source/processor/assember.cpp:34:label_dump(): 	*[2] = (null) -- -1
+
+source/processor/assember.cpp:34:label_dump(): 	*[3] = (null) -- -1
+
+source/processor/assember.cpp:34:label_dump(): 	*[4] = (null) -- -1
+
+source/processor/assember.cpp:34:label_dump(): 	*[5] = (null) -- -1
+
+source/processor/assember.cpp:34:label_dump(): 	*[6] = (null) -- -1
+
+source/processor/assember.cpp:34:label_dump(): 	*[7] = (null) -- -1
+
+source/processor/assember.cpp:34:label_dump(): 	*[8] = (null) -- -1
+
+source/processor/assember.cpp:34:label_dump(): 	*[9] = (null) -- -1
+
+source/processor/assember.cpp:34:label_dump(): 	*[10] = (null) -- -1
+
+source/processor/assember.cpp:34:label_dump(): 	*[11] = (null) -- -1
+
+source/processor/assember.cpp:34:label_dump(): 	*[12] = (null) -- -1
+
+source/processor/assember.cpp:34:label_dump(): 	*[13] = (null) -- -1
+
+source/processor/assember.cpp:34:label_dump(): 	*[14] = (null) -- -1
+
+source/processor/assember.cpp:34:label_dump(): 	*[15] = (null) -- -1
+
+source/processor/assember.cpp:39:label_dump(): }
+
+source/processor/assember.cpp:40:label_dump(): ============END LABEL DUMP============
+
+source/processor/assember.cpp:332:load_bytecode(): Can not open the file text/byte_code.txt.
+
+main.cpp:144:main(): Everything is good before deletion
+source/common/errors.cpp:114:tree_graph_dump(): Starting graph dump to logger/tree2.dot and logger/graph_tree2.png
+
+source/common/errors.cpp:158:tree_graph_dump(): Graph dump completed: logger/tree2.dot and logger/graph_tree2.png have been created
 
 source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000050, type=IDENTIFIER
-source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000090, type=IDENTIFIER
-source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x5040000000d0, type=OPERATOR
-source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000110, type=OPERATOR
-source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000150, type=IDENTIFIER
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000090, type=NUMBER
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x5040000000d0, type=STATEMENT
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000110, type=IDENTIFIER
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000150, type=NUMBER
 source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000190, type=OPERATOR
-source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x5040000001d0, type=OPERATOR
-source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000210, type=OPERATOR
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x5040000001d0, type=STATEMENT
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000210, type=STATEMENT
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000250, type=IDENTIFIER
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000290, type=NUMBER
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x5040000002d0, type=STATEMENT
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000310, type=STATEMENT
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000350, type=IDENTIFIER
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000390, type=IDENTIFIER
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x5040000003d0, type=IDENTIFIER
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000410, type=OPERATOR
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000450, type=NUMBER
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000490, type=IDENTIFIER
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x5040000004d0, type=OPERATOR
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000510, type=IDENTIFIER
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000550, type=OPERATOR
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000590, type=OPERATOR
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x5040000005d0, type=STATEMENT
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000610, type=STATEMENT
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000650, type=IDENTIFIER
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000690, type=IDENTIFIER
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x5040000006d0, type=IDENTIFIER
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000710, type=OPERATOR
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000750, type=STATEMENT
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000790, type=STATEMENT
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x5040000007d0, type=IDENTIFIER
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000810, type=IDENTIFIER
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000850, type=OPERATOR
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000890, type=IDENTIFIER
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x5040000008d0, type=OPERATOR
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000910, type=NUMBER
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000950, type=IDENTIFIER
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000990, type=OPERATOR
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x5040000009d0, type=OPERATOR
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000a10, type=STATEMENT
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000a50, type=STATEMENT
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000a90, type=IDENTIFIER
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000ad0, type=IDENTIFIER
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000b10, type=OPERATOR
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000b50, type=IDENTIFIER
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000b90, type=OPERATOR
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000bd0, type=NUMBER
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000c10, type=IDENTIFIER
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000c50, type=OPERATOR
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000c90, type=OPERATOR
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000cd0, type=STATEMENT
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000d10, type=STATEMENT
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000d50, type=IDENTIFIER
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000d90, type=STATEMENT
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000dd0, type=STATEMENT
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000e10, type=IDENTIFIER
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000e50, type=STATEMENT
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000e90, type=STATEMENT
 source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000010, type=ROOT
-main.cpp:81:main(): tree deleted succefully
+main.cpp:149:main(): tree deleted succefully
+main.cpp:37:main(): [INFO] LEXICAL_ANALYSIS START
+source/frontend/lexer.cpp:132:lexicalAnalysis(): buffer: a = 1;
+b = -5;
+c = 6;
+D = b*b - 4*a*c;
+
+sqrt_D = D*D;
+x1 = (-b + sqrt_D)/(2*a);
+x2 = (-b - sqrt_D)/(2*a); 
+print x1;
+print x2;$
+
+main.cpp:47:main(): [INFO] LEXICAL_ANALYSIS END
+source/frontend/lexer.cpp:285:lexer_dump(): [LEXER DUMP]
+source/frontend/lexer.cpp:286:lexer_dump(): token_list.count = 69, token_list->capacity = 128
+source/frontend/lexer.cpp:289:lexer_dump(): token_0, TOK_IDENTIFIER, 0, a
+source/frontend/lexer.cpp:289:lexer_dump(): token_1, TOK_ASSIGN, 0, =
+source/frontend/lexer.cpp:289:lexer_dump(): token_2, TOK_NUMBER, 1, 1
+source/frontend/lexer.cpp:289:lexer_dump(): token_3, TOK_SEMICOLON, 0, ;
+source/frontend/lexer.cpp:289:lexer_dump(): token_4, TOK_IDENTIFIER, 0, b
+source/frontend/lexer.cpp:289:lexer_dump(): token_5, TOK_ASSIGN, 0, =
+source/frontend/lexer.cpp:289:lexer_dump(): token_6, TOK_MINUS, 0, -
+source/frontend/lexer.cpp:289:lexer_dump(): token_7, TOK_NUMBER, 5, 5
+source/frontend/lexer.cpp:289:lexer_dump(): token_8, TOK_SEMICOLON, 0, ;
+source/frontend/lexer.cpp:289:lexer_dump(): token_9, TOK_IDENTIFIER, 0, c
+source/frontend/lexer.cpp:289:lexer_dump(): token_10, TOK_ASSIGN, 0, =
+source/frontend/lexer.cpp:289:lexer_dump(): token_11, TOK_NUMBER, 6, 6
+source/frontend/lexer.cpp:289:lexer_dump(): token_12, TOK_SEMICOLON, 0, ;
+source/frontend/lexer.cpp:289:lexer_dump(): token_13, TOK_IDENTIFIER, 0, D
+source/frontend/lexer.cpp:289:lexer_dump(): token_14, TOK_ASSIGN, 0, =
+source/frontend/lexer.cpp:289:lexer_dump(): token_15, TOK_IDENTIFIER, 0, b
+source/frontend/lexer.cpp:289:lexer_dump(): token_16, TOK_MULTIPLY, 0, *
+source/frontend/lexer.cpp:289:lexer_dump(): token_17, TOK_IDENTIFIER, 0, b
+source/frontend/lexer.cpp:289:lexer_dump(): token_18, TOK_MINUS, 0, -
+source/frontend/lexer.cpp:289:lexer_dump(): token_19, TOK_NUMBER, 4, 4
+source/frontend/lexer.cpp:289:lexer_dump(): token_20, TOK_MULTIPLY, 0, *
+source/frontend/lexer.cpp:289:lexer_dump(): token_21, TOK_IDENTIFIER, 0, a
+source/frontend/lexer.cpp:289:lexer_dump(): token_22, TOK_MULTIPLY, 0, *
+source/frontend/lexer.cpp:289:lexer_dump(): token_23, TOK_IDENTIFIER, 0, c
+source/frontend/lexer.cpp:289:lexer_dump(): token_24, TOK_SEMICOLON, 0, ;
+source/frontend/lexer.cpp:289:lexer_dump(): token_25, TOK_IDENTIFIER, 0, sqrt_D
+source/frontend/lexer.cpp:289:lexer_dump(): token_26, TOK_ASSIGN, 0, =
+source/frontend/lexer.cpp:289:lexer_dump(): token_27, TOK_IDENTIFIER, 0, D
+source/frontend/lexer.cpp:289:lexer_dump(): token_28, TOK_MULTIPLY, 0, *
+source/frontend/lexer.cpp:289:lexer_dump(): token_29, TOK_IDENTIFIER, 0, D
+source/frontend/lexer.cpp:289:lexer_dump(): token_30, TOK_SEMICOLON, 0, ;
+source/frontend/lexer.cpp:289:lexer_dump(): token_31, TOK_IDENTIFIER, 0, x1
+source/frontend/lexer.cpp:289:lexer_dump(): token_32, TOK_ASSIGN, 0, =
+source/frontend/lexer.cpp:289:lexer_dump(): token_33, TOK_LPAREN, 0, (
+source/frontend/lexer.cpp:289:lexer_dump(): token_34, TOK_MINUS, 0, -
+source/frontend/lexer.cpp:289:lexer_dump(): token_35, TOK_IDENTIFIER, 0, b
+source/frontend/lexer.cpp:289:lexer_dump(): token_36, TOK_PLUS, 0, +
+source/frontend/lexer.cpp:289:lexer_dump(): token_37, TOK_IDENTIFIER, 0, sqrt_D
+source/frontend/lexer.cpp:289:lexer_dump(): token_38, TOK_RPAREN, 0, )
+source/frontend/lexer.cpp:289:lexer_dump(): token_39, TOK_DIVIDE, 0, /
+source/frontend/lexer.cpp:289:lexer_dump(): token_40, TOK_LPAREN, 0, (
+source/frontend/lexer.cpp:289:lexer_dump(): token_41, TOK_NUMBER, 2, 2
+source/frontend/lexer.cpp:289:lexer_dump(): token_42, TOK_MULTIPLY, 0, *
+source/frontend/lexer.cpp:289:lexer_dump(): token_43, TOK_IDENTIFIER, 0, a
+source/frontend/lexer.cpp:289:lexer_dump(): token_44, TOK_RPAREN, 0, )
+source/frontend/lexer.cpp:289:lexer_dump(): token_45, TOK_SEMICOLON, 0, ;
+source/frontend/lexer.cpp:289:lexer_dump(): token_46, TOK_IDENTIFIER, 0, x2
+source/frontend/lexer.cpp:289:lexer_dump(): token_47, TOK_ASSIGN, 0, =
+source/frontend/lexer.cpp:289:lexer_dump(): token_48, TOK_LPAREN, 0, (
+source/frontend/lexer.cpp:289:lexer_dump(): token_49, TOK_MINUS, 0, -
+source/frontend/lexer.cpp:289:lexer_dump(): token_50, TOK_IDENTIFIER, 0, b
+source/frontend/lexer.cpp:289:lexer_dump(): token_51, TOK_MINUS, 0, -
+source/frontend/lexer.cpp:289:lexer_dump(): token_52, TOK_IDENTIFIER, 0, sqrt_D
+source/frontend/lexer.cpp:289:lexer_dump(): token_53, TOK_RPAREN, 0, )
+source/frontend/lexer.cpp:289:lexer_dump(): token_54, TOK_DIVIDE, 0, /
+source/frontend/lexer.cpp:289:lexer_dump(): token_55, TOK_LPAREN, 0, (
+source/frontend/lexer.cpp:289:lexer_dump(): token_56, TOK_NUMBER, 2, 2
+source/frontend/lexer.cpp:289:lexer_dump(): token_57, TOK_MULTIPLY, 0, *
+source/frontend/lexer.cpp:289:lexer_dump(): token_58, TOK_IDENTIFIER, 0, a
+source/frontend/lexer.cpp:289:lexer_dump(): token_59, TOK_RPAREN, 0, )
+source/frontend/lexer.cpp:289:lexer_dump(): token_60, TOK_SEMICOLON, 0, ;
+source/frontend/lexer.cpp:289:lexer_dump(): token_61, TOK_PRINT, 0, print
+source/frontend/lexer.cpp:289:lexer_dump(): token_62, TOK_IDENTIFIER, 0, x1
+source/frontend/lexer.cpp:289:lexer_dump(): token_63, TOK_SEMICOLON, 0, ;
+source/frontend/lexer.cpp:289:lexer_dump(): token_64, TOK_PRINT, 0, print
+source/frontend/lexer.cpp:289:lexer_dump(): token_65, TOK_IDENTIFIER, 0, x2
+source/frontend/lexer.cpp:289:lexer_dump(): token_66, TOK_SEMICOLON, 0, ;
+source/frontend/lexer.cpp:289:lexer_dump(): token_67, TOK_END, 0, $
+source/frontend/lexer.cpp:289:lexer_dump(): token_68, TOK_EOF, 0, 
+main.cpp:52:main(): 
+[INFO] SYNTAX_ANALYSIS START
+source/frontend/syntax_analysis.cpp:212:GetAssignment_tokens(): assignment node created
+source/frontend/syntax_analysis.cpp:212:GetAssignment_tokens(): assignment node created
+source/frontend/syntax_analysis.cpp:212:GetAssignment_tokens(): assignment node created
+source/frontend/syntax_analysis.cpp:212:GetAssignment_tokens(): assignment node created
+source/frontend/syntax_analysis.cpp:212:GetAssignment_tokens(): assignment node created
+source/frontend/syntax_analysis.cpp:212:GetAssignment_tokens(): assignment node created
+source/frontend/syntax_analysis.cpp:212:GetAssignment_tokens(): assignment node created
+source/frontend/syntax_analysis.cpp:122:GetProgram_tokens(): all expression was parsed in tree
+source/common/tree_operations.cpp:172:build_parent_links(): [INFO] start build parent links
+
+source/common/tree_operations.cpp:187:build_parent_links(): [INFO] end build parent links
+
+source/common/errors.cpp:114:tree_graph_dump(): Starting graph dump to logger/tree1.dot and logger/graph_tree1.png
+
+source/common/errors.cpp:158:tree_graph_dump(): Graph dump completed: logger/tree1.dot and logger/graph_tree1.png have been created
+
+main.cpp:70:main(): [INFO] SYNTAX_ANALYSIS END
+main.cpp:73:main(): expression has been loaded successfully
+
+main.cpp:75:main(): tree was saved successfully. trying to build it
+source/processor/assember.cpp:27:label_dump(): ============LABELS DUMB============
+
+source/processor/assember.cpp:28:label_dump(): 
+labels dump called from source/processor/assember.cpp assembler: 28
+
+source/processor/assember.cpp:29:label_dump(): labels [0x5cedad71f500]
+
+source/processor/assember.cpp:30:label_dump(): 
+	Size = 16
+
+source/processor/assember.cpp:31:label_dump(): {
+
+source/processor/assember.cpp:34:label_dump(): 	*[0] = (null) -- -1
+
+source/processor/assember.cpp:34:label_dump(): 	*[1] = (null) -- -1
+
+source/processor/assember.cpp:34:label_dump(): 	*[2] = (null) -- -1
+
+source/processor/assember.cpp:34:label_dump(): 	*[3] = (null) -- -1
+
+source/processor/assember.cpp:34:label_dump(): 	*[4] = (null) -- -1
+
+source/processor/assember.cpp:34:label_dump(): 	*[5] = (null) -- -1
+
+source/processor/assember.cpp:34:label_dump(): 	*[6] = (null) -- -1
+
+source/processor/assember.cpp:34:label_dump(): 	*[7] = (null) -- -1
+
+source/processor/assember.cpp:34:label_dump(): 	*[8] = (null) -- -1
+
+source/processor/assember.cpp:34:label_dump(): 	*[9] = (null) -- -1
+
+source/processor/assember.cpp:34:label_dump(): 	*[10] = (null) -- -1
+
+source/processor/assember.cpp:34:label_dump(): 	*[11] = (null) -- -1
+
+source/processor/assember.cpp:34:label_dump(): 	*[12] = (null) -- -1
+
+source/processor/assember.cpp:34:label_dump(): 	*[13] = (null) -- -1
+
+source/processor/assember.cpp:34:label_dump(): 	*[14] = (null) -- -1
+
+source/processor/assember.cpp:34:label_dump(): 	*[15] = (null) -- -1
+
+source/processor/assember.cpp:39:label_dump(): }
+
+source/processor/assember.cpp:40:label_dump(): ============END LABEL DUMP============
+
+source/processor/assember.cpp:27:label_dump(): ============LABELS DUMB============
+
+source/processor/assember.cpp:28:label_dump(): 
+labels dump called from source/processor/assember.cpp assembler: 28
+
+source/processor/assember.cpp:29:label_dump(): labels [0x5cedad71f500]
+
+source/processor/assember.cpp:30:label_dump(): 
+	Size = 16
+
+source/processor/assember.cpp:31:label_dump(): {
+
+source/processor/assember.cpp:34:label_dump(): 	*[0] = (null) -- -1
+
+source/processor/assember.cpp:34:label_dump(): 	*[1] = (null) -- -1
+
+source/processor/assember.cpp:34:label_dump(): 	*[2] = (null) -- -1
+
+source/processor/assember.cpp:34:label_dump(): 	*[3] = (null) -- -1
+
+source/processor/assember.cpp:34:label_dump(): 	*[4] = (null) -- -1
+
+source/processor/assember.cpp:34:label_dump(): 	*[5] = (null) -- -1
+
+source/processor/assember.cpp:34:label_dump(): 	*[6] = (null) -- -1
+
+source/processor/assember.cpp:34:label_dump(): 	*[7] = (null) -- -1
+
+source/processor/assember.cpp:34:label_dump(): 	*[8] = (null) -- -1
+
+source/processor/assember.cpp:34:label_dump(): 	*[9] = (null) -- -1
+
+source/processor/assember.cpp:34:label_dump(): 	*[10] = (null) -- -1
+
+source/processor/assember.cpp:34:label_dump(): 	*[11] = (null) -- -1
+
+source/processor/assember.cpp:34:label_dump(): 	*[12] = (null) -- -1
+
+source/processor/assember.cpp:34:label_dump(): 	*[13] = (null) -- -1
+
+source/processor/assember.cpp:34:label_dump(): 	*[14] = (null) -- -1
+
+source/processor/assember.cpp:34:label_dump(): 	*[15] = (null) -- -1
+
+source/processor/assember.cpp:39:label_dump(): }
+
+source/processor/assember.cpp:40:label_dump(): ============END LABEL DUMP============
+
+source/processor/errors_spu.cpp:114:spu_dump(): ============SPU DUMP============
+
+source/processor/errors_spu.cpp:115:spu_dump(): SPU DUMP called from source/processor/spu.cpp:80
+
+source/processor/errors_spu.cpp:116:spu_dump(): SPU ERROR: OK (0)
+
+source/processor/errors_spu.cpp:123:spu_dump(): 
+SPU [0x7ffe114d04e0]
+
+source/processor/errors_spu.cpp:124:spu_dump(): {
+
+source/processor/errors_spu.cpp:125:spu_dump():     code_size:        77
+
+source/processor/errors_spu.cpp:126:spu_dump():     code_size:        77
+
+source/processor/errors_spu.cpp:127:spu_dump():     instructor_ptr:  2
+
+source/processor/errors_spu.cpp:129:spu_dump(): code [0x512000000040]
+
+source/processor/errors_spu.cpp:130:spu_dump(): {
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[0] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[1] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[2] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[3] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[4] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[5] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[6] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[7] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[8] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[9] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[10] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[11] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[12] = 6
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[13] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[14] = 2
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[15] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[16] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[17] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[18] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[19] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[20] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[21] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[22] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[23] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[24] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[25] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[26] = 2
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[27] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[28] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[29] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[30] = 3
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[31] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[32] = 3
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[33] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[34] = 3
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[35] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[36] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[37] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[38] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[39] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[40] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[41] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[42] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[43] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[44] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[45] = 3
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[46] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[47] = 2
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[48] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[49] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[50] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[51] = 6
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[52] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[53] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[54] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[55] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[56] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[57] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[58] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[59] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[60] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[61] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[62] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[63] = 2
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[64] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[65] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[66] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[67] = 6
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[68] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[69] = 6
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[70] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[71] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[72] = 8
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[73] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[74] = 6
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[75] = 8
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[76] = 0
+
+source/processor/errors_spu.cpp:149:spu_dump(): }
+
+source/processor/errors_spu.cpp:152:spu_dump(): 
+    Registers:
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[0] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[1] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[2] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[3] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[4] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[5] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[6] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[7] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[8] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[9] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[10] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[11] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[12] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[13] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[14] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[15] = 0
+
+source/processor/errors_spu.cpp:156:spu_dump(): 
+    Stack state:
+
+source/processor/errors_spu.cpp:67:stack_dump(): ============STACK DUMP============
+
+source/processor/errors_spu.cpp:68:stack_dump(): 
+stack_dump called from source/processor/spu.cpp : 80
+
+source/processor/errors_spu.cpp:69:stack_dump(): Error: Success (0)
+
+source/processor/errors_spu.cpp:77:stack_dump(): Stack [0x7ffe114d04f8]
+
+source/processor/errors_spu.cpp:78:stack_dump(): {
+	Size = 1
+
+source/processor/errors_spu.cpp:79:stack_dump(): 	Capacity = 8
+}
+
+source/processor/errors_spu.cpp:80:stack_dump(): data [0x503000000040]
+
+source/processor/errors_spu.cpp:81:stack_dump(): {
+
+source/processor/errors_spu.cpp:98:stack_dump(): 	*[0] = 1
+
+source/processor/errors_spu.cpp:102:stack_dump(): 	 [1] = RUBBISH
+
+source/processor/errors_spu.cpp:102:stack_dump(): 	 [2] = RUBBISH
+
+source/processor/errors_spu.cpp:102:stack_dump(): 	 [3] = RUBBISH
+
+source/processor/errors_spu.cpp:102:stack_dump(): 	 [4] = RUBBISH
+
+source/processor/errors_spu.cpp:102:stack_dump(): 	 [5] = RUBBISH
+
+source/processor/errors_spu.cpp:102:stack_dump(): 	 [6] = RUBBISH
+
+source/processor/errors_spu.cpp:102:stack_dump(): 	 [7] = RUBBISH
+
+source/processor/errors_spu.cpp:104:stack_dump(): }
+
+source/processor/errors_spu.cpp:106:stack_dump(): ============END STACK DUMP============
+
+source/processor/errors_spu.cpp:159:spu_dump(): }
+========================================
+
+
+source/processor/errors_spu.cpp:114:spu_dump(): ============SPU DUMP============
+
+source/processor/errors_spu.cpp:115:spu_dump(): SPU DUMP called from source/processor/spu.cpp:80
+
+source/processor/errors_spu.cpp:116:spu_dump(): SPU ERROR: OK (0)
+
+source/processor/errors_spu.cpp:123:spu_dump(): 
+SPU [0x7ffe114d04e0]
+
+source/processor/errors_spu.cpp:124:spu_dump(): {
+
+source/processor/errors_spu.cpp:125:spu_dump():     code_size:        77
+
+source/processor/errors_spu.cpp:126:spu_dump():     code_size:        77
+
+source/processor/errors_spu.cpp:127:spu_dump():     instructor_ptr:  6
+
+source/processor/errors_spu.cpp:129:spu_dump(): code [0x512000000040]
+
+source/processor/errors_spu.cpp:130:spu_dump(): {
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[0] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[1] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[2] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[3] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[4] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[5] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[6] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[7] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[8] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[9] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[10] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[11] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[12] = 6
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[13] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[14] = 2
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[15] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[16] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[17] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[18] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[19] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[20] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[21] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[22] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[23] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[24] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[25] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[26] = 2
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[27] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[28] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[29] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[30] = 3
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[31] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[32] = 3
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[33] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[34] = 3
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[35] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[36] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[37] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[38] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[39] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[40] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[41] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[42] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[43] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[44] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[45] = 3
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[46] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[47] = 2
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[48] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[49] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[50] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[51] = 6
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[52] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[53] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[54] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[55] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[56] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[57] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[58] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[59] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[60] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[61] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[62] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[63] = 2
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[64] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[65] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[66] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[67] = 6
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[68] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[69] = 6
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[70] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[71] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[72] = 8
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[73] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[74] = 6
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[75] = 8
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[76] = 0
+
+source/processor/errors_spu.cpp:149:spu_dump(): }
+
+source/processor/errors_spu.cpp:152:spu_dump(): 
+    Registers:
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[0] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[1] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[2] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[3] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[4] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[5] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[6] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[7] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[8] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[9] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[10] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[11] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[12] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[13] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[14] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[15] = 0
+
+source/processor/errors_spu.cpp:156:spu_dump(): 
+    Stack state:
+
+source/processor/errors_spu.cpp:67:stack_dump(): ============STACK DUMP============
+
+source/processor/errors_spu.cpp:68:stack_dump(): 
+stack_dump called from source/processor/spu.cpp : 80
+
+source/processor/errors_spu.cpp:69:stack_dump(): Error: Success (0)
+
+source/processor/errors_spu.cpp:77:stack_dump(): Stack [0x7ffe114d04f8]
+
+source/processor/errors_spu.cpp:78:stack_dump(): {
+	Size = 1
+
+source/processor/errors_spu.cpp:79:stack_dump(): 	Capacity = 8
+}
+
+source/processor/errors_spu.cpp:80:stack_dump(): data [0x503000000040]
+
+source/processor/errors_spu.cpp:81:stack_dump(): {
+
+source/processor/errors_spu.cpp:98:stack_dump(): 	*[0] = 5
+
+source/processor/errors_spu.cpp:102:stack_dump(): 	 [1] = RUBBISH
+
+source/processor/errors_spu.cpp:102:stack_dump(): 	 [2] = RUBBISH
+
+source/processor/errors_spu.cpp:102:stack_dump(): 	 [3] = RUBBISH
+
+source/processor/errors_spu.cpp:102:stack_dump(): 	 [4] = RUBBISH
+
+source/processor/errors_spu.cpp:102:stack_dump(): 	 [5] = RUBBISH
+
+source/processor/errors_spu.cpp:102:stack_dump(): 	 [6] = RUBBISH
+
+source/processor/errors_spu.cpp:102:stack_dump(): 	 [7] = RUBBISH
+
+source/processor/errors_spu.cpp:104:stack_dump(): }
+
+source/processor/errors_spu.cpp:106:stack_dump(): ============END STACK DUMP============
+
+source/processor/errors_spu.cpp:159:spu_dump(): }
+========================================
+
+
+source/processor/errors_spu.cpp:114:spu_dump(): ============SPU DUMP============
+
+source/processor/errors_spu.cpp:115:spu_dump(): SPU DUMP called from source/processor/spu.cpp:80
+
+source/processor/errors_spu.cpp:116:spu_dump(): SPU ERROR: OK (0)
+
+source/processor/errors_spu.cpp:123:spu_dump(): 
+SPU [0x7ffe114d04e0]
+
+source/processor/errors_spu.cpp:124:spu_dump(): {
+
+source/processor/errors_spu.cpp:125:spu_dump():     code_size:        77
+
+source/processor/errors_spu.cpp:126:spu_dump():     code_size:        77
+
+source/processor/errors_spu.cpp:127:spu_dump():     instructor_ptr:  8
+
+source/processor/errors_spu.cpp:129:spu_dump(): code [0x512000000040]
+
+source/processor/errors_spu.cpp:130:spu_dump(): {
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[0] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[1] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[2] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[3] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[4] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[5] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[6] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[7] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[8] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[9] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[10] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[11] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[12] = 6
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[13] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[14] = 2
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[15] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[16] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[17] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[18] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[19] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[20] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[21] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[22] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[23] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[24] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[25] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[26] = 2
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[27] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[28] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[29] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[30] = 3
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[31] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[32] = 3
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[33] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[34] = 3
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[35] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[36] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[37] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[38] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[39] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[40] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[41] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[42] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[43] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[44] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[45] = 3
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[46] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[47] = 2
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[48] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[49] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[50] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[51] = 6
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[52] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[53] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[54] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[55] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[56] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[57] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[58] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[59] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[60] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[61] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[62] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[63] = 2
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[64] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[65] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[66] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[67] = 6
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[68] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[69] = 6
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[70] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[71] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[72] = 8
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[73] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[74] = 6
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[75] = 8
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[76] = 0
+
+source/processor/errors_spu.cpp:149:spu_dump(): }
+
+source/processor/errors_spu.cpp:152:spu_dump(): 
+    Registers:
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[0] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[1] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[2] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[3] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[4] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[5] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[6] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[7] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[8] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[9] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[10] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[11] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[12] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[13] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[14] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[15] = 0
+
+source/processor/errors_spu.cpp:156:spu_dump(): 
+    Stack state:
+
+source/processor/errors_spu.cpp:67:stack_dump(): ============STACK DUMP============
+
+source/processor/errors_spu.cpp:68:stack_dump(): 
+stack_dump called from source/processor/spu.cpp : 80
+
+source/processor/errors_spu.cpp:69:stack_dump(): Error: Success (0)
+
+source/processor/errors_spu.cpp:77:stack_dump(): Stack [0x7ffe114d04f8]
+
+source/processor/errors_spu.cpp:78:stack_dump(): {
+	Size = 2
+
+source/processor/errors_spu.cpp:79:stack_dump(): 	Capacity = 8
+}
+
+source/processor/errors_spu.cpp:80:stack_dump(): data [0x503000000040]
+
+source/processor/errors_spu.cpp:81:stack_dump(): {
+
+source/processor/errors_spu.cpp:98:stack_dump(): 	*[0] = 5
+
+source/processor/errors_spu.cpp:98:stack_dump(): 	*[1] = 0
+
+source/processor/errors_spu.cpp:102:stack_dump(): 	 [2] = RUBBISH
+
+source/processor/errors_spu.cpp:102:stack_dump(): 	 [3] = RUBBISH
+
+source/processor/errors_spu.cpp:102:stack_dump(): 	 [4] = RUBBISH
+
+source/processor/errors_spu.cpp:102:stack_dump(): 	 [5] = RUBBISH
+
+source/processor/errors_spu.cpp:102:stack_dump(): 	 [6] = RUBBISH
+
+source/processor/errors_spu.cpp:102:stack_dump(): 	 [7] = RUBBISH
+
+source/processor/errors_spu.cpp:104:stack_dump(): }
+
+source/processor/errors_spu.cpp:106:stack_dump(): ============END STACK DUMP============
+
+source/processor/errors_spu.cpp:159:spu_dump(): }
+========================================
+
+
+source/processor/errors_spu.cpp:114:spu_dump(): ============SPU DUMP============
+
+source/processor/errors_spu.cpp:115:spu_dump(): SPU DUMP called from source/processor/spu.cpp:80
+
+source/processor/errors_spu.cpp:116:spu_dump(): SPU ERROR: OK (0)
+
+source/processor/errors_spu.cpp:123:spu_dump(): 
+SPU [0x7ffe114d04e0]
+
+source/processor/errors_spu.cpp:124:spu_dump(): {
+
+source/processor/errors_spu.cpp:125:spu_dump():     code_size:        77
+
+source/processor/errors_spu.cpp:126:spu_dump():     code_size:        77
+
+source/processor/errors_spu.cpp:127:spu_dump():     instructor_ptr:  13
+
+source/processor/errors_spu.cpp:129:spu_dump(): code [0x512000000040]
+
+source/processor/errors_spu.cpp:130:spu_dump(): {
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[0] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[1] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[2] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[3] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[4] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[5] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[6] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[7] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[8] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[9] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[10] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[11] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[12] = 6
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[13] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[14] = 2
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[15] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[16] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[17] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[18] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[19] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[20] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[21] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[22] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[23] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[24] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[25] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[26] = 2
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[27] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[28] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[29] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[30] = 3
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[31] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[32] = 3
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[33] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[34] = 3
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[35] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[36] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[37] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[38] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[39] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[40] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[41] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[42] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[43] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[44] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[45] = 3
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[46] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[47] = 2
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[48] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[49] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[50] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[51] = 6
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[52] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[53] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[54] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[55] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[56] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[57] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[58] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[59] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[60] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[61] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[62] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[63] = 2
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[64] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[65] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[66] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[67] = 6
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[68] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[69] = 6
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[70] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[71] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[72] = 8
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[73] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[74] = 6
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[75] = 8
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[76] = 0
+
+source/processor/errors_spu.cpp:149:spu_dump(): }
+
+source/processor/errors_spu.cpp:152:spu_dump(): 
+    Registers:
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[0] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[1] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[2] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[3] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[4] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[5] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[6] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[7] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[8] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[9] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[10] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[11] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[12] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[13] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[14] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[15] = 0
+
+source/processor/errors_spu.cpp:156:spu_dump(): 
+    Stack state:
+
+source/processor/errors_spu.cpp:67:stack_dump(): ============STACK DUMP============
+
+source/processor/errors_spu.cpp:68:stack_dump(): 
+stack_dump called from source/processor/spu.cpp : 80
+
+source/processor/errors_spu.cpp:69:stack_dump(): Error: Success (0)
+
+source/processor/errors_spu.cpp:77:stack_dump(): Stack [0x7ffe114d04f8]
+
+source/processor/errors_spu.cpp:78:stack_dump(): {
+	Size = 1
+
+source/processor/errors_spu.cpp:79:stack_dump(): 	Capacity = 4
+}
+
+source/processor/errors_spu.cpp:80:stack_dump(): data [0x502000000c90]
+
+source/processor/errors_spu.cpp:81:stack_dump(): {
+
+source/processor/errors_spu.cpp:98:stack_dump(): 	*[0] = 6
+
+source/processor/errors_spu.cpp:102:stack_dump(): 	 [1] = RUBBISH
+
+source/processor/errors_spu.cpp:102:stack_dump(): 	 [2] = RUBBISH
+
+source/processor/errors_spu.cpp:102:stack_dump(): 	 [3] = RUBBISH
+
+source/processor/errors_spu.cpp:104:stack_dump(): }
+
+source/processor/errors_spu.cpp:106:stack_dump(): ============END STACK DUMP============
+
+source/processor/errors_spu.cpp:159:spu_dump(): }
+========================================
+
+
+source/processor/errors_spu.cpp:114:spu_dump(): ============SPU DUMP============
+
+source/processor/errors_spu.cpp:115:spu_dump(): SPU DUMP called from source/processor/spu.cpp:80
+
+source/processor/errors_spu.cpp:116:spu_dump(): SPU ERROR: OK (0)
+
+source/processor/errors_spu.cpp:123:spu_dump(): 
+SPU [0x7ffe114d04e0]
+
+source/processor/errors_spu.cpp:124:spu_dump(): {
+
+source/processor/errors_spu.cpp:125:spu_dump():     code_size:        77
+
+source/processor/errors_spu.cpp:126:spu_dump():     code_size:        77
+
+source/processor/errors_spu.cpp:127:spu_dump():     instructor_ptr:  22
+
+source/processor/errors_spu.cpp:129:spu_dump(): code [0x512000000040]
+
+source/processor/errors_spu.cpp:130:spu_dump(): {
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[0] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[1] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[2] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[3] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[4] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[5] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[6] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[7] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[8] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[9] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[10] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[11] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[12] = 6
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[13] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[14] = 2
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[15] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[16] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[17] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[18] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[19] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[20] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[21] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[22] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[23] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[24] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[25] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[26] = 2
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[27] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[28] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[29] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[30] = 3
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[31] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[32] = 3
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[33] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[34] = 3
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[35] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[36] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[37] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[38] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[39] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[40] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[41] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[42] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[43] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[44] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[45] = 3
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[46] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[47] = 2
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[48] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[49] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[50] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[51] = 6
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[52] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[53] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[54] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[55] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[56] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[57] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[58] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[59] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[60] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[61] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[62] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[63] = 2
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[64] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[65] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[66] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[67] = 6
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[68] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[69] = 6
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[70] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[71] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[72] = 8
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[73] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[74] = 6
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[75] = 8
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[76] = 0
+
+source/processor/errors_spu.cpp:149:spu_dump(): }
+
+source/processor/errors_spu.cpp:152:spu_dump(): 
+    Registers:
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[0] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[1] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[2] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[3] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[4] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[5] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[6] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[7] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[8] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[9] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[10] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[11] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[12] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[13] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[14] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[15] = 0
+
+source/processor/errors_spu.cpp:156:spu_dump(): 
+    Stack state:
+
+source/processor/errors_spu.cpp:67:stack_dump(): ============STACK DUMP============
+
+source/processor/errors_spu.cpp:68:stack_dump(): 
+stack_dump called from source/processor/spu.cpp : 80
+
+source/processor/errors_spu.cpp:69:stack_dump(): Error: Success (0)
+
+source/processor/errors_spu.cpp:77:stack_dump(): Stack [0x7ffe114d04f8]
+
+source/processor/errors_spu.cpp:78:stack_dump(): {
+	Size = 2
+
+source/processor/errors_spu.cpp:79:stack_dump(): 	Capacity = 4
+}
+
+source/processor/errors_spu.cpp:80:stack_dump(): data [0x502000000c90]
+
+source/processor/errors_spu.cpp:81:stack_dump(): {
+
+source/processor/errors_spu.cpp:98:stack_dump(): 	*[0] = 25
+
+source/processor/errors_spu.cpp:98:stack_dump(): 	*[1] = 4
+
+source/processor/errors_spu.cpp:102:stack_dump(): 	 [2] = RUBBISH
+
+source/processor/errors_spu.cpp:102:stack_dump(): 	 [3] = RUBBISH
+
+source/processor/errors_spu.cpp:104:stack_dump(): }
+
+source/processor/errors_spu.cpp:106:stack_dump(): ============END STACK DUMP============
+
+source/processor/errors_spu.cpp:159:spu_dump(): }
+========================================
+
+
+source/processor/errors_spu.cpp:114:spu_dump(): ============SPU DUMP============
+
+source/processor/errors_spu.cpp:115:spu_dump(): SPU DUMP called from source/processor/spu.cpp:80
+
+source/processor/errors_spu.cpp:116:spu_dump(): SPU ERROR: OK (0)
+
+source/processor/errors_spu.cpp:123:spu_dump(): 
+SPU [0x7ffe114d04e0]
+
+source/processor/errors_spu.cpp:124:spu_dump(): {
+
+source/processor/errors_spu.cpp:125:spu_dump():     code_size:        77
+
+source/processor/errors_spu.cpp:126:spu_dump():     code_size:        77
+
+source/processor/errors_spu.cpp:127:spu_dump():     instructor_ptr:  42
+
+source/processor/errors_spu.cpp:129:spu_dump(): code [0x512000000040]
+
+source/processor/errors_spu.cpp:130:spu_dump(): {
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[0] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[1] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[2] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[3] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[4] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[5] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[6] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[7] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[8] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[9] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[10] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[11] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[12] = 6
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[13] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[14] = 2
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[15] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[16] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[17] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[18] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[19] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[20] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[21] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[22] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[23] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[24] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[25] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[26] = 2
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[27] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[28] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[29] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[30] = 3
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[31] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[32] = 3
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[33] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[34] = 3
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[35] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[36] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[37] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[38] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[39] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[40] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[41] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[42] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[43] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[44] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[45] = 3
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[46] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[47] = 2
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[48] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[49] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[50] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[51] = 6
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[52] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[53] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[54] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[55] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[56] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[57] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[58] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[59] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[60] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[61] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[62] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[63] = 2
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[64] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[65] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[66] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[67] = 6
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[68] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[69] = 6
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[70] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[71] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[72] = 8
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[73] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[74] = 6
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[75] = 8
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[76] = 0
+
+source/processor/errors_spu.cpp:149:spu_dump(): }
+
+source/processor/errors_spu.cpp:152:spu_dump(): 
+    Registers:
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[0] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[1] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[2] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[3] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[4] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[5] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[6] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[7] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[8] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[9] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[10] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[11] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[12] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[13] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[14] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[15] = 0
+
+source/processor/errors_spu.cpp:156:spu_dump(): 
+    Stack state:
+
+source/processor/errors_spu.cpp:67:stack_dump(): ============STACK DUMP============
+
+source/processor/errors_spu.cpp:68:stack_dump(): 
+stack_dump called from source/processor/spu.cpp : 80
+
+source/processor/errors_spu.cpp:69:stack_dump(): Error: Success (0)
+
+source/processor/errors_spu.cpp:77:stack_dump(): Stack [0x7ffe114d04f8]
+
+source/processor/errors_spu.cpp:78:stack_dump(): {
+	Size = 2
+
+source/processor/errors_spu.cpp:79:stack_dump(): 	Capacity = 4
+}
+
+source/processor/errors_spu.cpp:80:stack_dump(): data [0x502000000c90]
+
+source/processor/errors_spu.cpp:81:stack_dump(): {
+
+source/processor/errors_spu.cpp:98:stack_dump(): 	*[0] = 5
+
+source/processor/errors_spu.cpp:98:stack_dump(): 	*[1] = 0
+
+source/processor/errors_spu.cpp:102:stack_dump(): 	 [2] = RUBBISH
+
+source/processor/errors_spu.cpp:102:stack_dump(): 	 [3] = RUBBISH
+
+source/processor/errors_spu.cpp:104:stack_dump(): }
+
+source/processor/errors_spu.cpp:106:stack_dump(): ============END STACK DUMP============
+
+source/processor/errors_spu.cpp:159:spu_dump(): }
+========================================
+
+
+source/processor/errors_spu.cpp:114:spu_dump(): ============SPU DUMP============
+
+source/processor/errors_spu.cpp:115:spu_dump(): SPU DUMP called from source/processor/spu.cpp:80
+
+source/processor/errors_spu.cpp:116:spu_dump(): SPU ERROR: OK (0)
+
+source/processor/errors_spu.cpp:123:spu_dump(): 
+SPU [0x7ffe114d04e0]
+
+source/processor/errors_spu.cpp:124:spu_dump(): {
+
+source/processor/errors_spu.cpp:125:spu_dump():     code_size:        77
+
+source/processor/errors_spu.cpp:126:spu_dump():     code_size:        77
+
+source/processor/errors_spu.cpp:127:spu_dump():     instructor_ptr:  48
+
+source/processor/errors_spu.cpp:129:spu_dump(): code [0x512000000040]
+
+source/processor/errors_spu.cpp:130:spu_dump(): {
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[0] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[1] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[2] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[3] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[4] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[5] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[6] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[7] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[8] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[9] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[10] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[11] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[12] = 6
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[13] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[14] = 2
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[15] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[16] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[17] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[18] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[19] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[20] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[21] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[22] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[23] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[24] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[25] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[26] = 2
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[27] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[28] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[29] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[30] = 3
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[31] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[32] = 3
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[33] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[34] = 3
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[35] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[36] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[37] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[38] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[39] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[40] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[41] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[42] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[43] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[44] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[45] = 3
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[46] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[47] = 2
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[48] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[49] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[50] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[51] = 6
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[52] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[53] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[54] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[55] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[56] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[57] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[58] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[59] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[60] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[61] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[62] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[63] = 2
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[64] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[65] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[66] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[67] = 6
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[68] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[69] = 6
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[70] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[71] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[72] = 8
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[73] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[74] = 6
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[75] = 8
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[76] = 0
+
+source/processor/errors_spu.cpp:149:spu_dump(): }
+
+source/processor/errors_spu.cpp:152:spu_dump(): 
+    Registers:
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[0] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[1] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[2] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[3] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[4] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[5] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[6] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[7] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[8] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[9] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[10] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[11] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[12] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[13] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[14] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[15] = 0
+
+source/processor/errors_spu.cpp:156:spu_dump(): 
+    Stack state:
+
+source/processor/errors_spu.cpp:67:stack_dump(): ============STACK DUMP============
+
+source/processor/errors_spu.cpp:68:stack_dump(): 
+stack_dump called from source/processor/spu.cpp : 80
+
+source/processor/errors_spu.cpp:69:stack_dump(): Error: Success (0)
+
+source/processor/errors_spu.cpp:77:stack_dump(): Stack [0x7ffe114d04f8]
+
+source/processor/errors_spu.cpp:78:stack_dump(): {
+	Size = 2
+
+source/processor/errors_spu.cpp:79:stack_dump(): 	Capacity = 4
+}
+
+source/processor/errors_spu.cpp:80:stack_dump(): data [0x502000000c90]
+
+source/processor/errors_spu.cpp:81:stack_dump(): {
+
+source/processor/errors_spu.cpp:98:stack_dump(): 	*[0] = 6
+
+source/processor/errors_spu.cpp:98:stack_dump(): 	*[1] = 2
+
+source/processor/errors_spu.cpp:102:stack_dump(): 	 [2] = RUBBISH
+
+source/processor/errors_spu.cpp:102:stack_dump(): 	 [3] = RUBBISH
+
+source/processor/errors_spu.cpp:104:stack_dump(): }
+
+source/processor/errors_spu.cpp:106:stack_dump(): ============END STACK DUMP============
+
+source/processor/errors_spu.cpp:159:spu_dump(): }
+========================================
+
+
+source/processor/errors_spu.cpp:114:spu_dump(): ============SPU DUMP============
+
+source/processor/errors_spu.cpp:115:spu_dump(): SPU DUMP called from source/processor/spu.cpp:80
+
+source/processor/errors_spu.cpp:116:spu_dump(): SPU ERROR: OK (0)
+
+source/processor/errors_spu.cpp:123:spu_dump(): 
+SPU [0x7ffe114d04e0]
+
+source/processor/errors_spu.cpp:124:spu_dump(): {
+
+source/processor/errors_spu.cpp:125:spu_dump():     code_size:        77
+
+source/processor/errors_spu.cpp:126:spu_dump():     code_size:        77
+
+source/processor/errors_spu.cpp:127:spu_dump():     instructor_ptr:  58
+
+source/processor/errors_spu.cpp:129:spu_dump(): code [0x512000000040]
+
+source/processor/errors_spu.cpp:130:spu_dump(): {
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[0] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[1] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[2] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[3] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[4] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[5] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[6] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[7] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[8] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[9] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[10] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[11] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[12] = 6
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[13] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[14] = 2
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[15] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[16] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[17] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[18] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[19] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[20] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[21] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[22] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[23] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[24] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[25] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[26] = 2
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[27] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[28] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[29] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[30] = 3
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[31] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[32] = 3
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[33] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[34] = 3
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[35] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[36] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[37] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[38] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[39] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[40] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[41] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[42] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[43] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[44] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[45] = 3
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[46] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[47] = 2
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[48] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[49] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[50] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[51] = 6
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[52] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[53] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[54] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[55] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[56] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[57] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[58] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[59] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[60] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[61] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[62] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[63] = 2
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[64] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[65] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[66] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[67] = 6
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[68] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[69] = 6
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[70] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[71] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[72] = 8
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[73] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[74] = 6
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[75] = 8
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[76] = 0
+
+source/processor/errors_spu.cpp:149:spu_dump(): }
+
+source/processor/errors_spu.cpp:152:spu_dump(): 
+    Registers:
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[0] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[1] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[2] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[3] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[4] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[5] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[6] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[7] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[8] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[9] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[10] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[11] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[12] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[13] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[14] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[15] = 0
+
+source/processor/errors_spu.cpp:156:spu_dump(): 
+    Stack state:
+
+source/processor/errors_spu.cpp:67:stack_dump(): ============STACK DUMP============
+
+source/processor/errors_spu.cpp:68:stack_dump(): 
+stack_dump called from source/processor/spu.cpp : 80
+
+source/processor/errors_spu.cpp:69:stack_dump(): Error: Success (0)
+
+source/processor/errors_spu.cpp:77:stack_dump(): Stack [0x7ffe114d04f8]
+
+source/processor/errors_spu.cpp:78:stack_dump(): {
+	Size = 2
+
+source/processor/errors_spu.cpp:79:stack_dump(): 	Capacity = 4
+}
+
+source/processor/errors_spu.cpp:80:stack_dump(): data [0x502000000c90]
+
+source/processor/errors_spu.cpp:81:stack_dump(): {
+
+source/processor/errors_spu.cpp:98:stack_dump(): 	*[0] = 5
+
+source/processor/errors_spu.cpp:98:stack_dump(): 	*[1] = 0
+
+source/processor/errors_spu.cpp:102:stack_dump(): 	 [2] = RUBBISH
+
+source/processor/errors_spu.cpp:102:stack_dump(): 	 [3] = RUBBISH
+
+source/processor/errors_spu.cpp:104:stack_dump(): }
+
+source/processor/errors_spu.cpp:106:stack_dump(): ============END STACK DUMP============
+
+source/processor/errors_spu.cpp:159:spu_dump(): }
+========================================
+
+
+source/processor/errors_spu.cpp:114:spu_dump(): ============SPU DUMP============
+
+source/processor/errors_spu.cpp:115:spu_dump(): SPU DUMP called from source/processor/spu.cpp:80
+
+source/processor/errors_spu.cpp:116:spu_dump(): SPU ERROR: OK (0)
+
+source/processor/errors_spu.cpp:123:spu_dump(): 
+SPU [0x7ffe114d04e0]
+
+source/processor/errors_spu.cpp:124:spu_dump(): {
+
+source/processor/errors_spu.cpp:125:spu_dump():     code_size:        77
+
+source/processor/errors_spu.cpp:126:spu_dump():     code_size:        77
+
+source/processor/errors_spu.cpp:127:spu_dump():     instructor_ptr:  64
+
+source/processor/errors_spu.cpp:129:spu_dump(): code [0x512000000040]
+
+source/processor/errors_spu.cpp:130:spu_dump(): {
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[0] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[1] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[2] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[3] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[4] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[5] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[6] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[7] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[8] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[9] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[10] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[11] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[12] = 6
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[13] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[14] = 2
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[15] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[16] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[17] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[18] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[19] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[20] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[21] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[22] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[23] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[24] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[25] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[26] = 2
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[27] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[28] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[29] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[30] = 3
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[31] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[32] = 3
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[33] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[34] = 3
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[35] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[36] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[37] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[38] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[39] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[40] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[41] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[42] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[43] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[44] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[45] = 3
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[46] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[47] = 2
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[48] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[49] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[50] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[51] = 6
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[52] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[53] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[54] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[55] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[56] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[57] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[58] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[59] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[60] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[61] = 4
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[62] = 1
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[63] = 2
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[64] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[65] = 0
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[66] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[67] = 6
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[68] = 23
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[69] = 6
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[70] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[71] = 5
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[72] = 8
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[73] = 22
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[74] = 6
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[75] = 8
+
+source/processor/errors_spu.cpp:147:spu_dump(): 	*[76] = 0
+
+source/processor/errors_spu.cpp:149:spu_dump(): }
+
+source/processor/errors_spu.cpp:152:spu_dump(): 
+    Registers:
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[0] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[1] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[2] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[3] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[4] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[5] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[6] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[7] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[8] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[9] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[10] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[11] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[12] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[13] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[14] = 0
+
+source/processor/errors_spu.cpp:154:spu_dump():         R[15] = 0
+
+source/processor/errors_spu.cpp:156:spu_dump(): 
+    Stack state:
+
+source/processor/errors_spu.cpp:67:stack_dump(): ============STACK DUMP============
+
+source/processor/errors_spu.cpp:68:stack_dump(): 
+stack_dump called from source/processor/spu.cpp : 80
+
+source/processor/errors_spu.cpp:69:stack_dump(): Error: Success (0)
+
+source/processor/errors_spu.cpp:77:stack_dump(): Stack [0x7ffe114d04f8]
+
+source/processor/errors_spu.cpp:78:stack_dump(): {
+	Size = 2
+
+source/processor/errors_spu.cpp:79:stack_dump(): 	Capacity = 4
+}
+
+source/processor/errors_spu.cpp:80:stack_dump(): data [0x502000000c90]
+
+source/processor/errors_spu.cpp:81:stack_dump(): {
+
+source/processor/errors_spu.cpp:98:stack_dump(): 	*[0] = 4
+
+source/processor/errors_spu.cpp:98:stack_dump(): 	*[1] = 2
+
+source/processor/errors_spu.cpp:102:stack_dump(): 	 [2] = RUBBISH
+
+source/processor/errors_spu.cpp:102:stack_dump(): 	 [3] = RUBBISH
+
+source/processor/errors_spu.cpp:104:stack_dump(): }
+
+source/processor/errors_spu.cpp:106:stack_dump(): ============END STACK DUMP============
+
+source/processor/errors_spu.cpp:159:spu_dump(): }
+========================================
+
+
+main.cpp:144:main(): Everything is good before deletion
+source/common/errors.cpp:114:tree_graph_dump(): Starting graph dump to logger/tree2.dot and logger/graph_tree2.png
+
+source/common/errors.cpp:158:tree_graph_dump(): Graph dump completed: logger/tree2.dot and logger/graph_tree2.png have been created
+
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000050, type=IDENTIFIER
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000090, type=NUMBER
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x5040000000d0, type=STATEMENT
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000110, type=IDENTIFIER
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000150, type=NUMBER
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000190, type=OPERATOR
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x5040000001d0, type=STATEMENT
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000210, type=STATEMENT
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000250, type=IDENTIFIER
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000290, type=NUMBER
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x5040000002d0, type=STATEMENT
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000310, type=STATEMENT
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000350, type=IDENTIFIER
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000390, type=IDENTIFIER
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x5040000003d0, type=IDENTIFIER
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000410, type=OPERATOR
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000450, type=NUMBER
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000490, type=IDENTIFIER
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x5040000004d0, type=OPERATOR
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000510, type=IDENTIFIER
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000550, type=OPERATOR
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000590, type=OPERATOR
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x5040000005d0, type=STATEMENT
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000610, type=STATEMENT
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000650, type=IDENTIFIER
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000690, type=IDENTIFIER
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x5040000006d0, type=IDENTIFIER
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000710, type=OPERATOR
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000750, type=STATEMENT
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000790, type=STATEMENT
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x5040000007d0, type=IDENTIFIER
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000810, type=IDENTIFIER
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000850, type=OPERATOR
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000890, type=IDENTIFIER
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x5040000008d0, type=OPERATOR
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000910, type=NUMBER
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000950, type=IDENTIFIER
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000990, type=OPERATOR
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x5040000009d0, type=OPERATOR
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000a10, type=STATEMENT
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000a50, type=STATEMENT
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000a90, type=IDENTIFIER
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000ad0, type=IDENTIFIER
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000b10, type=OPERATOR
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000b50, type=IDENTIFIER
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000b90, type=OPERATOR
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000bd0, type=NUMBER
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000c10, type=IDENTIFIER
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000c50, type=OPERATOR
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000c90, type=OPERATOR
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000cd0, type=STATEMENT
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000d10, type=STATEMENT
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000d50, type=IDENTIFIER
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000d90, type=STATEMENT
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000dd0, type=STATEMENT
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000e10, type=IDENTIFIER
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000e50, type=STATEMENT
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000e90, type=STATEMENT
+source/common/tree_operations.cpp:151:destroy_node(): Destroying node 0x504000000010, type=ROOT
+main.cpp:149:main(): tree deleted succefully

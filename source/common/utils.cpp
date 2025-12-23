@@ -8,6 +8,7 @@
 #include "utils.h"
 #include "tree_structure.h"
 #include "errors.h"
+#include "read_file.h"
 
 
 
@@ -39,18 +40,7 @@ void to_upper_str(char * input)
 }
 
 
-size_t get_file_size(const char * filename) 
-{
-    assert(filename != NULL);
-    
-    struct stat file_stat;
-    if (stat(filename, &file_stat) == -1) 
-    {
-        return (size_t)-1;
-    }
 
-    return (size_t)(file_stat.st_size);
-}
 
 
 char * initialize_buffer(size_t file_size)

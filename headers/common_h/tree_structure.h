@@ -22,7 +22,8 @@ typedef enum
     DIFFERENTIATION_ERROR,
 
     LEXER_ERROR,
-    PARSER_ERROR
+    PARSER_ERROR,
+    TRANSLATING_TO_ASM_ERROR
 } ErrorCode;
 
 

@@ -11,13 +11,15 @@
 #include "build_tree.h"
 #include "lexer.h"
 #include "syntax_analysis.h"
+#include "load_expression.h"
+#include "translate_to_asm.h"
+#include "spu.h"
+#include "assembler.h"
+#include "read_file.h"
+#include "stack.h"
+#include "errors_spu.h"
 
-#define AST_OUTPUT "ast_output.txt"
-// void savenode(Node_t * node, FILE * file_ptr);
-// ErrorCode save_tree(Tree_t * tree);
 
-void generate_code(Node_t* node, FILE* file);
-ErrorCode generate_source_code(Tree_t* tree, const char* filename) ;
 
 int main(void)
 {
@@ -70,125 +72,82 @@ int main(void)
     
     DEBUG_PRINT("expression has been loaded successfully\n");
     save_tree(&tree, AST_OUTPUT);
+    DEBUG_PRINT("tree was saved successfully. trying to build it");
+
+    
+    // Tree_t tree_middleend = {};
+    // error = SUCCESS;
+    // error = init_tree(&tree_middleend);
+    // if (error != SUCCESS)
+    // {
+    //     destroy_tree(&tree_middleend);
+    //     return 1;
+    // }
+
+    // error = load_expression_prefix(&tree_middleend, AST_OUTPUT);
+    // if (error != SUCCESS)
+    // {
+    //     destroy_tree(&tree_middleend);
+    //     return 1;
+    // }
+    // GRAPH_DUMP(&tree_middleend);
+    // DEBUG_PRINT("tree_middleend was created");
+
+    //translate_to_asm(&tree_middleend, "asm_output.txt");
+    error = SUCCESS;
+    error = translate_to_asm(&tree, "asm_output.txt");
+    if (error == SUCCESS)
+    {
+        puts("ASSEMBLY START");
+        Stack_Err stack_err = assembler("asm_output.txt", "byte_code.txt");
+        puts("ASSEMBLY START\n");
+        if (stack_err != STACK_OK)
+        {
+            DEBUG_PRINT("Assembly error\n");
+            printf("Programm is finished\n");
+            return 1;
+        }
+        puts("ASSEMBLY END\n\n");
+
+        spu_t spu = {};
+        Spu_Err spu_err = spu_init(&spu);
+        if (spu_err != SPU_OK)
+        {
+            DEBUG_PRINT("SPU initialization error\n");
+            finish_program(&spu);
+            return 1;
+        }
+        puts("SPU INITED\n");
+        //spu_dump(&spu, SPU_OK, __FILE__, __LINE__);
+
+        puts("START RUNNING SPU\n");
+        spu_err |= run_spu(&spu);
+        if (spu_err != SPU_OK)
+        {
+            DEBUG_PRINT("Run spu error\n");
+            
+            finish_program(&spu);
+            printf("with error\n");
+            return 1;
+    }
+
+    //spu_dump(&spu, SPU_OK, __FILE__, __LINE__);
+    finish_program(&spu);
+    }
+
+    // if (tree_middleend.root)
+    //     destroy_tree(&tree_middleend);
    
+    
+
                    
     DEBUG_PRINT("Everything is good before deletion");
     if (tree.root)
         destroy_tree(&tree);
-    //destroy_tree(&diff_tree);
-    //make_html();
-    //symbol_table_destroy(&symbols_table);
+    
+    symbol_table_destroy(&symbols_table);
     DEBUG_PRINT("tree deleted succefully");
     printf("Programm is finished\n");
     return 0;
-}
-
-
-
-void generate_code(Node_t* node, FILE* file) 
-{
-    if (!node) return;
-    
-    switch(node->type) {
-        case STATEMENT: {
-            statement_t stmt = node->value.stmt;
-            switch(stmt) {
-                case OP_PRINT: {
-                    fprintf(file, "print ");
-                    generate_code(node->right, file);  // выражение для печати
-                    fprintf(file, ";\n");
-                    break;
-                }
-                case OP_ASSIGNMENT: {
-                    generate_code(node->left, file);   // идентификатор
-                    fprintf(file, " = ");
-                    generate_code(node->right, file);  // выражение
-                    fprintf(file, ";\n");
-                    break;
-                }
-                case OP_IF: {
-                    fprintf(file, "if (");
-                    generate_code(node->left, file);   // условие
-                    fprintf(file, ") ");
-                    generate_code(node->right, file);  // блок
-                    break;
-                }
-                case OP_WHILE: {
-                    fprintf(file, "while (");
-                    generate_code(node->left, file);   // условие
-                    fprintf(file, ") ");
-                    generate_code(node->right, file);  // блок
-                    break;
-                }
-                case OP_BLOCK: {
-                    fprintf(file, "{\n");
-                    // Проходим по всем statement'ам в блоке
-                    Node_t* current = node->right;
-                    while (current) {
-                        if (current->type == STATEMENT && current->value.stmt == OP_END) {
-                            current = current->right;  // пропускаем разделитель
-                        } else {
-                            generate_code(current, file);
-                            current = current->right;
-                        }
-                    }
-                    fprintf(file, "}\n");
-                    break;
-                }
-                default:{
-                    // Просто выражение
-                    generate_code(node->left, file);
-                    fprintf(file, ";\n");
-                    break;}
-            }
-            break;
-        }
-            
-        case OPERATOR: {
-            char op_char = '?';
-            switch(node->value.op) {
-                case OP_ADD: op_char = '+'; break;
-                case OP_SUB: op_char = '-'; break;
-                case OP_MUL: op_char = '*'; break;
-                case OP_DIV: op_char = '/'; break;
-                default: op_char = '?';
-            }
-            fprintf(file, "(");
-            generate_code(node->left, file);
-            fprintf(file, " %c ", op_char);
-            generate_code(node->right, file);
-            fprintf(file, ")");
-            break;
-        }
-            
-        case IDENTIFIER:
-            fprintf(file, "%s", get_id_name(node->value.id_index));
-            break;
-            
-        case NUMBER:
-            fprintf(file, "%.2lf", node->value.number);
-            break;
-            
-        case STRING:
-            fprintf(file, "\"%s\"", node->value.string_value);
-            break;
-            
-        default:
-            fprintf(file, "/* unknown node type %d */", node->type);
-    }
-}
-
-ErrorCode generate_source_code(Tree_t* tree, const char* filename) 
-{
-    FILE* file = fopen(filename, "w");
-    if (!file) return OPENING_FILE_ERROR;
-    
-    if (tree->root && tree->root->right) {
-        generate_code(tree->root->right, file);
-    }
-    
-    fprintf(file, "$\n");  // конец программы
-    fclose(file);
-    return SUCCESS;
 }
 

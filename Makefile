@@ -13,7 +13,7 @@ CXXFLAGS := -g -DDEBUG -ggdb3 -std=c++17 -O0 -Wall -Wextra -Weffc++ -Waggressive
  -fsized-deallocation -fstack-protector -fstrict-overflow -flto-odr-type-merging -fno-omit-frame-pointer -Wlarger-than=8192 \
  -Wstack-usage=8192 -pie -fPIE -Werror=vla 
 
-INC_DIRS := headers/backend_h headers/middleend_h headers/frontend_h headers/processor_h headers/common_h
+INC_DIRS := headers/backend_h headers/middleend_h headers/frontend_h headers/processor_h headers/common_h headers/processor
 INCLUDES = $(addprefix -I,$(INC_DIRS))
 
 SRC_DIR := source
@@ -21,6 +21,7 @@ FRONTEND_DIR := $(SRC_DIR)/frontend
 BACKEND_DIR := $(SRC_DIR)/backend
 MIDDLEEND_DIR := $(SRC_DIR)/middleend
 COMMON_DIR := $(SRC_DIR)/common
+PROCESSOR_DIR := $(SRC_DIR)/processor
 
 HEADERS_DIR := headers
 BUILD_DIR := build
@@ -32,6 +33,7 @@ SOURCES := main.cpp \
 		  $(wildcard $(BACKEND_DIR)/*.cpp) \
 		  $(wildcard $(MIDDLEEND_DIR)/*.cpp) \
 		  $(wildcard $(COMMON_DIR)/*.cpp)  \
+		  $(wildcard $(PROCESSOR_DIR)/*.cpp)  \
 
 OBJECTS := $(SOURCES:%.cpp=$(OBJ_DIR)/%.o)
 

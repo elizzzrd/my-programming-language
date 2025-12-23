@@ -156,10 +156,9 @@ void destroy_node(Node_t * node)
 void destroy_tree(Tree_t * tree)
 {
     assert(tree);
-    DEBUG_PRINT("[DEBUG] root->value.root before destroy: %s\n", tree->root->value.root);
+    //DEBUG_PRINT("[DEBUG] root->value.root before destroy: %s\n", tree->root->value.root);
     GRAPH_DUMP(tree);
 
-    
     destroy_node(tree->root);
     tree->tree_size = 0;
     return;

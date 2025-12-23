@@ -19,7 +19,7 @@ size_t get_file_size(const char * filename);
 int check_option_with_stack_commands(char * option);
 int check_register(const char * reg_buffer);
 bool is_number(const char *str);
-int is_label(const char * option);
+
 
 
 // extern const char *stack_commands[];

@@ -81,14 +81,14 @@ ErrorCode save_tree(Tree_t * tree, const char * filename)
 }
 
 
-ErrorCode load_expression_prefix(Tree_t * tree, const char * filename)
+ErrorCode load_expression_prefix(Tree_t * tree, const char * expression_input)
 {
-    assert(tree && filename);
+    assert(tree);
 
     ErrorCode error = SUCCESS;
 
     char * buffer = NULL;
-    error = load_to_buffer(EXPRESSION_INPUT, &buffer);
+    error = load_to_buffer(expression_input, &buffer);
     if (error != SUCCESS)
         return error;
     DEBUG_PRINT("[DEBUG]: expression has been loaded to buffer\n");

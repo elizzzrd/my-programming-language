@@ -7,13 +7,14 @@
 #include "read_file.h"
 #include "assembler.h"
 #include "spu.h"
+#include "utils.h"
 
 
 
 #define IF_THERE_IS_STACK_ERROR(stack_errors, fmt) \
     do { \
         if ((stack_errors) != STACK_OK) { \
-            log_message(fmt, __FILE__, __LINE__); \
+            DEBUG_PRINT(fmt); \
             spu_errors = SPU_STACK_ERROR; \
             return spu_errors; \
         } \
@@ -32,7 +33,7 @@ Spu_Err spu_init(spu_t * spu)
     spu -> code_size = 0;
     spu -> instructor_ptr = 0;
 
-    spu -> code = load_bytecode("text/byte_code.txt", &(spu -> code_size));
+    spu -> code = load_bytecode("byte_code.txt", &(spu -> code_size));
     
     spu -> stack = {};
     if((stack_init(&(spu -> stack), 8)) != STACK_OK) errors |= SPU_STACK_ERROR;
@@ -66,7 +67,7 @@ Spu_Err run_spu(spu_t * spu)
                 {
                     (spu -> instructor_ptr) = spu -> code_size;
                     spu_errors |= SPU_INVALID_COMMAND;
-                    log_message("Error: missing argument for PUSH\n", __FILE__, __LINE__); 
+                    DEBUG_PRINT("Error: missing argument for PUSH\n"); 
                     break;
                 }
                 int value = (spu -> code)[spu -> instructor_ptr];
@@ -88,7 +89,7 @@ Spu_Err run_spu(spu_t * spu)
                 if (reg_num >= 0 && reg_num < REGS_COUNT) 
                     spu -> regs[reg_num] = a;
                 else {
-                    log_message("Invalid register index in POPR", __FILE__, __LINE__);
+                    DEBUG_PRINT("Invalid register index in POPR");
                     spu_errors |= SPU_INVALID_COMMAND;
                     return spu_errors;
                 }
@@ -102,7 +103,7 @@ Spu_Err run_spu(spu_t * spu)
                     stack_errors = stack_push(&(spu -> stack), spu -> regs[reg_num]);       IF_THERE_IS_STACK_ERROR(stack_errors, "Error during spu running: PUSHR");
                 }
                 else {
-                    log_message("Invalid register index in PUSHR", __FILE__, __LINE__);
+                    DEBUG_PRINT("Invalid register index in PUSHR");
                     spu_errors |= SPU_INVALID_COMMAND;
                     return spu_errors;
                 }
@@ -117,7 +118,7 @@ Spu_Err run_spu(spu_t * spu)
                 if (ram_num >= 0 && ram_num < RAM_COUNT) 
                     spu -> RAM[ram_num] = a;
                 else {
-                    log_message("Invalid ram index in POPR", __FILE__, __LINE__);
+                    DEBUG_PRINT("Invalid ram index in POPR");
                     spu_errors |= SPU_INVALID_COMMAND;
                     return spu_errors;
                 }
@@ -131,7 +132,7 @@ Spu_Err run_spu(spu_t * spu)
                     stack_errors = stack_push(&(spu -> stack), spu -> RAM[ram_num]);       IF_THERE_IS_STACK_ERROR(stack_errors, "Error during spu running: PUSHR");
                 }
                 else {
-                    log_message("Invalid ram index in PUSHR", __FILE__, __LINE__);
+                    DEBUG_PRINT("Invalid ram index in PUSHR");
                     spu_errors |= SPU_INVALID_COMMAND;
                     return spu_errors;
                 }
@@ -139,7 +140,7 @@ Spu_Err run_spu(spu_t * spu)
             }
             case DUMP: 
             {
-                log_message("\n\nstack dump from run_spu:", __FILE__, __LINE__);
+                DEBUG_PRINT("\n\nstack dump from run_spu:");
                 spu_dump(spu, spu_errors, __FILE__, __LINE__); 
                 break;
             }
@@ -174,7 +175,7 @@ Spu_Err run_spu(spu_t * spu)
                 stack_errors = stack_pop(&(spu -> stack), &b);                              IF_THERE_IS_STACK_ERROR(stack_errors, "Error during spu running: DIV");
                 if (a == 0)
                 {
-                    log_message("Error: division by zero\n", __FILE__, __LINE__); 
+                    DEBUG_PRINT("Error: division by zero\n"); 
                     spu_errors |= SPU_DIVISION_BY_ZERO;
                     stack_push(&(spu -> stack), a);                                         IF_THERE_IS_STACK_ERROR(stack_errors, "Error during spu running: PUSH");
                     stack_push(&(spu -> stack), b);                                         IF_THERE_IS_STACK_ERROR(stack_errors, "Error during spu running: PUSH");
@@ -189,7 +190,7 @@ Spu_Err run_spu(spu_t * spu)
                 if (a < 0) 
                 {
                     spu_errors |= SPU_INVALID_COMMAND;
-                    log_message("Error: sqrt of negative number\n", __FILE__, __LINE__); 
+                    DEBUG_PRINT("Error: sqrt of negative number\n"); 
                     stack_push(&(spu -> stack), a);
                     return spu_errors;
                 }
@@ -300,7 +301,7 @@ Spu_Err run_spu(spu_t * spu)
             }
             default: 
             {
-                log_message("Unknown command\n", __FILE__, __LINE__);
+                DEBUG_PRINT("Unknown command\n");
                 spu_errors |= SPU_INVALID_COMMAND;
                 return spu_errors;
                 break;

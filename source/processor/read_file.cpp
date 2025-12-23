@@ -6,6 +6,7 @@
 #include <string.h>
 #include "read_file.h"
 #include "assembler.h"
+#include "utils.h"
 #include "errors_spu.h"
 
 
@@ -53,22 +54,22 @@ size_t get_file_size(const char * filename)
 }
 
 
-int is_label(const char * option)
-{
-    int label_num = 0;
-    if (option[0] == ':' && isdigit(option[1]))
-    {
-        int id = atoi(option + 1);
-            if (id >= 0 && id < MAX_LABELS)
-                return id;
-            else
-            {
-                log_message("Label index out of range", __FILE__, __LINE__);
-                return 0;
-            }
-    }
-    return -1;
-}
+// int is_label(const char * option)
+// {
+//     int label_num = 0;
+//     if (option[0] == ':' && isdigit(option[1]))
+//     {
+//         int id = atoi(option + 1);
+//             if (id >= 0 && id < MAX_LABELS)
+//                 return id;
+//             else
+//             {
+//                 DEBUG_PRINT("Label index out of range");
+//                 return 0;
+//             }
+//     }
+//     return -1;
+// }
 
 
 bool is_number(const char * str) 

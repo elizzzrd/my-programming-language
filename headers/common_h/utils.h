@@ -30,6 +30,6 @@ bool IS_ONE(Node_t * node);
 
 char * read_line(void);
 void to_upper_str(char * input);
-size_t get_file_size(const char * filename);
+
 char * initialize_buffer(size_t file_size);
 ErrorCode load_to_buffer(const char * filename, char ** buffer);

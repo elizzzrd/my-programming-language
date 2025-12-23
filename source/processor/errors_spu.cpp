@@ -2,30 +2,8 @@
 #include "stack.h"
 #include "spu.h"
 #include "errors_spu.h"
+#include "utils.h"
 
-FILE * log_file = NULL;
-
-FILE * log_init(const char * filename)
-{
-    log_file = fopen(filename, "a+");
-    if (log_file) return log_file;
-    else return NULL;
-}
-
-void log_close(void)
-{
-    if (log_file)
-    {
-        fclose(log_file);
-        log_file = NULL;
-    }
-}
-
-void log_message(const char * format, const char * file, int line)
-{
-    fprintf(log_file, "[%s %d]: %s\n", file, line, format);
-    fprintf(log_file, "\n");
-}
 
 Stack_Err stack_verify(const stack_t * stack) 
 {
@@ -86,46 +64,46 @@ const char * stack_error_string(Stack_Err error)
 
 void stack_dump(const stack_t * stack, Stack_Err error, const char * file, int line)
 {
-    fprintf(log_file, "============STACK DUMP============\n");
-    fprintf(log_file, "\nstack_dump called from %s : %d\n", file, line);
-    fprintf(log_file, "Error: %s (%u)\n", stack_error_string(error), error);
+    DEBUG_PRINT("============STACK DUMP============\n");
+    DEBUG_PRINT("\nstack_dump called from %s : %d\n", file, line);
+    DEBUG_PRINT("Error: %s (%u)\n", stack_error_string(error), error);
 
     if (stack == NULL) 
     {
-        fprintf(log_file, "Stack pointer is NULL\n");
+        DEBUG_PRINT("Stack pointer is NULL\n");
         return;
     }
     
-    fprintf(log_file, "Stack [%p]\n", stack);
-    fprintf(log_file, "{\n\tSize = %zu\n", stack->size);
-    fprintf(log_file, "\tCapacity = %zu\n}\n", stack->capacity);
-    fprintf(log_file, "data [%p]\n", (void*)stack->data);
-    fprintf(log_file, "{\n");
+    DEBUG_PRINT("Stack [%p]\n", stack);
+    DEBUG_PRINT("{\n\tSize = %zu\n", stack->size);
+    DEBUG_PRINT("\tCapacity = %zu\n}\n", stack->capacity);
+    DEBUG_PRINT("data [%p]\n", (void*)stack->data);
+    DEBUG_PRINT("{\n");
 
     if (stack->data == NULL) 
     {
-        fprintf(log_file, "Data array is NULL\n");
+        DEBUG_PRINT("Data array is NULL\n");
         return;
     }
     
     if (stack->size == 0) 
     {
-        fprintf(log_file, "\t[empty]\n}\n");
+        DEBUG_PRINT("\t[empty]\n}\n");
     } 
     else 
     {
         size_t i = 0;
         for (i = 0; i < stack -> size; i++)
         {
-            fprintf(log_file, "\t*[%zu] = %d\n", i, stack -> data[i]);
+            DEBUG_PRINT("\t*[%zu] = %d\n", i, stack -> data[i]);
         }
         for (; i < stack->capacity; i++)
         {
-            fprintf(log_file, "\t [%zu] = RUBBISH\n", i);
+            DEBUG_PRINT("\t [%zu] = RUBBISH\n", i);
         }
-        fprintf(log_file, "}\n");
+        DEBUG_PRINT("}\n");
     }
-    fprintf(log_file, "============END STACK DUMP============\n");
+    DEBUG_PRINT("============END STACK DUMP============\n");
 }
 
 
@@ -133,52 +111,52 @@ void stack_dump(const stack_t * stack, Stack_Err error, const char * file, int l
 
 void spu_dump(const spu_t * spu, Spu_Err err, const char * file, int line)
 {
-    fprintf(log_file, "============SPU DUMP============\n");
-    fprintf(log_file, "SPU DUMP called from %s:%d\n", file, line);
-    fprintf(log_file, "SPU ERROR: %s (%u)\n", spu_error_string(err), err);
+    DEBUG_PRINT("============SPU DUMP============\n");
+    DEBUG_PRINT("SPU DUMP called from %s:%d\n", file, line);
+    DEBUG_PRINT("SPU ERROR: %s (%u)\n", spu_error_string(err), err);
 
     if (spu == NULL) {
-        fprintf(log_file, "SPU pointer is NULL\n");
+        DEBUG_PRINT("SPU pointer is NULL\n");
         return;
     }
 
-    fprintf(log_file, "\nSPU [%p]\n", spu);
-    fprintf(log_file, "{\n");
-    fprintf(log_file, "    code_size:        %zu\n", spu->code_size);
-    fprintf(log_file, "    code_size:        %zu\n", spu->code_size);
-    fprintf(log_file, "    instructor_ptr:  %zu\n", spu->instructor_ptr);
+    DEBUG_PRINT("\nSPU [%p]\n", spu);
+    DEBUG_PRINT("{\n");
+    DEBUG_PRINT("    code_size:        %zu\n", spu->code_size);
+    DEBUG_PRINT("    code_size:        %zu\n", spu->code_size);
+    DEBUG_PRINT("    instructor_ptr:  %zu\n", spu->instructor_ptr);
 
-    fprintf(log_file, "code [%p]\n", spu -> code);
-    fprintf(log_file, "{\n");
+    DEBUG_PRINT("code [%p]\n", spu -> code);
+    DEBUG_PRINT("{\n");
 
     if (spu -> code == NULL) 
     {
-        fprintf(log_file, "Code array is NULL\n");
+        DEBUG_PRINT("Code array is NULL\n");
         return;
     }
     
     if (spu -> code_size == 0) 
     {
-        fprintf(log_file, "\t[empty]\n}\n");
+        DEBUG_PRINT("\t[empty]\n}\n");
     } 
     else 
     {
         size_t i = 0;
         for (i = 0; i < (spu -> code_size); i++)
         {
-            fprintf(log_file, "\t*[%zu] = %d\n", i, spu -> code[i]);
+            DEBUG_PRINT("\t*[%zu] = %d\n", i, spu -> code[i]);
         }
-        fprintf(log_file, "}\n");
+        DEBUG_PRINT("}\n");
     }
 
-    fprintf(log_file, "\n    Registers:\n");
+    DEBUG_PRINT("\n    Registers:\n");
     for (size_t i = 0; i < REGS_COUNT; i++)
-        fprintf(log_file, "        R[%zu] = %d\n", i, spu->regs[i]);
+        DEBUG_PRINT("        R[%zu] = %d\n", i, spu->regs[i]);
 
-    fprintf(log_file, "\n    Stack state:\n");
+    DEBUG_PRINT("\n    Stack state:\n");
     stack_dump(&(spu->stack), STACK_OK, file, line);
 
-    fprintf(log_file, "}\n========================================\n\n");
+    DEBUG_PRINT("}\n========================================\n\n");
 }
 
 const char * spu_error_string(Spu_Err err)
@@ -204,7 +182,6 @@ const char * spu_error_string(Spu_Err err)
 
 void finish_program(spu_t * spu)
 {
-    log_close();
     spu_destroy(spu);
-    printf("Programm is finished\n");
+    printf("spu running is finished\n");
 }
