@@ -31,9 +31,9 @@ int main(void)
         destroy_tree(&tree);
         return 1;
     }
-
     
     TokenList token_list = {};
+    token_list_init(&token_list);
     DEBUG_PRINT("[INFO] LEXICAL_ANALYSIS START");
     error = lexicalAnalysis(&token_list);
     if (error != SUCCESS)
@@ -145,7 +145,8 @@ int main(void)
     if (tree.root)
         destroy_tree(&tree);
     
-    symbol_table_destroy(&symbols_table);
+    symbol_table_destroy(&symbols_table[SB_VAR]);
+    symbol_table_destroy(&symbols_table[SB_FUNC]);
     DEBUG_PRINT("tree deleted succefully");
     printf("Programm is finished\n");
     return 0;

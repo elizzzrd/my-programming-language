@@ -29,7 +29,7 @@ void savenode(Node_t *node, FILE *f)
             break;
 
         case IDENTIFIER:
-            fprintf(f, "%s", get_id_name(node->value.id_index));
+            fprintf(f, "%s", get_id_name(node->value.id_index, SB_VAR));
             break;
 
         case OPERATOR:

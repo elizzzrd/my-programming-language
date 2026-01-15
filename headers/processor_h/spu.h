@@ -5,7 +5,7 @@
 
 
 #define REGS_COUNT 16
-#define RAM_COUNT 100
+#define RAM_COUNT 512
 
 typedef struct 
 {

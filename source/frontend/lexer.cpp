@@ -9,109 +9,58 @@
 #include "utils.h"
 
 
-SymbolTable symbols_table = {NULL, 0, 0};
+SymbolTable symbols_table[2] = {{NULL, 0, 0}, {NULL, 0, 0}};
 
-
-int symbol_table_find(const char * name)
+const char * token_type_strings[] =
 {
-    for (size_t i = 0; i < symbols_table.count; i++)
-    {
-        if (strcmp(symbols_table.names[i], name) == 0)
-            return (int)i;
-    }
-    return -1;
-}
+    "TOK_EOF",
+    "TOK_END",
+    "TOK_NUMBER",
+    "TOK_IDENTIFIER",
+    "TOK_STRING",
 
-const char * get_id_name(size_t id_index)
+    "TOK_SEMICOLON",
+    "TOK_LPAREN",
+    "TOK_RPAREN",
+    "TOK_LBRACE",
+    "TOK_RBRACE",
+
+    "TOK_MINUS",
+    "TOK_PLUS",
+    "TOK_MULTIPLY",
+    "TOK_ASSIGN",
+    "TOK_DIVIDE",
+    "TOK_POW",
+
+    "TOK_BELOW",
+    "TOK_BELOW_EQUAL",
+    "TOK_ABOVE",
+    "TOK_ABOVE_EQUAL",
+    "TOK_EQUAL_EQUAL",
+    "TOK_NON_EQUAL",
+
+    "TOK_PRINT",
+    "TOK_WHILE",
+    "TOK_IF",
+    "TOK_READ",
+    "TOK_DEF",
+    "TOK_ID_DEF",
+    "TOK_OUT",
+
+    "TOK_SIN",
+    "TOK_COS",
+    "TOK_TG",
+    "TOK_LN",
+    "TOK_SQRT",
+    "TOK_EXP"
+};
+
+const char * get_string_token_type(token_t type)
 {
-    if (id_index >= 0 && id_index < symbols_table.count)
-        return symbols_table.names[id_index];
-    else    
-        return NULL;
-}
-
-
-int symbol_table_add(const char * name)
-{
-    if (symbols_table.count == symbols_table.capasity)
-    {
-        if (!symbol_table_resize(&symbols_table))
-            return -1;
-    }
-
-    symbols_table.names[symbols_table.count] = strdup(name);
-    if (!symbols_table.names[symbols_table.count])
-        return -1;
-
-    return (int)symbols_table.count++;
-}
-
-int symbol_table_resize(SymbolTable *sb)
-{
-    size_t new_capacity = (sb->capasity == 0) ? 8 : sb -> capasity * 2;
-    char ** new_names = (char **)realloc(sb->names, new_capacity * sizeof(char *));
-    if (!new_names)     return 0;
-
-    sb -> names = new_names;
-    sb -> capasity = new_capacity;
-    return 1;
-}
-
-int symbol_table_get_or_add(const char * name)
-{
-    int index = symbol_table_find(name);
-    if (index >= 0)
-        return index;
+    if (type >= TOK_EOF && type <= TOK_IF)
+        return token_type_strings[type];
     else
-        return symbol_table_add(name);
-}
-
-
-
-void symbol_table_destroy(SymbolTable * sb)
-{
-    assert(sb);
-
-    for (size_t i = 0; i < sb->count; i++)
-        free(sb->names[i]);
-    free(sb->names);
-}
-
-
-int token_list_resize(TokenList * token_list)
-{
-    size_t new_capacity = (token_list->capasity == 0) ? 8 : token_list -> capasity * 2;
-    Token * new_data = (Token *)realloc(token_list -> data, new_capacity * sizeof(Token));
-    if (!new_data)     return 0;
-
-    token_list->data = new_data;
-    token_list -> capasity = new_capacity;
-    return 1;
-}
-
-int token_list_push(TokenList * token_list, Token cur_token)
-{
-    if (token_list->count == token_list->capasity)
-    {
-        if (!token_list_resize(token_list))
-            return -1;
-    }
-
-    token_list -> data[token_list -> count++] = cur_token;
-    return token_list -> count;
-}
-
-
-
-
-
-token_t keyword(const char * word)
-{
-    if (strcmp(word, "while") == 0)    return TOK_WHILE;
-    if (strcmp(word, "if") == 0)       return TOK_IF;
-    if (strcmp(word, "print") == 0)    return TOK_PRINT;
-
-    return TOK_IDENTIFIER;
+        return "Unknown type";
 }
 
 static void skip_spaces(const char ** s)
@@ -119,7 +68,6 @@ static void skip_spaces(const char ** s)
     while (**s == ' ' || **s == '\t' || **s == '\n' || **s == '\r')
         (*s)++;
 }
-
 
 ErrorCode lexicalAnalysis(TokenList * token_list)
 {
@@ -182,26 +130,41 @@ ErrorCode lexicalAnalysis(TokenList * token_list)
             token_list_push(token_list, tk);
             if (*p == '"') 
                 p++; // skip "
+            else
+            {
+                ERROR_MESSAGE(SYNTAX_ERROR, error);
+                return error;
+            }
             continue;
         }
 
         // operators + punctuation
         switch (*p) 
         {
-            case ';': token_list_push(token_list, make_token(TOK_SEMICOLON, p++, 1)); continue;
-            case '{': token_list_push(token_list, make_token(TOK_LBRACE, p++, 1)); continue;
-            case '}': token_list_push(token_list, make_token(TOK_RBRACE, p++, 1)); continue;
-            case '(': token_list_push(token_list, make_token(TOK_LPAREN, p++, 1)); continue;
-            case ')': token_list_push(token_list, make_token(TOK_RPAREN, p++, 1)); continue;
-            case '+': token_list_push(token_list, make_token(TOK_PLUS, p++, 1)); continue;
-            case '-': token_list_push(token_list, make_token(TOK_MINUS, p++, 1)); continue;
-            case '*': token_list_push(token_list, make_token(TOK_MULTIPLY, p++, 1)); continue;
-            case '^': token_list_push(token_list, make_token(TOK_POW, p++, 1)); continue;
-            case '/': token_list_push(token_list, make_token(TOK_DIVIDE, p++, 1)); continue;
-            case '=': token_list_push(token_list, make_token(TOK_ASSIGN, p++, 1)); continue;
-            case '$': token_list_push(token_list, make_token(TOK_END, p++, 1)); continue;
+            case ';':  token_list_push(token_list, make_token(TOK_SEMICOLON, p++, 1)); continue;
+            case '{':  token_list_push(token_list, make_token(TOK_LBRACE, p++, 1)); continue;
+            case '}':  token_list_push(token_list, make_token(TOK_RBRACE, p++, 1)); continue;
+            case '(':  token_list_push(token_list, make_token(TOK_LPAREN, p++, 1)); continue;
+            case ')':  token_list_push(token_list, make_token(TOK_RPAREN, p++, 1)); continue;
+            case '+':  token_list_push(token_list, make_token(TOK_PLUS, p++, 1)); continue;
+            case '-':  token_list_push(token_list, make_token(TOK_MINUS, p++, 1)); continue;
+            case '*':  token_list_push(token_list, make_token(TOK_MULTIPLY, p++, 1)); continue;
+            case '^':  token_list_push(token_list, make_token(TOK_POW, p++, 1)); continue;
+            case '/':  token_list_push(token_list, make_token(TOK_DIVIDE, p++, 1)); continue;
+            case '=':  token_list_push(token_list, make_token(TOK_ASSIGN, p++, 1)); continue;
+            case '$':  token_list_push(token_list, make_token(TOK_END, p++, 1)); continue;
+            case '<':  token_list_push(token_list, make_token(TOK_BELOW, p++, 1)); continue;
+            case '<=': token_list_push(token_list, make_token(TOK_BELOW_EQUAL, p++, 1)); continue;
+            case '>':  token_list_push(token_list, make_token(TOK_ABOVE, p++, 1)); continue;
+            case '>=': token_list_push(token_list, make_token(TOK_ABOVE_EQUAL, p++, 1)); continue;
+            case '==': token_list_push(token_list, make_token(TOK_EQUAL_EQUAL, p++, 1)); continue;
+            case '!=': token_list_push(token_list, make_token(TOK_NON_EQUAL, p++, 1)); continue;
+            case ',': token_list_push(token_list, make_token(TOK_COMMA, p++, 1)); continue;
         }
-        printf("Unknown char: %d\n", *p); break;
+        if (*p == '\0')
+            ;
+        else
+            printf("Unknown char: %d\n", *p); break;
         p++;
     }
 
@@ -209,6 +172,51 @@ ErrorCode lexicalAnalysis(TokenList * token_list)
     token_list_push(token_list, make_token(TOK_EOF, "", 0));
     free(buffer);
     return SUCCESS;
+}
+
+
+
+int token_list_resize(TokenList * token_list)
+{
+    size_t new_capacity = (token_list->capasity == 0) ? 8 : token_list -> capasity * 2;
+    Token * new_data = (Token *)realloc(token_list -> data, new_capacity * sizeof(Token));
+    if (!new_data)     return 0;
+
+    token_list->data = new_data;
+    token_list -> capasity = new_capacity;
+    return 1;
+}
+
+int token_list_push(TokenList * token_list, Token cur_token)
+{
+    if (token_list->count == token_list->capasity)
+    {
+        if (!token_list_resize(token_list))
+            return -1;
+    }
+
+    token_list -> data[token_list -> count++] = cur_token;
+    return token_list -> count;
+}
+
+
+token_t keyword(const char * word)
+{
+    if (strcmp(word, "while")  == 0)     return TOK_WHILE;
+    if (strcmp(word, "if")     == 0)     return TOK_IF;
+    if (strcmp(word, "print")  == 0)     return TOK_PRINT;
+    if (strcmp(word, "out")    == 0)     return TOK_OUT;
+    if (strcmp(word, "read")   == 0)     return TOK_READ;
+    if (strcmp(word, "def")    == 0)     return TOK_DEF;
+    if (strcmp(word, "ID_def") == 0)     return TOK_ID_DEF;
+    if (strcmp(word, "Sin")    == 0)     return TOK_SIN;
+    if (strcmp(word, "Cos")    == 0)     return TOK_COS;
+    if (strcmp(word, "Tg")     == 0)     return TOK_TG;
+    if (strcmp(word, "Ln")     == 0)     return TOK_LN;
+    if (strcmp(word, "Sqrt")   == 0)     return TOK_SQRT;
+    if (strcmp(word, "Exp")    == 0)     return TOK_EXP;
+
+    return TOK_IDENTIFIER;
 }
 
 
@@ -224,6 +232,7 @@ Token make_token(token_t type, const char * start, size_t len)
     return t;
 }
 
+
 Token make_token_number(const char * start, size_t len) 
 {
     Token token_number = make_token(TOK_NUMBER, start, len);
@@ -231,8 +240,17 @@ Token make_token_number(const char * start, size_t len)
     return token_number;
 }
 
+void token_list_init(TokenList * token_list)
+{
+    assert(token_list);
+    token_list->data = NULL;
+    token_list->count = 0;
+    token_list->capasity = 0;
+}
+
 void destroy_tokens(TokenList * token_list)
 {
+    assert(token_list);
     for (size_t i = 0; i < token_list -> count; i++) 
     {
         free(token_list->data[i].string_value);
@@ -243,38 +261,72 @@ void destroy_tokens(TokenList * token_list)
     token_list->data = NULL;
 }
 
-const char * token_type_strings[] =
+
+int symbol_table_find(const char * name, sb_mode_t mode)
 {
-    "TOK_EOF",
-    "TOK_END",
-    "TOK_NUMBER",
-    "TOK_IDENTIFIER",
-    "TOK_STRING",
+    for (size_t i = 0; i < symbols_table[mode].count; i++)
+    {
+        if (strcmp(symbols_table[mode].names[i], name) == 0)
+            return (int)i;
+    }
+    return -1;
+}
 
-    "TOK_SEMICOLON",
-    "TOK_LPAREN",
-    "TOK_RPAREN",
-    "TOK_LBRACE",
-    "TOK_RBRACE",
 
-    "TOK_MINUS",
-    "TOK_PLUS",
-    "TOK_MULTIPLY",
-    "TOK_ASSIGN",
-    "TOK_DIVIDE",
-    "TOK_POW",
-
-    "TOK_PRINT",
-    "TOK_WHILE",
-    "TOK_IF",
-};
-
-const char * get_string_token_type(token_t type)
+const char * get_id_name(size_t id_index, sb_mode_t mode)
 {
-    if (type >= TOK_EOF && type <= TOK_IF)
-        return token_type_strings[type];
+    if (id_index >= 0 && id_index < symbols_table[mode].count)
+        return symbols_table[mode].names[id_index];
+    else    
+        return NULL;
+}
+
+
+int symbol_table_add(const char * name, sb_mode_t mode)
+{
+    if (symbols_table[mode].count == symbols_table[mode].capasity)
+    {
+        if (!symbol_table_resize(&symbols_table[mode], mode))
+            return -1;
+    }
+
+    symbols_table[mode].names[symbols_table[mode].count] = strdup(name);
+    if (!symbols_table[mode].names[symbols_table[mode].count])
+        return -1;
+
+    return (int)symbols_table[mode].count++;
+}
+
+
+int symbol_table_resize(SymbolTable *sb, sb_mode_t mode)
+{
+    size_t new_capacity = (sb->capasity == 0) ? 8 : sb -> capasity * 2;
+    char ** new_names = (char **)realloc(sb->names, new_capacity * sizeof(char *));
+    if (!new_names)     return 0;
+
+    sb -> names = new_names;
+    sb -> capasity = new_capacity;
+    return 1;
+}
+
+
+int symbol_table_get_or_add(const char * name, sb_mode_t mode)
+{
+    int index = symbol_table_find(name, mode);
+    if (index >= 0)
+        return index;
     else
-        return "Unknown type";
+        return symbol_table_add(name, mode);
+}
+
+
+void symbol_table_destroy(SymbolTable * sb)
+{
+    assert(sb);
+
+    for (size_t i = 0; i < sb->count; i++)
+        free(sb->names[i]);
+    free(sb->names);
 }
 
 
@@ -288,5 +340,4 @@ void lexer_dump(const TokenList * token_list)
     {
         DEBUG_PRINT("token_%d, %s, %d, %s", i, get_string_token_type(token_list->data[i].type), token_list->data[i].int_value, token_list->data[i].string_value);
     }
-
 }

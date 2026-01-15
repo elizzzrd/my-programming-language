@@ -214,7 +214,7 @@ Node_t * GetAssignment(char **s, Tree_t * tree)
         SyntaxError(__LINE__, __func__, **s);
         return NULL;
     }
-    DEBUG_PRINT("identifier %s", symbols_table.names[(id->value.id_index)]);
+    DEBUG_PRINT("identifier %s", symbols_table[SB_VAR].names[(id->value.id_index)]);
     skip_spaces(s);
 
     REQUIRE_CHAR('=');
@@ -592,7 +592,7 @@ Node_t * GetIdentifier(char **s, Tree_t * tree)
     name[len] = '\0';
     DEBUG_PRINT("var_name was parsed, name = %s", name);
 
-    int id_index = symbol_table_get_or_add(name);
+    int id_index = symbol_table_get_or_add(name, SB_VAR);
     free(name);
     Node_result_t var_res = create_identifier_node(tree, id_index);  
     if (var_res.error != SUCCESS)   

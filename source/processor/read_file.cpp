@@ -15,7 +15,7 @@ const char * stack_commands[] =
     "HLT", "PUSH", "DUMP", "ADD", "SUB", "MUL", 
     "DIV", "SQRT","OUT", "POP", "PUSHR", "POPR",
     "JB", "JBE", "JA", "JAE", "JE", "JNE", "JMP", "IN", "CALL", "RET",
-    "PUSHM", "POPM"
+    "PUSHM", "POPM", "SIN", "COS", "LN", "EXP", "ARCTG", "PUTS"
 };
 
 int check_option_with_stack_commands(char * option)

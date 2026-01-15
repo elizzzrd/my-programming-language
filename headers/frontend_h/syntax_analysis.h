@@ -18,3 +18,14 @@ Node_t * GetAddSub_tokens(TokenList * tokens, size_t * pos, Tree_t * tree);
 Node_t * GetMulDiv_tokens(TokenList * tokens, size_t * pos, Tree_t * tree);
 Node_t * GetUnary_tokens(TokenList * tokens, size_t * pos, Tree_t * tree);
 Node_t * GetPrimaryExpression_tokens(TokenList * tokens, size_t * pos, Tree_t * tree);
+
+Node_t * GetVarDef_tokens(TokenList * tokens, size_t * pos, Tree_t * tree);
+Node_t * GetPow_tokens(TokenList * tokens, size_t * pos, Tree_t * tree);
+Node_t * GetEquality_tokens(TokenList * tokens, size_t * pos, Tree_t * tree);
+Node_t * GetComp_tokens(TokenList * tokens, size_t * pos, Tree_t * tree);
+Node_t * GetFuncCall_tokens(TokenList * tokens, size_t * pos, Tree_t * tree);
+Node_t * GetReturn_tokens(TokenList * tokens, size_t * pos, Tree_t * tree);
+Node_t * GetArgs_tokens(TokenList * tokens, size_t * pos, Tree_t * tree);
+Node_t * GetParams_tokens(TokenList * tokens, size_t * pos, Tree_t * tree);
+Node_t * GetFuncDef(TokenList * tokens, size_t * pos, Tree_t * tree);
+Node_t * GetInputStmt(TokenList * tokens, size_t * pos, Tree_t * tree);

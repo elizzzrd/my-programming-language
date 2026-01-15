@@ -23,7 +23,8 @@ typedef enum
 
     LEXER_ERROR,
     PARSER_ERROR,
-    TRANSLATING_TO_ASM_ERROR
+    TRANSLATING_TO_ASM_ERROR,
+    SYNTAX_ERROR
 } ErrorCode;
 
 
@@ -34,11 +35,13 @@ typedef struct treenode
     
     value_t value;
 
-    bool is_unary;
-
     struct treenode * left; 
     struct treenode * right;
     struct treenode * prev;
+
+    bool is_unary;
+
+    size_t child_count;
 } Node_t;
 
 

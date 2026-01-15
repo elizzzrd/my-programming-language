@@ -22,25 +22,32 @@ typedef enum
     OP_SUB,
     OP_POW,
 
+    OP_EQUAL,
+    OP_NON_EQUAL,
+    OP_BELOW,
+    OP_BELOW_EQUAL,
+    OP_ABOVE,
+    OP_ABOVE_EQUAL,
+
     OP_SIN,
     OP_COS,
     OP_TAN,
-    OP_CTG,
-    OP_ARCSIN,
-    OP_ARCCOS,
-    OP_ARCTAN,
-    OP_ARCCTG,
+    // OP_CTG,
+    // OP_ARCSIN,
+    // OP_ARCCOS,
+    // OP_ARCTAN,
+    // OP_ARCCTG,
 
-    OP_SINH,
-    OP_COSH,
-    OP_TANH,
-    OP_CTGH,
+    // OP_SINH,
+    // OP_COSH,
+    // OP_TANH,
+    // OP_CTGH,
 
     OP_EXP,
     OP_LN,
 
     OP_SQRT,
-    OP_ABS,
+    //OP_ABS,
     OP_UNARY_MINUS,
 
 } operator_t;
@@ -51,10 +58,19 @@ typedef enum
     OP_STATEMENT,
     OP_END,
     OP_PRINT,
+    OP_INPUT,
     OP_ASSIGNMENT,
     OP_IF,
     OP_WHILE,
-    OP_BLOCK
+    OP_BLOCK,
+
+    OP_FUNC_DEF,
+    OP_CALL,
+    OP_RETURN,
+    OP_VAR_DEF,
+
+    OP_PARAMS,
+    OP_ARGS
 } statement_t;
 
 typedef union 

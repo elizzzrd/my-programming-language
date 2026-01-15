@@ -12,8 +12,21 @@
     } while(0)
 
 
+typedef struct 
+{
+    const char * name;
+    int label;
+    int param_count;
+} function_info_t;
+
+
 ErrorCode translate_to_asm(Tree_t * tree, const char * filename);
 ErrorCode translate_node(Node_t * node, FILE * file_ptr);
 int get_id_address(const char * name);
 ErrorCode translate_operator(Node_t * node, FILE * file_ptr);
 ErrorCode translate_statement(Node_t * node, FILE * file_ptr);
+ErrorCode translate_string(Node_t * node, FILE * file_ptr);
+
+void emit_op_pow(FILE * file_ptr);
+int emit_strings(FILE * file_ptr, const char * s);
+void emit_cmp(FILE * file_ptr, const char * jmp);

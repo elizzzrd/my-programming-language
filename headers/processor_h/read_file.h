@@ -2,14 +2,14 @@
 #include "stack.h"
 
 #define NMAX 128
-#define NCOMMANDS 24
+#define NCOMMANDS 29
 
 typedef enum 
 {
     HLT, PUSH, DUMP, ADD, SUB, MUL,
     DIV, SQRT, OUT, POP, PUSHR, POPR,
     JB, JBE, JA, JAE, JE, JNE, JMP, IN, CALL, RET,
-    PUSHM, POPM
+    PUSHM, POPM, SIN, COS, LN, EXP, ARCTG, PUTS
 } Stack_commands;
 
 

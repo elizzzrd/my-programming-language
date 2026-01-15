@@ -31,6 +31,7 @@ const char * tree_error_string(ErrorCode error)
         "Error during lexical analysis",                // [13] LEXER_ERROR
         "Error during syntax analysis"                  // [14] PARSER_ERROR
         "Error during traslating to asm"                // [15] TRANSLATING_TO_ASM_ERROR
+        "Syntax error"                                  // [16] SYNTAX_ERROR
     };
     
     if (error < SUCCESS || error > PARSER_ERROR) 

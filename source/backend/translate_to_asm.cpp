@@ -10,8 +10,12 @@
 #include "read_file.h"
 #include "lexer.h"
 #include "translate_to_asm.h"
+#include "utils.h"
 
-            
+static int string_top = 256; // где в RAM начинаются строки
+function_info_t functions[128];
+int function_count = 0;
+
 
 ErrorCode translate_to_asm(Tree_t * tree, const char * filename)
 {
@@ -84,7 +88,12 @@ ErrorCode translate_node(Node_t * node, FILE * file_ptr)
             IF_THERE_IS_TRANSLATE_ERROR(error);
             break;
         }
-        case STRING: break;
+        case STRING: 
+        {
+            error = translate_string(node, file_ptr); 
+            IF_THERE_IS_TRANSLATE_ERROR(error);
+            break;
+        }
         default: 
         {
             ERROR_MESSAGE(TREE_INVALID_NODE_TYPE, error);
@@ -111,6 +120,7 @@ int get_id_address(const char * name)
     return index;
 }
 
+
 ErrorCode translate_operator(Node_t * node, FILE * file_ptr)
 {
     assert(node && file_ptr);
@@ -128,15 +138,19 @@ ErrorCode translate_operator(Node_t * node, FILE * file_ptr)
 
         switch (op)
         {
-            case OP_ADD:    fprintf(file_ptr, "add\n"); break;
-            case OP_SUB:    fprintf(file_ptr, "sub\n"); break;
-            case OP_MUL:    fprintf(file_ptr, "mul\n"); break;
-            case OP_DIV:    fprintf(file_ptr, "div\n"); break;
-            case OP_POW:    
-            {
-                // реализация возведения в степень
-                break;
-            }
+            case OP_ADD:            fprintf(file_ptr, "add\n"); break;
+            case OP_SUB:            fprintf(file_ptr, "sub\n"); break;
+            case OP_MUL:            fprintf(file_ptr, "mul\n"); break;
+            case OP_DIV:            fprintf(file_ptr, "div\n"); break;
+            case OP_POW:            emit_op_pow(file_ptr); break;
+
+            case OP_EQUAL:          emit_cmp(file_ptr, "je\n"); break;
+            case OP_NON_EQUAL:      emit_cmp(file_ptr, "jne\n"); break;
+            case OP_BELOW:          emit_cmp(file_ptr, "jb\n"); break;
+            case OP_BELOW_EQUAL:    emit_cmp(file_ptr, "jbe\n"); break;
+            case OP_ABOVE:          emit_cmp(file_ptr, "ja\n"); break;
+            case OP_ABOVE_EQUAL:    emit_cmp(file_ptr, "jae\n"); break;
+
             default:
             {
                 ERROR_MESSAGE(TRANSLATING_TO_ASM_ERROR, error);
@@ -159,8 +173,34 @@ ErrorCode translate_operator(Node_t * node, FILE * file_ptr)
                 fprintf(file_ptr, "sub\n");
                 break;
             }
-            case OP_SQRT: fprintf(file_ptr, "sqrt\n"); break;
-            case OP_ABS:  /* abs */ break;
+            case OP_SQRT:   fprintf(file_ptr, "sqrt\n"); break;
+            case OP_SIN:    fprintf(file_ptr, "sin\n");  break;
+            case OP_COS:    fprintf(file_ptr, "cos\n");  break;
+            case OP_TAN:    
+            {
+                fprintf(file_ptr, "popr rax\n");  
+                fprintf(file_ptr, "pushr rax\n");
+                fprintf(file_ptr, "sin\n");  
+                fprintf(file_ptr, "pushr rax\n");
+                fprintf(file_ptr, "cos\n");
+                fprintf(file_ptr, "push 0\npopr rax\n");
+                fprintf(file_ptr, "div\n");
+                break;
+            }
+            // case OP_CTG:
+            // {
+            //     fprintf(file_ptr, "popr rax\n");  
+            //     fprintf(file_ptr, "pushr rax\n");
+            //     fprintf(file_ptr, "cos\n");  
+            //     fprintf(file_ptr, "pushr rax\n");
+            //     fprintf(file_ptr, "sin\n");
+            //     fprintf(file_ptr, "push 0\npopr rax\n");
+            //     fprintf(file_ptr, "div\n");
+            //     break;
+            // }
+            // case OP_ARCTAN: fprintf(file_ptr, "arctg\n"); break;
+            case OP_EXP:    fprintf(file_ptr, "exp\n");  break;
+            case OP_LN:     fprintf(file_ptr, "ln\n");   break;
             default:
                 ERROR_MESSAGE(TREE_INVALID_OPERATOR, error);
                 return error;
@@ -172,6 +212,16 @@ ErrorCode translate_operator(Node_t * node, FILE * file_ptr)
     return error;
 }
 
+
+ErrorCode translate_string(Node_t * node, FILE * file_ptr)
+{
+    assert(node && file_ptr);
+
+    int addr = emit_strings(file_ptr, node->value.string_value);
+
+    fprintf(file_ptr, "push %d\n", addr);
+    return SUCCESS;
+}
 
 
 
@@ -195,16 +245,24 @@ ErrorCode translate_statement(Node_t * node, FILE * file_ptr)
         }
         case OP_PRINT:
         {
-            error = translate_node(node->right, file_ptr);              // строки??
+            Node_t * arg = node->right;
+
+            error = translate_node(arg, file_ptr);              
             IF_THERE_IS_TRANSLATE_ERROR(error);
-            fprintf(file_ptr, "out\n");
+
+            if (arg->type == STRING)
+                fprintf(file_ptr, "puts\n");
+            else
+                fprintf(file_ptr, "out\n");
             break;
         }
         case OP_ASSIGNMENT:
+        case OP_VAR_DEF:
         {
             error = translate_node(node->right, file_ptr);
-            int index = get_id_address(get_id_name(node->left->value.id_index));
-            if (index < 0)      error = TRANSLATING_TO_ASM_ERROR;
+            int index = get_id_address(get_id_name(node->left->value.id_index, SB_VAR));
+            if (index < 0)      
+                error = TRANSLATING_TO_ASM_ERROR;
             IF_THERE_IS_TRANSLATE_ERROR(error);
 
             fprintf(file_ptr, "popm [%d]\n", index);
@@ -215,16 +273,16 @@ ErrorCode translate_statement(Node_t * node, FILE * file_ptr)
             static int label_id = 0;
             int cur = label_id++;
 
-            error = translate_node(node->left, file_ptr);
+            error = translate_node(node->left, file_ptr); // условие
             IF_THERE_IS_TRANSLATE_ERROR(error);
 
             fprintf(file_ptr, "push 0\n");
-            fprintf(file_ptr, "je endif_%d\n", cur);
+            fprintf(file_ptr, "je ENDIF_%d\n", cur);
 
-            error = translate_node(node->right, file_ptr);
+            error = translate_node(node->right, file_ptr); // тело
             IF_THERE_IS_TRANSLATE_ERROR(error);
 
-            fprintf(file_ptr, "endif_%d:\n", cur);
+            fprintf(file_ptr, "ENDIF_%d:\n", cur);
             break;
         }
         case OP_WHILE:
@@ -232,19 +290,19 @@ ErrorCode translate_statement(Node_t * node, FILE * file_ptr)
             static int label_id = 0;
             int cur = label_id++;
 
-            fprintf(file_ptr, "while_%d\n", cur);
+            fprintf(file_ptr, "WHILE_%d\n", cur);
 
             error = translate_node(node->left, file_ptr);
             IF_THERE_IS_TRANSLATE_ERROR(error);
 
             fprintf(file_ptr, "push 0\n");
-            fprintf(file_ptr, "je endwhile_%d\n", cur);
+            fprintf(file_ptr, "je ENDWHILE_%d\n", cur);
 
             error = translate_node(node->right, file_ptr);
             IF_THERE_IS_TRANSLATE_ERROR(error);
 
-            fprintf(file_ptr, "jmp while_%d\n", cur);
-            fprintf(file_ptr, "endwhile_%d:\n", cur);
+            fprintf(file_ptr, "jmp WHILE_%d\n", cur);
+            fprintf(file_ptr, "ENDWHILE_%d:\n", cur);
             break;
         }
         case OP_BLOCK:
@@ -253,8 +311,128 @@ ErrorCode translate_statement(Node_t * node, FILE * file_ptr)
             IF_THERE_IS_TRANSLATE_ERROR(error);
             break;
         }
+        case OP_INPUT:
+        {
+            Node_t * arg = node->right;
+
+            error = translate_node(arg, file_ptr);              
+            IF_THERE_IS_TRANSLATE_ERROR(error);
+
+            if (arg->type == NUMBER)
+                fprintf(file_ptr, "in\n");
+            else
+            {
+                ERROR_MESSAGE(TRANSLATING_TO_ASM_ERROR, error);
+                DEBUG_PRINT("Can not read non-number\n");
+                return error;
+            }
+            break;
+        }
+        case OP_FUNC_DEF:
+        {
+            fprintf(file_ptr, "%s:\n", get_id_name(node->value.id_index, SB_FUNC));
+
+
+
+            fprintf(file_ptr, "ret\n");
+
+        }
+        case OP_CALL:
+        {
+            fprintf(file_ptr, "call %s\n", get_id_name(node->value.id_index, SB_FUNC));
+        }
+        case OP_RETURN:
+        {
+            fprintf(file_ptr, "")
+        }
         default: break;
     }
     return SUCCESS;
+}
+
+
+
+
+int emit_strings(FILE * file_ptr, const char * s)
+{
+    assert(file_ptr && s);
+
+    int addr = string_top;
+
+    for (size_t i = 0; s[i]; i++)
+    {
+        fprintf(file_ptr, "push %d\n", (unsigned char)s[i]);
+        fprintf(file_ptr, "popm [%d]\n", string_top++);
+    }
+
+    fprintf(file_ptr, "push 0\n");
+    fprintf(file_ptr, "popm [%d]\n", string_top++);
+
+    return addr;
+}
+
+void emit_cmp(FILE * file_ptr, const char * jmp)
+{
+    assert(file_ptr && jmp);
+
+    static int cmp_labels = 0;
+    int id = cmp_labels++;
+
+    fprintf(file_ptr, "sub\n");
+    fprintf(file_ptr, "push 0\n");
+    fprintf(file_ptr, "%s TRUE_CONDITION_%d\n", jmp, id);
+    fprintf(file_ptr, "push 0\n");
+    fprintf(file_ptr, "jmp END_CONDITION_%d\n", id);
+    fprintf(file_ptr, "TRUE_CONDITION_%d:\n", id);
+    fprintf(file_ptr, "push 1\n");
+    fprintf(file_ptr, "END_CONDITION_%d:\n", id);
+}
+
+void emit_op_pow(FILE * file_ptr)
+{
+    assert(file_ptr);
+
+    fprintf(file_ptr, 
+    "in\n in\n"      
+    "popr rbx\n popr rax\n"
+    "pushr rax\n"
+    "push 0\n"
+    "jbe NEGATIVE_BASE\n\n"
+    "pushr rbx\n"
+    "push 0\n"
+    "je POWER_ZERO\n\n"
+    "push 1\n"
+    "popr rdx\n"
+    "push 0\n"
+    "popr rcx\n\n"
+    "START_LOOP:\n"
+    "pushr rcx\n"
+    "pushr rbx\n"
+    "jae END_LOOP\n\n"
+    "pushr rdx\n"
+    "pushr rax\n"
+    "mul\n"
+    "popr rdx\n\n"
+    "pushr rcx\n"
+    "push 1\n"
+    "add\n"
+    "popr rcx\n\n"
+    "jmp START_LOOP\n\n"
+    "END_LOOP:\n"
+    "pushr rdx\n"
+    "jmp END\n\n"
+    "NEGATIVE_BASE:\n"
+    "pushr rbx\n"
+    "push 0\n"
+    "je POWER_ZERO\n\n"
+    "push 0\n"
+    "jmp END\n\n"
+    "POWER_ZERO:\n"
+    "push 1\n"
+    "jmp END\n\n"
+    "END:\n"
+    "out\n"
+    "push 0\npopr rax\npush 0\npopr rbx\npush 0\npopr rx\npush 0\npopr rdx\n"
+    "hlt\n");
 }
 

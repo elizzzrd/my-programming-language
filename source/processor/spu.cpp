@@ -281,22 +281,69 @@ Spu_Err run_spu(spu_t * spu)
                     printf("Invalid number. Please try again\n");
                     continue;
                 }
-                stack_errors |= stack_push(&(spu -> stack), n);                             IF_THERE_IS_STACK_ERROR(stack_errors, "Error during spu running: PUSH");
+                stack_errors |= stack_push(&(spu -> stack), n);                                             IF_THERE_IS_STACK_ERROR(stack_errors, "Error during spu running: PUSH");
                 break;
             }
             case CALL:
             {
                 StackElem target = spu->code[spu->instructor_ptr++];
                 StackElem next_ptr = spu->instructor_ptr;
-                stack_errors = stack_push(&(spu->return_address), next_ptr);                         IF_THERE_IS_STACK_ERROR(stack_errors, "Error during spu running: CALL PUSH");
+                stack_errors = stack_push(&(spu->return_address), next_ptr);                                IF_THERE_IS_STACK_ERROR(stack_errors, "Error during spu running: CALL PUSH");
                 spu->instructor_ptr = (size_t) target;
                 break;
             }
             case RET:
             {
                 StackElem return_ptr = 0;
-                stack_errors = stack_pop(&(spu->return_address), &return_ptr);                       IF_THERE_IS_STACK_ERROR(stack_errors, "Error during spu running: RET POP");
+                stack_errors = stack_pop(&(spu->return_address), &return_ptr);                              IF_THERE_IS_STACK_ERROR(stack_errors, "Error during spu running: RET POP");
                 spu->instructor_ptr = (size_t) return_ptr;
+                break;
+            }
+            case SIN:
+            {
+                StackElem a = 0;
+                stack_errors = stack_pop(&(spu->stack), &a);                                                IF_THERE_IS_STACK_ERROR(stack_errors, "Error during spu running: POP");
+                stack_errors = stack_push(&(spu->stack), StackElem(sin(a)));                                IF_THERE_IS_STACK_ERROR(stack_errors, "Error during spu running: PUSH");
+                break;
+            }
+            case COS:
+            {
+                StackElem a = 0;
+                stack_errors = stack_pop(&(spu->stack), &a);                                                IF_THERE_IS_STACK_ERROR(stack_errors, "Error during spu running: POP");
+                stack_errors = stack_push(&(spu->stack), StackElem(cos(a)));                                IF_THERE_IS_STACK_ERROR(stack_errors, "Error during spu running: PUSH");
+                break;
+            }
+            case LN:
+            {
+                StackElem a = 0;
+                stack_errors = stack_pop(&(spu->stack), &a);                                                IF_THERE_IS_STACK_ERROR(stack_errors, "Error during spu running: POP");
+                stack_errors = stack_push(&(spu->stack), StackElem(log(a)));                                IF_THERE_IS_STACK_ERROR(stack_errors, "Error during spu running: PUSH");
+                break;
+            }
+            case EXP:
+            {
+                StackElem a = 0;
+                stack_errors = stack_pop(&(spu->stack), &a);                                                IF_THERE_IS_STACK_ERROR(stack_errors, "Error during spu running: POP");
+                stack_errors = stack_push(&(spu->stack), StackElem(exp(a)));                                IF_THERE_IS_STACK_ERROR(stack_errors, "Error during spu running: PUSH");
+                break;
+            }
+            case ARCTG:
+            {
+                StackElem a = 0;
+                stack_errors = stack_pop(&(spu->stack), &a);                                                IF_THERE_IS_STACK_ERROR(stack_errors, "Error during spu running: POP");
+                stack_errors = stack_push(&(spu->stack), StackElem(atan(a)));                               IF_THERE_IS_STACK_ERROR(stack_errors, "Error during spu running: PUSH");
+                break;
+            }
+            case PUTS:
+            {
+                StackElem addr = 0;
+                stack_errors = stack_pop(&(spu->stack), &addr);                                             IF_THERE_IS_STACK_ERROR(stack_errors, "Error during spu running: POP"); 
+
+                while (spu->RAM[addr] != 0)
+                {
+                    putchar((char) spu->RAM[addr]);
+                    addr++;
+                }
                 break;
             }
             default: 
