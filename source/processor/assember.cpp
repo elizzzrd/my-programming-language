@@ -7,7 +7,7 @@
 #include <ctype.h>
 
 #include "stack.h"
-#include "errors.h"
+#include "errors_spu.h"
 #include "read_file.h"
 #include "spu.h"
 #include "assembler.h"
@@ -16,7 +16,7 @@
 
 
 
-static label_t labels[MAX_LABELS];
+static label_t g_labels[MAX_LABELS];
 static size_t labels_count = 0;
 static int code_buffer[MAX_CODE_SIZE];
 static size_t code_size = 0;
@@ -24,20 +24,20 @@ static size_t code_size = 0;
 
 void label_dump(const char * func, int line, const char * filename)
 {
-    DEBUG_PRINT("============LABELS DUMB============\n");
-    DEBUG_PRINT("\nlabels dump called from %s %s: %d\n", filename, func, __LINE__);
-    DEBUG_PRINT("labels [%p]\n", labels);
-    DEBUG_PRINT("\n\tSize = %d\n", MAX_LABELS);
-    DEBUG_PRINT("{\n");
+    DEBUG_PRINT("\t============LABELS DUMB============\n");
+    DEBUG_PRINT("labels dump called from %s %s: %d", filename, func, __LINE__);
+    DEBUG_PRINT("labels [%p]", g_labels);
+    DEBUG_PRINT("\tSize = %d", MAX_LABELS);
+    DEBUG_PRINT("{");
     for (int i = 0; i < MAX_LABELS; i++)
     {
-        DEBUG_PRINT("\t*[%d] = %s -- %d\n",
+        DEBUG_PRINT("\t*[%d] = %s -- %d",
         i,
-        labels[i].name ? labels[i].name : "(null)",
-        labels[i].instructor_ptr);
+        g_labels[i].name ? g_labels[i].name : "(null)",
+        g_labels[i].instructor_ptr);
     }
-    DEBUG_PRINT("}\n");
-    DEBUG_PRINT("============END LABEL DUMP============\n");
+    DEBUG_PRINT("}");
+    DEBUG_PRINT("\t============END LABEL DUMP============");
 }
 
 int is_label(const char * option, size_t ip)
@@ -52,18 +52,18 @@ int is_label(const char * option, size_t ip)
 
         if (find_label(name) != -1)
         {
-            DEBUG_PRINT("label redefinition");
+            DEBUG_PRINT("[ERROR] label redefinition");
             return -2;
         }
 
         if (labels_count < MAX_LABELS)
         {
-            labels[labels_count++] = (label_t){.name = strdup(name), .instructor_ptr = ip};
-            return (labels_count - 1);
+            g_labels[labels_count++] = (label_t){.name = strdup(name), .instructor_ptr = ip};
+            return (int)(labels_count - 1);
         }
         else
         {
-            DEBUG_PRINT("labels is out of range");
+            DEBUG_PRINT("[ERROR] labels is out of range");
             return -2;
         }
     }
@@ -74,9 +74,9 @@ int find_label(const char * name)
 {
     assert(name);
 
-    for (size_t i = 0; i < labels_count; i++)
+    for (int i = 0; i < (int)labels_count; i++)
     {
-        if (strcmp(name, labels[i].name) == 0)
+        if (strcmp(name, g_labels[i].name) == 0)
             return i;
     }
     return -1;
@@ -100,8 +100,8 @@ void init_labels(void)
     labels_count = 0;
     for (int i = 0; i < MAX_LABELS; i++)
     {
-        labels[i].instructor_ptr = -1;
-        labels[i].name = NULL;
+        g_labels[i].instructor_ptr = -1;
+        g_labels[i].name = NULL;
     }
 }
 
@@ -109,7 +109,7 @@ void destroy_labels(label_t * labels)
 {
     assert(labels);
 
-    for (int i = 0; i < labels_count; i++)
+    for (size_t i = 0; i < labels_count; i++)
         free(labels[i].name);
 }
 
@@ -118,20 +118,21 @@ Spu_Err parse_argument(const char * arg, int * value, type_arg * type)
 {
     assert(value && type);
     Spu_Err errors = SPU_OK;
+    *type = UNKNOWN_TYPE;
     if (!arg || !*arg) return SPU_INVALID_COMMAND;
 
     if (is_number(arg)) 
     {
         *value = atoi(arg);
         *type = NUM;
-        return errors;
+        return SPU_OK;
     }
     else if (arg[0] == 'r' && isalpha((unsigned char)arg[1])) 
     {
         int reg_num = (toupper(arg[1]) - 'A') + 1;
         if (strlen(arg) != 3 || (reg_num < 1 || reg_num > 16)) 
         {
-            DEBUG_PRINT("Invalid register name");
+            DEBUG_PRINT("[ERROR] Invalid register name");
             return SPU_INVALID_COMMAND;
         }
         *value = reg_num;
@@ -145,7 +146,7 @@ Spu_Err parse_argument(const char * arg, int * value, type_arg * type)
 
         if (len <=2)
         {
-            DEBUG_PRINT("Empty brackets in pushm/popm");
+            DEBUG_PRINT("[ERROR] Empty brackets in pushm/popm");
             errors |= SPU_INVALID_COMMAND;
             return errors;
         }
@@ -157,7 +158,7 @@ Spu_Err parse_argument(const char * arg, int * value, type_arg * type)
             int addr = atoi(inside);
             if (addr < 0)
             {
-                DEBUG_PRINT("Negative RAM address");
+                DEBUG_PRINT("[ERROR] Negative RAM address");
                 return SPU_INVALID_COMMAND;
             }
             *value = addr;
@@ -169,12 +170,12 @@ Spu_Err parse_argument(const char * arg, int * value, type_arg * type)
     int id = find_label(arg);
     if (id != -1) 
     {
-        *value = labels[id].instructor_ptr;
+        *value = g_labels[id].instructor_ptr;
         *type = LABEL;
         return errors;
     }
 
-    DEBUG_PRINT("Unrecognized argument type");
+    DEBUG_PRINT("[ERROR] Unrecognized argument type '%s'", get_string_type_arg(*type));
     *type = UNKNOWN_TYPE;
     return SPU_INVALID_COMMAND;
 }
@@ -190,7 +191,7 @@ Spu_Err first_pass(const char * txt_filename)
     FILE * file_txt = fopen(txt_filename, "r");
     if (!file_txt) 
     {
-        DEBUG_PRINT("Can not open the file %s.\n", txt_filename); 
+        DEBUG_PRINT("[ERROR] Can not open the file %s.\n", txt_filename); 
         errors |= SPU_FILE_ERROR;
         return errors;
     }
@@ -237,7 +238,7 @@ Spu_Err first_pass(const char * txt_filename)
         //printf("assembler 181: option: %s - cmd: %d \n", option, cmd);
         if (cmd == -1) 
         {
-            DEBUG_PRINT("Unknown command in text file\n");
+            DEBUG_PRINT("[ERROR] Unknown command in text file\n");
             errors |= SPU_UNKNOWN_COMMAND;
         }
 
@@ -257,7 +258,7 @@ Spu_Err second_pass(const char * txt_filename)
 
     FILE *file = fopen(txt_filename, "r");
     if (!file) {
-        DEBUG_PRINT("Cannot open input file (second pass)");
+        DEBUG_PRINT("[ERROR] Cannot open input file (second pass)");
         return SPU_FILE_ERROR;
     }
 
@@ -284,7 +285,7 @@ Spu_Err second_pass(const char * txt_filename)
         int cmd = check_option_with_stack_commands(option);
         if (cmd == -1) 
         {
-            DEBUG_PRINT("Unknown command");
+            DEBUG_PRINT("[ERROR] Unknown command");
             errors |= SPU_UNKNOWN_COMMAND;
             continue;
         }
@@ -300,12 +301,12 @@ Spu_Err second_pass(const char * txt_filename)
 
             if (errors != SPU_OK)
             {
-                DEBUG_PRINT("Error during parsing");
+                DEBUG_PRINT("[ERROR] Error during parsing");
                 return errors;
             }
             else if (type == UNKNOWN_TYPE)
             {
-                DEBUG_PRINT("Unknown argument type");
+                DEBUG_PRINT("[ERROR] Unknown argument type");
                 return errors;
             }
             code_buffer[code_size++] = value;
@@ -329,18 +330,17 @@ int * load_bytecode(const char * file_byte, size_t * size)
     FILE * file = fopen(file_byte, "r");
     if (!file) 
     {
-        DEBUG_PRINT("Can not open the file %s.\n", file_byte);
+        DEBUG_PRINT("[ERROR] Can not open the file %s.\n", file_byte);
         return NULL;
     }
 
-    
     #define MAX_TEMP 1024
     int temp_buffer[MAX_TEMP];
     size_t count = 0;
     
-    while (count < MAX_TEMP && fscanf(file, "%d", &temp_buffer[count]) == 1) {
+    while (count < MAX_TEMP && fscanf(file, "%d", &temp_buffer[count]) == 1) 
         count++;
-    }
+    
     
     fclose(file);
     
@@ -374,28 +374,28 @@ Spu_Err assembler(const char * txt_filename, const char * byte_filename)
     label_dump(__func__, __LINE__, __FILE__);
     if (errors != SPU_OK) 
     {
-        DEBUG_PRINT("Assembler failed during 1 pass");
+        DEBUG_PRINT("[ERROR] Assembler failed during 1 pass");
         return errors;
     }
     errors |= second_pass(txt_filename);
     label_dump(__func__, __LINE__, __FILE__);
     if (errors != SPU_OK) 
     {
-        DEBUG_PRINT("Assembler failed during 2 pass");
+        DEBUG_PRINT("[ERROR] Assembler failed during 2 pass");
         return errors;
     }
 
     FILE *out = fopen(byte_filename, "w+");
     if (!out) 
     {
-        DEBUG_PRINT("Cannot open output file");
+        DEBUG_PRINT("[ERROR] Cannot open output file");
         return SPU_FILE_ERROR;
     }
 
     for (size_t i = 0; i < code_size; i++)
         fprintf(out, "%d\n", code_buffer[i]);
 
-    destroy_labels(labels);
+    destroy_labels(g_labels);
     fclose(out);
     return errors;
 }

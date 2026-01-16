@@ -64,7 +64,7 @@ AddSub      ::= MulDiv ( ('+' | '-') MulDiv )*
 MulDiv      ::= Pow ( ('*' | '/') Pow )*
 Pow         ::= Unary ('^' Unary)*
 Unary       ::=  ( '+' | '-' | FuncOper )? Primary
-FuncOper    ::= 'Sin' | 'Cos' | 'Tg' | 'Ln' | 'Sqrt'
+FuncOper    ::= ('Sin' | 'Cos' | 'Tg' | 'Ln' | 'Sqrt' ) 
 Primary     ::= '(' Expression ')'
                 | Number
                 | Identifier
@@ -158,7 +158,7 @@ Node_t * GetProgram_tokens(TokenList * tokens, size_t * pos, Tree_t * tree)
         }
         else
         {
-            DEBUG_PRINT("[SYNTAX ERROR] expected ';' oe end\n");
+            DEBUG_PRINT("[SYNTAX ERROR] expected ';'\n");
             DEBUG_PRINT("got token %s at %lu", get_string_token_type(t->type), *pos);
             return NULL;
         }
@@ -285,8 +285,8 @@ Node_t * GetParams_tokens(TokenList * tokens, size_t * pos, Tree_t * tree)
     Token * t = current_token(tokens, *pos);
     REQUIRE_TOKEN(TOK_IDENTIFIER, t);
 
-    int id_index = symbol_table_add(t->string_value, SB_VAR);
-    Node_result_t first_var = create_identifier_node(tree, id_index);
+    int id_indx = symbol_table_add(t->string_value, SB_VAR);
+    Node_result_t first_var = create_identifier_node(tree, id_indx);
     if (first_var.error != SUCCESS)
     {
         ERROR_MESSAGE(SYNTAX_ERROR, error);
@@ -321,7 +321,7 @@ Node_t * GetParams_tokens(TokenList * tokens, size_t * pos, Tree_t * tree)
 
         prev->right = var.node;
         var.node->prev = prev;
-        list->child_count++;
+        list->param_count++;
         prev = var.node;
     }
 
@@ -359,7 +359,7 @@ Node_t * GetArgs_tokens(TokenList * tokens, size_t * pos, Tree_t * tree)
 
         prev->right = next_expr;
         next_expr->prev = prev;
-        list->child_count++;
+        list->param_count++;
         prev = next_expr;
     }
     return list;
@@ -491,6 +491,7 @@ Node_t * GetInputStmt(TokenList * tokens, size_t * pos, Tree_t * tree)
     }
     REQUIRE_TOKEN(TOK_RBRACE, current_token(tokens, *pos));
     (*pos)++;
+    return expr;
 }
 
 
@@ -1058,13 +1059,16 @@ Node_t * GetUnary_tokens(TokenList * tokens, size_t * pos, Tree_t * tree)
         }
 
         (*pos)++;
-
+        // REQUIRE_TOKEN(TOK_LBRACE, current_token(tokens, *pos));
+        // (*pos);
         Node_t * prim = GetPrimaryExpression_tokens(tokens, pos, tree);
         if (!prim)
         {
             DEBUG_PRINT("[SYNTAX ERROR] expected primary after function");
             return NULL;
         }
+        // REQUIRE_TOKEN(TOK_RBRACE, current_token(tokens, *pos));
+        // (*pos);
 
         Node_result_t res = create_operator_node(tree, op);
         if (res.error != SUCCESS) return NULL;

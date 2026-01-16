@@ -80,7 +80,7 @@ typedef union
     statement_t stmt;
     double number;
     int id_index;
-    char * string_value;
+    const char * string_value;
 } value_t;
 
 typedef struct 

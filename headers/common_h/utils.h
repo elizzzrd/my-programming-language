@@ -14,7 +14,7 @@
     do {                                                                    \
         FILE *dbg_fp = fopen(DEBUG_LOG_FILE, "a");                         \
         if (dbg_fp) {                                                       \
-            fprintf(dbg_fp, "%s:%d:%s(): " fmt "\n",                       \
+            fprintf(dbg_fp, "%s:%d: %s: " fmt "\n",                       \
                     __FILE__, __LINE__, __func__, ##__VA_ARGS__);          \
             fclose(dbg_fp);                                                 \
         }                                                                   \

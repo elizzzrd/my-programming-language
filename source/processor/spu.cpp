@@ -7,6 +7,7 @@
 #include "read_file.h"
 #include "assembler.h"
 #include "spu.h"
+#include "translate_to_asm.h"
 #include "utils.h"
 
 
@@ -19,6 +20,7 @@
             return spu_errors; \
         } \
     } while(0)
+
 
 Spu_Err spu_init(spu_t * spu)
 {
@@ -57,6 +59,7 @@ Spu_Err run_spu(spu_t * spu)
 
     while ((spu -> instructor_ptr) < (spu -> code_size))
     {
+        static int print_count = 0;
         int cmd = (spu -> code)[(spu -> instructor_ptr)++];
         switch(cmd) 
         {
@@ -71,12 +74,8 @@ Spu_Err run_spu(spu_t * spu)
                     break;
                 }
                 int value = (spu -> code)[spu -> instructor_ptr];
-
-
-                //printf("INSTR_PTR=%zu CMD=%d NEXT=%d\n", spu->instructor_ptr - 1, cmd, value);
                 stack_errors = stack_push(&(spu->stack), value);                            IF_THERE_IS_STACK_ERROR(stack_errors, "Error during spu running: PUSH");
                 (spu->instructor_ptr)++;
-                //stack_dump(&(spu->stack), STACK_OK, __FILE__, __LINE__);
                 spu_dump(spu, SPU_OK, __FILE__, __LINE__);
                 break;
             }
@@ -171,22 +170,22 @@ Spu_Err run_spu(spu_t * spu)
             case DIV:
             {
                 StackElem a = 0, b = 0;
-                stack_errors = stack_pop(&(spu -> stack), &a);                              IF_THERE_IS_STACK_ERROR(stack_errors, "Error during spu running: DIV");
-                stack_errors = stack_pop(&(spu -> stack), &b);                              IF_THERE_IS_STACK_ERROR(stack_errors, "Error during spu running: DIV");
+                stack_errors = stack_pop(&(spu -> stack), &a);                                              IF_THERE_IS_STACK_ERROR(stack_errors, "Error during spu running: DIV");
+                stack_errors = stack_pop(&(spu -> stack), &b);                                              IF_THERE_IS_STACK_ERROR(stack_errors, "Error during spu running: DIV");
                 if (a == 0)
                 {
                     DEBUG_PRINT("Error: division by zero\n"); 
                     spu_errors |= SPU_DIVISION_BY_ZERO;
-                    stack_push(&(spu -> stack), a);                                         IF_THERE_IS_STACK_ERROR(stack_errors, "Error during spu running: PUSH");
-                    stack_push(&(spu -> stack), b);                                         IF_THERE_IS_STACK_ERROR(stack_errors, "Error during spu running: PUSH");
+                    stack_push(&(spu -> stack), a);                                                         IF_THERE_IS_STACK_ERROR(stack_errors, "Error during spu running: PUSH");
+                    stack_push(&(spu -> stack), b);                                                         IF_THERE_IS_STACK_ERROR(stack_errors, "Error during spu running: PUSH");
                 }
-                stack_errors = stack_push(&(spu -> stack), b / a);                          IF_THERE_IS_STACK_ERROR(stack_errors, "Error during spu running: PUSH");
+                stack_errors = stack_push(&(spu -> stack), b / a);                                          IF_THERE_IS_STACK_ERROR(stack_errors, "Error during spu running: PUSH");
                 break;
             }       
             case SQRT:
             {
                 StackElem a = 0;
-                stack_errors = stack_pop(&(spu -> stack), &a);
+                stack_errors = stack_pop(&(spu -> stack), &a);                                              IF_THERE_IS_STACK_ERROR(stack_errors, "Error during spu running: POP");
                 if (a < 0) 
                 {
                     spu_errors |= SPU_INVALID_COMMAND;
@@ -196,20 +195,22 @@ Spu_Err run_spu(spu_t * spu)
                 }
                 else
                 {
-                    stack_errors = stack_push(&(spu -> stack), (StackElem) sqrt(a));       IF_THERE_IS_STACK_ERROR(stack_errors, "Error during spu running: PUSH");
+                    stack_errors = stack_push(&(spu -> stack), (StackElem) sqrt(a));                        IF_THERE_IS_STACK_ERROR(stack_errors, "Error during spu running: PUSH");
                 }
                 break;
             }    
             case OUT:
             {
                 StackElem a = 0;
-                stack_errors = stack_pop(&(spu -> stack), &a);                              IF_THERE_IS_STACK_ERROR(stack_errors, "Error during spu running: POP");
-                printf("value for out %d\n", a);
-                if (stack_errors != STACK_OK)
+                stack_errors = stack_pop(&(spu -> stack), &a);                                              IF_THERE_IS_STACK_ERROR(stack_errors, "Error during spu running: POP");
+                
+                if (print_count == 0)
                 {
-                    printf("Error with OUT\n");
+                    OUTPUT("=========================== OUTPUT ===========================\n");
+                    print_count++;
                 }
-                printf("OUT: %d\n", a);
+                OUTPUT("\n");
+                OUTPUT("OUT: %d\n", a);
                 break;
             }
             case JB:                                                    //jump if below
@@ -286,8 +287,8 @@ Spu_Err run_spu(spu_t * spu)
             }
             case CALL:
             {
-                StackElem target = spu->code[spu->instructor_ptr++];
-                StackElem next_ptr = spu->instructor_ptr;
+                StackElem target = (int)spu->code[spu->instructor_ptr++];
+                StackElem next_ptr = (int)spu->instructor_ptr;
                 stack_errors = stack_push(&(spu->return_address), next_ptr);                                IF_THERE_IS_STACK_ERROR(stack_errors, "Error during spu running: CALL PUSH");
                 spu->instructor_ptr = (size_t) target;
                 break;
@@ -339,11 +340,18 @@ Spu_Err run_spu(spu_t * spu)
                 StackElem addr = 0;
                 stack_errors = stack_pop(&(spu->stack), &addr);                                             IF_THERE_IS_STACK_ERROR(stack_errors, "Error during spu running: POP"); 
 
+                if (print_count == 0)
+                {
+                    OUTPUT("=========================== OUTPUT ===========================\n");
+                    print_count++;
+                }
+                OUTPUT("\n");
                 while (spu->RAM[addr] != 0)
                 {
-                    putchar((char) spu->RAM[addr]);
+                    OUTPUT("%c", (char) spu->RAM[addr]);
                     addr++;
                 }
+                OUTPUT("\n");
                 break;
             }
             default: 

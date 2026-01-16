@@ -146,7 +146,7 @@ void destroy_node(Node_t * node)
     if (node->type == ROOT && node->value.root)
         free(node->value.root);
     if (node->type == STRING && node->value.string_value)
-        free(node->value.string_value);
+        free((void*)node->value.string_value);
 
     DEBUG_PRINT("Destroying node %p, type=%s", (void*)node, get_string_type(node->type));
     free(node);
@@ -159,7 +159,8 @@ void destroy_tree(Tree_t * tree)
     //DEBUG_PRINT("[DEBUG] root->value.root before destroy: %s\n", tree->root->value.root);
     GRAPH_DUMP(tree);
 
-    destroy_node(tree->root);
+    if (tree->root)
+        destroy_node(tree->root);
     tree->tree_size = 0;
     return;
 }

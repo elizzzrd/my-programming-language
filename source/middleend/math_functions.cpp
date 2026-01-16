@@ -38,19 +38,19 @@ ErrorCode evaluate_const_node(const Node_t * node, double * result)
                     case OP_SIN:        *result = sin(left_val); break;
                     case OP_COS:        *result = cos(left_val); break;
                     case OP_TAN:        *result = tan(left_val); break;
-                    case OP_CTG:        *result = 1.0 / tan(left_val); break;
-                    case OP_ARCSIN:     *result = asin(left_val); break;
-                    case OP_ARCCOS:     *result = acos(left_val); break;
-                    case OP_ARCTAN:     *result = atan(left_val); break;
-                    case OP_ARCCTG:     *result = atan(1.0 / left_val); break;
-                    case OP_SINH:       *result = sinh(left_val); break;
-                    case OP_COSH:       *result = cosh(left_val); break;
-                    case OP_TANH:       *result = tanh(left_val); break;
-                    case OP_CTGH:       *result = 1.0 / tanh(left_val); break;
+                    // case OP_CTG:        *result = 1.0 / tan(left_val); break;
+                    // case OP_ARCSIN:     *result = asin(left_val); break;
+                    // case OP_ARCCOS:     *result = acos(left_val); break;
+                    // case OP_ARCTAN:     *result = atan(left_val); break;
+                    // case OP_ARCCTG:     *result = atan(1.0 / left_val); break;
+                    // case OP_SINH:       *result = sinh(left_val); break;
+                    // case OP_COSH:       *result = cosh(left_val); break;
+                    // case OP_TANH:       *result = tanh(left_val); break;
+                    // case OP_CTGH:       *result = 1.0 / tanh(left_val); break;
                     case OP_EXP:        *result = exp(left_val); break;
                     case OP_LN:         *result = log(left_val); break;
                     case OP_SQRT:       *result = sqrt(left_val); break;
-                    case OP_ABS:        *result = fabs(left_val); break;
+                    //case OP_ABS:        *result = fabs(left_val); break;
                     case OP_UNARY_MINUS:*result = -left_val; break;
                     default:
                     {

@@ -41,7 +41,7 @@ typedef struct treenode
 
     bool is_unary;
 
-    size_t child_count;
+    size_t param_count;
 } Node_t;
 
 

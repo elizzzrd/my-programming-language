@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "stack.h"
 #include "spu.h"
+#include "assembler.h"
 #include "errors_spu.h"
 #include "utils.h"
 
@@ -178,6 +179,25 @@ const char * spu_error_string(Spu_Err err)
     
     return spu_error_strings[err];
 }
+
+
+const char * get_string_type_arg(type_arg type)
+{
+    static const char * type_arg_strings[] =
+    {
+        "NUM",
+        "LABEL",
+        "REG",
+        "RAM",
+        "UNKNOWN_TYPE"
+    };
+
+    if (type < NUM || type > UNKNOWN_TYPE) return "Unknown type_arg";
+    
+    return type_arg_strings[type];
+}
+
+
 
 
 void finish_program(spu_t * spu)

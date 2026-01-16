@@ -29,21 +29,31 @@ ErrorCode translate_to_asm(Tree_t * tree, const char * filename)
         return error;
     }
 
-    error = translate_node(tree->root, file_ptr);
-    if (error != SUCCESS)
+    if (tree->root)
     {
-        ERROR_MESSAGE(TRANSLATING_TO_ASM_ERROR, error);
+        error = translate_node(tree->root, file_ptr);
+        if (error != SUCCESS)
+        {
+            ERROR_MESSAGE(TRANSLATING_TO_ASM_ERROR, error);
+            fclose(file_ptr);
+            return error;
+        }
+        fprintf(file_ptr, "hlt\n");
         fclose(file_ptr);
-        return error;
+        return SUCCESS;
     }
-    fprintf(file_ptr, "hlt\n");
-    fclose(file_ptr);
-    return SUCCESS;
+    else
+    {
+        fclose(file_ptr);
+        return TRANSLATING_TO_ASM_ERROR;
+    }
 }
 
 ErrorCode translate_node(Node_t * node, FILE * file_ptr)
 {
-    assert(node && file_ptr);
+    assert(file_ptr);
+    if (!node)
+        return TREE_NULL_POINTER;
     ErrorCode error = SUCCESS;
 
     switch (node->type)
@@ -70,7 +80,7 @@ ErrorCode translate_node(Node_t * node, FILE * file_ptr)
         }
         case IDENTIFIER:
         {
-            int index = get_id_address(get_id_name(node->value.id_index));
+            int index = get_id_address(get_id_name(node->value.id_index, SB_VAR));
             if (index < 0)      
                 error = TRANSLATING_TO_ASM_ERROR;    
             IF_THERE_IS_TRANSLATE_ERROR(error);
@@ -109,7 +119,7 @@ int get_id_address(const char * name)
 {
     assert(name);
 
-    int index = symbol_table_find(name);
+    int index = symbol_table_find(name, SB_VAR);
     if (index < 0)
     {
         ErrorCode error = SUCCESS;
@@ -249,7 +259,7 @@ ErrorCode translate_statement(Node_t * node, FILE * file_ptr)
 
             error = translate_node(arg, file_ptr);              
             IF_THERE_IS_TRANSLATE_ERROR(error);
-
+            
             if (arg->type == STRING)
                 fprintf(file_ptr, "puts\n");
             else
@@ -331,19 +341,84 @@ ErrorCode translate_statement(Node_t * node, FILE * file_ptr)
         case OP_FUNC_DEF:
         {
             fprintf(file_ptr, "%s:\n", get_id_name(node->value.id_index, SB_FUNC));
+            Node_t * params = node -> left;
+            int param_count = 0;
+            Node_t * param_list[16];
 
+            if (params && params->type == STATEMENT && params->value.stmt == OP_PARAMS)
+            {
+                Node_t * param = param->right;
+                while (param && param_count < 16)
+                {
+                    if (param->type == IDENTIFIER)      param_list[param_count] = param;
+                    param = param -> right;
+                }
+            }
 
+            // pop arguments from stack and assign them to params
+            for (int i = param_count - 1; i >= 0; i--)
+            {
+                int param_index = param_list[i]->value.id_index;
+                if (param_index < 0)
+                {
+                    ERROR_MESSAGE(TRANSLATING_TO_ASM_ERROR, error);
+                    return error;
+                }
+                fprintf(file_ptr, "popm [%d]\n", param_index);
+            }
 
+            Node_t * body = node -> right;
+            if (body)
+            {
+                error = translate_node(body, file_ptr);
+                IF_THERE_IS_TRANSLATE_ERROR(error);
+            }
+
+            fprintf(file_ptr, "push 0\n");
             fprintf(file_ptr, "ret\n");
-
+            break;
         }
         case OP_CALL:
         {
+            Node_t * args = node->right;
+            int arg_count = 0;
+            Node_t * arg_list[16];
+
+            if (args && args->type == STATEMENT && args->value.stmt == OP_ARGS)
+            {
+                Node_t * arg = args->right;
+                while (arg && arg_count < 16)
+                {
+                    arg_list[arg_count++] = arg;
+                    arg = arg->right;
+                }
+
+            }
+            // evalute args for pushing in stack
+            for (int i = 0; i < arg_count; i++)
+            {
+                error = translate_node(arg_list[i], file_ptr);
+                IF_THERE_IS_TRANSLATE_ERROR(error);
+            }
+            
             fprintf(file_ptr, "call %s\n", get_id_name(node->value.id_index, SB_FUNC));
+            break;
         }
         case OP_RETURN:
         {
-            fprintf(file_ptr, "")
+            Node_t * expr = node -> right;
+            if (expr)
+            {
+                error = translate_node(expr, file_ptr);
+                IF_THERE_IS_TRANSLATE_ERROR(error);
+            }
+            else
+            {
+                // no return value
+                fprintf(file_ptr, "push 0\n");
+            }
+            fprintf(file_ptr, "ret\n");
+            break;
         }
         default: break;
     }
@@ -351,7 +426,7 @@ ErrorCode translate_statement(Node_t * node, FILE * file_ptr)
 }
 
 
-
+  
 
 int emit_strings(FILE * file_ptr, const char * s)
 {
@@ -392,23 +467,25 @@ void emit_op_pow(FILE * file_ptr)
 {
     assert(file_ptr);
 
-    fprintf(file_ptr, 
-    "in\n in\n"      
-    "popr rbx\n popr rax\n"
+    static int pow_labels = 0;
+    int id = pow_labels++;
+
+    fprintf(file_ptr,     
+    "popr rbx\npopr rax\n"
     "pushr rax\n"
     "push 0\n"
-    "jbe NEGATIVE_BASE\n\n"
+    "jbe NEGATIVE_BASE_%d\n\n"
     "pushr rbx\n"
     "push 0\n"
-    "je POWER_ZERO\n\n"
+    "je POWER_ZERO_%d\n\n"
     "push 1\n"
     "popr rdx\n"
     "push 0\n"
     "popr rcx\n\n"
-    "START_LOOP:\n"
+    "START_LOOP_%d:\n"
     "pushr rcx\n"
     "pushr rbx\n"
-    "jae END_LOOP\n\n"
+    "jae END_LOOP_%d\n\n"
     "pushr rdx\n"
     "pushr rax\n"
     "mul\n"
@@ -417,22 +494,22 @@ void emit_op_pow(FILE * file_ptr)
     "push 1\n"
     "add\n"
     "popr rcx\n\n"
-    "jmp START_LOOP\n\n"
-    "END_LOOP:\n"
+    "jmp START_LOOP_%d\n\n"
+    "END_LOOP_%d:\n"
     "pushr rdx\n"
-    "jmp END\n\n"
-    "NEGATIVE_BASE:\n"
+    "jmp END_%d\n\n"
+    "NEGATIVE_BASE_%d:\n"
     "pushr rbx\n"
     "push 0\n"
-    "je POWER_ZERO\n\n"
+    "je POWER_ZERO_%d\n\n"
     "push 0\n"
-    "jmp END\n\n"
-    "POWER_ZERO:\n"
+    "jmp END_%d\n\n"
+    "POWER_ZERO_%d:\n"
     "push 1\n"
-    "jmp END\n\n"
-    "END:\n"
+    "jmp END_%d\n\n"
+    "END_%d:\n"
     "out\n"
-    "push 0\npopr rax\npush 0\npopr rbx\npush 0\npopr rx\npush 0\npopr rdx\n"
-    "hlt\n");
+    "push 0\npopr rax\npush 0\npopr rbx\npush 0\npopr rcx\npush 0\npopr rdx\n",
+    id, id, id, id, id, id, id, id, id, id, id, id, id);
 }
 

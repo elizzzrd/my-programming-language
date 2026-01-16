@@ -1,10 +1,1 @@
-a = 1;
-b = -5;
-c = 6;
-D = b*b - 4*a*c;
-
-sqrt_D = D*D;
-x1 = (-b + sqrt_D)/(2*a);
-x2 = (-b - sqrt_D)/(2*a); 
-print x1;
-print x2;$
+print { "hello" };$

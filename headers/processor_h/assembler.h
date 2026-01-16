@@ -36,6 +36,6 @@ int find_label(const char * name);
 int is_label(const char * option, size_t ip);
 
 
-#define MAX_LABELS 16
+#define MAX_LABELS 128
 #define MAX_CODE_SIZE 1024
 #define MAX_LABEL_LEN 64

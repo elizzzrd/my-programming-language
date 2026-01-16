@@ -156,8 +156,7 @@ Node_t * GetStatement(char ** s, Tree_t * tree)
     else if (start_with_identifier(**s))
     {
         // проверяем на то, что это assignment, ищем '='
-        const char * saved_substring = *s; 
-        const char * start = *s;
+        char * saved_substring = *s; 
         while (is_identifier(**s))
             (*s)++;
         
@@ -555,7 +554,7 @@ Node_t * GetStringLiteral(char ** s, Tree_t * tree)
         return NULL;
     }
 
-    size_t len = *s - start;
+    size_t len = (size_t)(*s - start);
     char * str = (char *)calloc(len + 1, sizeof(char));
     if (!str)   return NULL;
 

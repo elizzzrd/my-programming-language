@@ -7,5 +7,5 @@ digraph NodeGraph {
     edge [fontname="Consolas", arrowsize=0.8];
 
 
-    node_0x504000000e90 [fillcolor = "#d29bdaff", label="{ <t> STATEMENT | <v> op_end | { <l> 0 | <r> 0}}"];
+    node_0x5060000000e0 [fillcolor = "#d29bdaff", label="{ <t> STATEMENT | <v> print | { <l> 0 | <r> 0}}"];
 }

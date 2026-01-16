@@ -1,1 +1,1 @@
-(op_end(op_end(op_end(op_end(op_end(op_end(op_end(op_end(assignment(a nil nil)(1 nil nil))(assignment(b nil nil)(-(5 nil nil))))(assignment(c nil nil)(6 nil nil)))(assignment(D nil nil)(-(*(b nil nil)(b nil nil))(*(*(4 nil nil)(a nil nil))(c nil nil)))))(assignment(sqrt_D nil nil)(*(D nil nil)(D nil nil))))(assignment(x1 nil nil)(/(+(-(b nil nil))(sqrt_D nil nil))(*(2 nil nil)(a nil nil)))))(assignment(x2 nil nil)(/(-(-(b nil nil))(sqrt_D nil nil))(*(2 nil nil)(a nil nil)))))(print(x1 nil nil)))(print(x2 nil nil)))
+(print("hello" nil nil))

@@ -16,6 +16,7 @@ const char * tree_error_string(ErrorCode error)
     static const char * tree_error_strings[] = 
     {
         "Success",                                      // [0] SUCCESS
+
         "Null pointer provided",                        // [1] TREE_NULL_POINTER
         "Memory allocation failed",                     // [2] TREE_MEMORY_ALLOCATION_ERROR
         "Deletion failed",                              // [3] TREE_DELETION_ERROR
@@ -23,18 +24,20 @@ const char * tree_error_string(ErrorCode error)
         "Invalid node_type",                            // [5] TREE_INVALID_NODE_TYPE
         "Invalid operator type",                        // [6] TREE_INVALID_OPERATOR
         "Error during creating a node",                 // [7] TREE_CREATING_NODE_ERROR,
+
         "Can not open the file",                        // [8] OPENING_FILE_ERROR
         "Error during loading expression",              // [9] LOADING_EXPRESSION_ERROR
         "Error during saving expression to latex",      // [10] SAVING_LATEX_ERROR
         "Graph_dump failed",                            // [11] GRAPH_DUMP_ERROR
-        "Error during differentiation",                 // [12] DIFFERENTIATION_ERROR    
+        "Error during differentiation",                 // [12] DIFFERENTIATION_ERROR   
+         
         "Error during lexical analysis",                // [13] LEXER_ERROR
         "Error during syntax analysis"                  // [14] PARSER_ERROR
         "Error during traslating to asm"                // [15] TRANSLATING_TO_ASM_ERROR
         "Syntax error"                                  // [16] SYNTAX_ERROR
     };
     
-    if (error < SUCCESS || error > PARSER_ERROR) 
+    if (error < SUCCESS || error > SYNTAX_ERROR) 
         return "Unknown error";
     
     return tree_error_strings[error];
@@ -244,7 +247,7 @@ void define_node_type_for_dump(type_t type, const char ** fillcolor, const char 
         case IDENTIFIER:
         {
             *fillcolor = "#f7d598ff";
-            *value_str = get_id_name(node->value.id_index);
+            *value_str = get_id_name(node->value.id_index, SB_VAR);
             break;
         }
         case NUMBER:

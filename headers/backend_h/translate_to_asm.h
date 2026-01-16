@@ -12,6 +12,16 @@
     } while(0)
 
 
+#define OUTPUT_FILE "output.txt"    
+#define OUTPUT(fmt, ...)                                               \
+    do {                                                                    \
+        FILE *fp = fopen(OUTPUT_FILE, "a");                         \
+        if (fp) {                                                       \
+            fprintf(fp, fmt, ##__VA_ARGS__);          \
+            fclose(fp);                                                 \
+        }                                                                   \
+    } while (0)
+
 typedef struct 
 {
     const char * name;

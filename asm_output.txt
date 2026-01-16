@@ -1,47 +1,15 @@
-push 1
-popm [0]
-push 5
+push 104
+popm [256]
+push 101
+popm [257]
+push 108
+popm [258]
+push 108
+popm [259]
+push 111
+popm [260]
 push 0
-sub
-popm [1]
-push 6
-popm [2]
-pushm [1]
-pushm [1]
-mul
-push 4
-pushm [0]
-mul
-pushm [2]
-mul
-sub
-popm [3]
-pushm [3]
-pushm [3]
-mul
-popm [4]
-pushm [1]
-push 0
-sub
-pushm [4]
-add
-push 2
-pushm [0]
-mul
-div
-popm [5]
-pushm [1]
-push 0
-sub
-pushm [4]
-sub
-push 2
-pushm [0]
-mul
-div
-popm [6]
-pushm [5]
-out
-pushm [6]
-out
+popm [261]
+push 256
+puts
 hlt

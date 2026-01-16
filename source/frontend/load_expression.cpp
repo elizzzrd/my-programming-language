@@ -178,6 +178,29 @@ Node_t * read_node(char * buffer, size_t * pos, Tree_t * tree)
                 }
                 break;
             }
+            case STATEMENT:
+            {
+                current = create_statement_node(tree, token.value.stmt);
+                if (current.error != SUCCESS)
+                {
+                    ERROR_MESSAGE(TREE_CREATING_NODE_ERROR, error);
+                    return NULL;
+                }
+                break;
+            }
+            case STRING:
+            {
+                current = create_string_node(tree, token.value.string_value);
+                if (current.error != SUCCESS)
+                {
+                    ERROR_MESSAGE(TREE_CREATING_NODE_ERROR, error);
+                    free((void*)token.value.string_value);
+                    return NULL;
+                }
+                free((void*)token.value.string_value);  
+                token.value.string_value = NULL;
+                break;
+            }
             default:
             {
                 ERROR_MESSAGE(TREE_INVALID_NODE_TYPE, current.error);
@@ -187,7 +210,7 @@ Node_t * read_node(char * buffer, size_t * pos, Tree_t * tree)
         }
         if (current.error == SUCCESS)
         {    
-            DEBUG_PRINT("[DEBUG] node has been succesfully created: %s\n", get_string_type(current.node->type));
+            DEBUG_PRINT("[DEBUG] node has been succesfully created: %s", get_string_type(current.node->type));
             tree->tree_size++;
         }
         else 

@@ -24,6 +24,7 @@ const char * token_type_strings[] =
     "TOK_RPAREN",
     "TOK_LBRACE",
     "TOK_RBRACE",
+    "TOK_COMMA",
 
     "TOK_MINUS",
     "TOK_PLUS",
@@ -57,7 +58,7 @@ const char * token_type_strings[] =
 
 const char * get_string_token_type(token_t type)
 {
-    if (type >= TOK_EOF && type <= TOK_IF)
+    if (type >= TOK_EOF && type <= TOK_EXP)
         return token_type_strings[type];
     else
         return "Unknown type";
@@ -77,7 +78,7 @@ ErrorCode lexicalAnalysis(TokenList * token_list)
     ErrorCode error = load_to_buffer(EXPRESSION_INPUT, &buffer);
     if (error != SUCCESS)
         return error;
-    DEBUG_PRINT("buffer: %s", buffer);
+    DEBUG_PRINT("buffer:\n%s", buffer);
 
     token_list->capasity = 0;
     token_list->count = 0;
@@ -151,20 +152,70 @@ ErrorCode lexicalAnalysis(TokenList * token_list)
             case '*':  token_list_push(token_list, make_token(TOK_MULTIPLY, p++, 1)); continue;
             case '^':  token_list_push(token_list, make_token(TOK_POW, p++, 1)); continue;
             case '/':  token_list_push(token_list, make_token(TOK_DIVIDE, p++, 1)); continue;
-            case '=':  token_list_push(token_list, make_token(TOK_ASSIGN, p++, 1)); continue;
             case '$':  token_list_push(token_list, make_token(TOK_END, p++, 1)); continue;
-            case '<':  token_list_push(token_list, make_token(TOK_BELOW, p++, 1)); continue;
-            case '<=': token_list_push(token_list, make_token(TOK_BELOW_EQUAL, p++, 1)); continue;
-            case '>':  token_list_push(token_list, make_token(TOK_ABOVE, p++, 1)); continue;
-            case '>=': token_list_push(token_list, make_token(TOK_ABOVE_EQUAL, p++, 1)); continue;
-            case '==': token_list_push(token_list, make_token(TOK_EQUAL_EQUAL, p++, 1)); continue;
-            case '!=': token_list_push(token_list, make_token(TOK_NON_EQUAL, p++, 1)); continue;
             case ',': token_list_push(token_list, make_token(TOK_COMMA, p++, 1)); continue;
+            case '<':  
+            {
+                if (*(p + 1) != '\0' && *(p+1) == '=')
+                {
+                    token_list_push(token_list, make_token(TOK_BELOW_EQUAL, p, 2)); 
+                    p += 2;
+                    continue;
+                }
+                else
+                {
+                    token_list_push(token_list, make_token(TOK_BELOW, p++, 1)); 
+                    continue;
+                }
+            }
+            case '>':  
+            {
+                if (*(p + 1) != '\0' && *(p+1) == '=')
+                {
+                    token_list_push(token_list, make_token(TOK_ABOVE_EQUAL, p, 2)); 
+                    p += 2;
+                    continue;
+                }
+                else
+                {
+                    token_list_push(token_list, make_token(TOK_ABOVE, p++, 1)); 
+                    continue;
+                }
+            }
+            case '=':  
+            {
+                if (*(p + 1) != '\0' && *(p+1) == '=')
+                {
+                    token_list_push(token_list, make_token(TOK_EQUAL_EQUAL, p, 2)); 
+                    p += 2;
+                    continue;
+                }
+                else
+                {
+                    token_list_push(token_list, make_token(TOK_ASSIGN, p++, 1)); 
+                    continue;
+                }
+            }
+            case '!': 
+            {
+                if (*(p + 1) != '\0' && *(p+1) == '=')
+                {
+                    token_list_push(token_list, make_token(TOK_NON_EQUAL, p, 2));
+                    p += 2; 
+                    continue;
+                }
+                else    
+                    printf("Unknown char: %d\n", *p); 
+                break;
+            }
         }
         if (*p == '\0')
             ;
         else
-            printf("Unknown char: %d\n", *p); break;
+        {
+            printf("Unknown char: %d\n", *p); 
+            break;
+        }
         p++;
     }
 
@@ -325,8 +376,12 @@ void symbol_table_destroy(SymbolTable * sb)
     assert(sb);
 
     for (size_t i = 0; i < sb->count; i++)
-        free(sb->names[i]);
-    free(sb->names);
+    {
+        if (sb->names[i])
+            free(sb->names[i]);
+    }
+    if (sb->names)
+        free(sb->names);
 }
 
 
@@ -335,7 +390,7 @@ void lexer_dump(const TokenList * token_list)
     assert (token_list);
     
     DEBUG_PRINT("[LEXER DUMP]");
-    DEBUG_PRINT("token_list.count = %lu, token_list->capacity = %lu", token_list->count, token_list->capasity);
+    DEBUG_PRINT("token_list.count = %lu, token_list->capacity = %lu\n", token_list->count, token_list->capasity);
     for (int i = 0; i < token_list->count; i ++)
     {
         DEBUG_PRINT("token_%d, %s, %d, %s", i, get_string_token_type(token_list->data[i].type), token_list->data[i].int_value, token_list->data[i].string_value);

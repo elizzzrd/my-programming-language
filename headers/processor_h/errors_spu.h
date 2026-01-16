@@ -1,6 +1,7 @@
 #pragma once
 #include "stack.h"
 #include "spu.h"
+#include "assembler.h"
 
 #define LOG_FILENAME "log_file.txt"
 extern FILE * log_file;
@@ -35,6 +36,7 @@ void log_message(const char * format, const char * file, int line);
 void stack_dump(const stack_t * stack, Stack_Err error, const char * file, int line);
 void spu_dump(const spu_t * spu, Spu_Err err, const char * file, int line);
 Stack_Err stack_verify(const stack_t * stack); 
+const char * get_string_type_arg(type_arg type);
 Spu_Err spu_verify(const spu_t *spu);
 const char * stack_error_string(Stack_Err error);
 const char * spu_error_string(Spu_Err err);

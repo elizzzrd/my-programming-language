@@ -2,7 +2,7 @@
 #include "stack.h"
 
 #define NMAX 128
-#define NCOMMANDS 29
+#define NCOMMANDS 30
 
 typedef enum 
 {

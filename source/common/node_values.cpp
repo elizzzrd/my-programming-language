@@ -157,8 +157,9 @@ token_res check_for_string(const char * token)
     if (len >= 2 && token[0] == '"' && token[len - 1] == '"')
     {
         res.type = STRING;
-        res.value.string_value = strdup(token + 1);
-        res.value.string_value[len - 2] = '\0';
+        res.value.string_value = strndup(token + 1, len - 2);
+        if (!res.value.string_value) 
+            res.type = ROOT;
     }
     return res;
 }
@@ -212,29 +213,29 @@ bool is_function_operator(operator_t op)
 
 operator_t get_enum_operator_from_string(const char* str) 
 {
-    if (strcmp(str, "+") == 0)          return OP_ADD;
-    if (strcmp(str, "-") == 0)          return OP_SUB;
-    if (strcmp(str, "*") == 0)          return OP_MUL;
-    if (strcmp(str, "/") == 0)          return OP_DIV;
-    if (strcmp(str, "^") == 0)          return OP_POW;
+    if (strcmp(str, "+")    == 0)          return OP_ADD;
+    if (strcmp(str, "-")    == 0)          return OP_SUB;
+    if (strcmp(str, "*")    == 0)          return OP_MUL;
+    if (strcmp(str, "/")    == 0)          return OP_DIV;
+    if (strcmp(str, "^")    == 0)          return OP_POW;
 
-    if (strcmp(str, "==") == 0)          return OP_EQUAL;
-    if (strcmp(str, "!=") == 0)          return OP_NON_EQUAL;
-    if (strcmp(str, "<") == 0)          return OP_BELOW;
-    if (strcmp(str, "<=") == 0)          return OP_BELOW_EQUAL;
-    if (strcmp(str, ">") == 0)          return OP_ABOVE;
-    if (strcmp(str, ">=") == 0)          return OP_ABOVE_EQUAL;
+    if (strcmp(str, "==")   == 0)          return OP_EQUAL;
+    if (strcmp(str, "!=")   == 0)          return OP_NON_EQUAL;
+    if (strcmp(str, "<")    == 0)          return OP_BELOW;
+    if (strcmp(str, "<=")   == 0)          return OP_BELOW_EQUAL;
+    if (strcmp(str, ">")    == 0)          return OP_ABOVE;
+    if (strcmp(str, ">=")   == 0)          return OP_ABOVE_EQUAL;
 
-    if (strcmp(str, "sin") == 0)        return OP_SIN;
-    if (strcmp(str, "cos") == 0)        return OP_COS;
-    if (strcmp(str, "tan") == 0)        return OP_TAN;
+    if (strcmp(str, "sin")  == 0)          return OP_SIN;
+    if (strcmp(str, "cos")  == 0)          return OP_COS;
+    if (strcmp(str, "tan")  == 0)          return OP_TAN;
     // if (strcmp(str, "ctg") == 0)        return OP_CTG;
     // if (strcmp(str, "arcsin") == 0)     return OP_ARCSIN;
     // if (strcmp(str, "arccos") == 0)     return OP_ARCCOS;
     // if (strcmp(str, "arctan") == 0)     return OP_ARCTAN;
-    if (strcmp(str, "exp") == 0)        return OP_EXP;
-    if (strcmp(str, "ln") == 0)         return OP_LN;
-    if (strcmp(str, "sqrt") == 0)       return OP_SQRT;
+    if (strcmp(str, "exp")  == 0)          return OP_EXP;
+    if (strcmp(str, "ln")   == 0)          return OP_LN;
+    if (strcmp(str, "sqrt") == 0)          return OP_SQRT;
     //if (strcmp(str, "abs") == 0)        return OP_ABS;
     
     return OP_ADD; // default
