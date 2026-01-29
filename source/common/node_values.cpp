@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <assert.h>
+#include <ctype.h>
 
 #include "node_values.h"
 #include "utils.h"
@@ -37,6 +38,15 @@ const char * operator_strings[] =
     "-",            // OP_SUB
     "^",            // OP_POW
 
+    "read",         // OP_READ
+
+    "==",           // OP_EQUAL
+    "!=",           // OP_NON_EQUAL
+    "<",            // OP_BELOW
+    "<=",           // OP_BELOW_EQUAL
+    ">",            // OP_ABOVE
+    ">=",           // OP_ABOVE_EQUAL
+
     "sin",          // OP_SIN
     "cos",          // OP_COS
     "tan",          // OP_TAN
@@ -56,7 +66,7 @@ const char * operator_strings[] =
 
     "sqrt",         // OP_SQRT
     //"abs",          // OP_ABS
-    "-"             // OP_UNARY_MINUS
+    "u-"             // OP_UNARY_MINUS
 };
    
 const char * statement_strings[] =
@@ -69,7 +79,6 @@ const char * statement_strings[] =
     "if",           // IF
     "while",        // WHILE
     "block",        // BLOCK
-    "input",        // INPUT
     "func_def",     // OP_FUNC_DEF
     "func_call",    // OP_CALL
     "return",       // OP_RETURN 
@@ -131,8 +140,7 @@ token_res check_for_statement(const char * token)
     else if (strcmp(token, "if")         == 0)   { res.type = STATEMENT; res.value.stmt = OP_IF; }
     else if (strcmp(token, "while")      == 0)   { res.type = STATEMENT; res.value.stmt = OP_WHILE; }
     else if (strcmp(token, "block")      == 0)   { res.type = STATEMENT; res.value.stmt = OP_BLOCK; }
-    else if (strcmp(token, "end")        == 0)   { res.type = STATEMENT; res.value.stmt = OP_END; }
-    else if (strcmp(token, "input")      == 0)   { res.type = STATEMENT; res.value.stmt = OP_INPUT; }
+    else if (strcmp(token, "op_end")        == 0)   { res.type = STATEMENT; res.value.stmt = OP_END; }
     else if (strcmp(token, "func_def")   == 0)   { res.type = STATEMENT; res.value.stmt = OP_FUNC_DEF; }
     else if (strcmp(token, "func_call")  == 0)   { res.type = STATEMENT; res.value.stmt = OP_CALL; }
     else if (strcmp(token, "return")     == 0)   { res.type = STATEMENT; res.value.stmt = OP_RETURN; }
@@ -165,23 +173,42 @@ token_res check_for_string(const char * token)
 }
 
 
+
 token_res check_for_identifier(const char * token)
 {
     assert(token);
     
     token_res result = {.type = ROOT};
-    int id_index = symbol_table_find(token, SB_VAR);
-    if (id_index == -1)
-    {
-        DEBUG_PRINT("identifier has not been found in symbol table\n");
+
+    const char * delimiter = "##";
+    
+    const char * pos = strstr(token, delimiter);
+    if (pos == NULL)
         return result;
+    
+    int name_len = pos - token;
+    char * name_buffer = (char *) malloc(name_len + 1);
+    if (!name_buffer)
+        return result;
+    
+    strncpy(name_buffer, token, name_len);
+    name_buffer[name_len] = '\0';
+    
+    const char * digits_start = pos + 2;  
+    for (const char * p = digits_start; *p != '\0'; p++) {
+        if (!isdigit((unsigned char)*p)) 
+        {
+            free(name_buffer);
+            return result;
+        }
     }
-    else
-    {
-        result.type = IDENTIFIER;
-        result.value.id_index = id_index;
-    }
-        
+    
+    int id = atoi(digits_start);  
+    
+    result.type = IDENTIFIER;
+    result.id.id_index = id;
+    result.id.name = name_buffer;
+
     return result;
 }
 
@@ -201,7 +228,7 @@ bool is_binary_operator(operator_t op)
 
 bool is_unary_operator(operator_t op) 
 {
-    return (op >= OP_SIN && op <= OP_UNARY_MINUS);
+    return ((op >= OP_SIN && op <= OP_UNARY_MINUS) || (op == OP_READ));
 }
 
 bool is_function_operator(operator_t op) 
@@ -218,6 +245,8 @@ operator_t get_enum_operator_from_string(const char* str)
     if (strcmp(str, "*")    == 0)          return OP_MUL;
     if (strcmp(str, "/")    == 0)          return OP_DIV;
     if (strcmp(str, "^")    == 0)          return OP_POW;
+
+    if (strcmp(str, "read") == 0)          return OP_READ;
 
     if (strcmp(str, "==")   == 0)          return OP_EQUAL;
     if (strcmp(str, "!=")   == 0)          return OP_NON_EQUAL;
@@ -237,6 +266,7 @@ operator_t get_enum_operator_from_string(const char* str)
     if (strcmp(str, "ln")   == 0)          return OP_LN;
     if (strcmp(str, "sqrt") == 0)          return OP_SQRT;
     //if (strcmp(str, "abs") == 0)        return OP_ABS;
+    if (strcmp(str, "u-")   == 0)          return OP_UNARY_MINUS;
     
     return OP_ADD; // default
 }

@@ -2,9 +2,33 @@
 #include "utils.h"
 #include "tree_structure.h"
 #include "tree_operations.h"
-#include "build_tree.h"
 #include "lexer.h"
 
+
+#define SYNTAX_ANALISYS_ERROR(tree_root) \
+    do { \
+        if (!tree_root) {\
+            ERROR_MESSAGE(PARSER_ERROR, error); \
+            DEBUG_PRINT("[ERROR] SYNTAX ANALYSIS END WITH ERROR"); \
+            fprintf(stderr, "[INFO] ERROR DURING FRONTEND\n"); \
+            destroy_tokens(&token_list); \
+            return -1;} \
+    } while (0)
+
+
+#define BUILDING_FRONTEND_TREE_ERROR(error) \
+    do { \
+        if (!tree_root) {\
+            ERROR_MESSAGE(LOADING_EXPRESSION_ERROR, error); \
+            DEBUG_PRINT("[ERROR] SYNTAX ANALYSIS END WITH ERROR"); \
+            destroy_tokens(&token_list); \
+            destroy_tree(&tree, "destroy_frontend_error"); \
+            return -1;} \
+        else { \
+            DEBUG_PRINT("[INFO] SYNTAX_ANALYSIS END"); \
+            DEBUG_PRINT("[INFO] EXPRESSION HAS BEEN LOADED SUCCESSFULLY\n"); \
+            destroy_tokens(&token_list); }\
+    } while (0)
 
 Node_t * GetProgram_tokens(TokenList * tokens, size_t * pos, Tree_t * tree);
 Node_t * GetStatement_tokens(TokenList * tokens, size_t * pos, Tree_t * tree);

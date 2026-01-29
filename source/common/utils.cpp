@@ -59,6 +59,19 @@ char * initialize_buffer(size_t file_size)
     return buffer;
 }
 
+static size_t get_file_size(const char * filename) 
+{
+    assert(filename != NULL);
+    
+    struct stat file_stat;
+    if (stat(filename, &file_stat) == -1) 
+    {
+        return (size_t)-1;
+    }
+
+    return (size_t)(file_stat.st_size);
+}
+
 
 ErrorCode load_to_buffer(const char * filename, char ** buffer)
 {
@@ -73,6 +86,7 @@ ErrorCode load_to_buffer(const char * filename, char ** buffer)
         ERROR_MESSAGE(OPENING_FILE_ERROR, error);
         return error;
     }
+
 
     *buffer = initialize_buffer(file_size);
     if (*buffer == NULL) 
@@ -110,3 +124,4 @@ bool IS_ZERO(Node_t * node)
 
     return (node->type == NUMBER && fabs(node->value.number) < 1e-9);
 }
+

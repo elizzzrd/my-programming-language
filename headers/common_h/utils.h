@@ -6,10 +6,9 @@
 #include <stdbool.h>
 #include "errors.h"
 
-#ifdef DEBUG
+
 
 #define DEBUG_LOG_FILE "logger/debug.log"
-
 #define DEBUG_PRINT(fmt, ...)                                               \
     do {                                                                    \
         FILE *dbg_fp = fopen(DEBUG_LOG_FILE, "a");                         \
@@ -19,9 +18,7 @@
             fclose(dbg_fp);                                                 \
         }                                                                   \
     } while (0)
-#else
-#define DEBUG_PRINT(fmt, ...)  
-#endif
+
 
 
 bool IS_ZERO(Node_t * node); 

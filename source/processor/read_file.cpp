@@ -40,47 +40,15 @@ void to_upper_str(const char * input, char * output)
     return;
 }
 
-size_t get_file_size(const char * filename) 
-{
-    assert(filename != NULL);
-    
-    struct stat file_stat;
-    if (stat(filename, &file_stat) == -1) 
-    {
-        return (size_t)-1;
-    }
-
-    return (size_t)(file_stat.st_size);
-}
-
-
-// int is_label(const char * option)
-// {
-//     int label_num = 0;
-//     if (option[0] == ':' && isdigit(option[1]))
-//     {
-//         int id = atoi(option + 1);
-//             if (id >= 0 && id < MAX_LABELS)
-//                 return id;
-//             else
-//             {
-//                 DEBUG_PRINT("Label index out of range");
-//                 return 0;
-//             }
-//     }
-//     return -1;
-// }
-
 
 bool is_number(const char * str) 
 {
     if (!str || !*str) return false;
-    if (*str == '-' || *str == '+') str++;
-    for (; *str; str++)     
-    {
-        if (!isdigit((unsigned char)*str)) return false;
-    }
-    return true;
+    
+    char *endptr;
+    strtod(str, &endptr);
+    
+    return (endptr != str && *endptr == '\0');
 }
 
 int check_register(const char * reg_buffer)
@@ -88,4 +56,33 @@ int check_register(const char * reg_buffer)
     int reg_num = (toupper(reg_buffer[1]) - 'A') + 1;
     if (strlen(reg_buffer) != 3 || reg_num < 1 || reg_num > 16) return 0;
     else return reg_num;
+}
+
+
+
+bool is_zero_double(double num)
+{
+    return (fabs(num) < EPSILON);
+}
+
+
+bool is_positive_double(double num)
+{
+    return (num > EPSILON);
+}
+
+
+void clamp_to_zero_double(double * number)
+{
+    assert(number != NULL && "NULL pointer");
+    if (is_zero_double(*number))
+    {
+        *number = 0;
+    }
+}
+
+
+bool double_comparison(double number1, double number2)
+{
+    return (fabs(number1 - number2) < EPSILON);
 }

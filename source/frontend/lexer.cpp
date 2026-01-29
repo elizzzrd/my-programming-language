@@ -9,7 +9,6 @@
 #include "utils.h"
 
 
-SymbolTable symbols_table[2] = {{NULL, 0, 0}, {NULL, 0, 0}};
 
 const char * token_type_strings[] =
 {
@@ -53,12 +52,13 @@ const char * token_type_strings[] =
     "TOK_TG",
     "TOK_LN",
     "TOK_SQRT",
-    "TOK_EXP"
+    "TOK_EXP",
+    "TOK_UNARY_MINUS"
 };
 
 const char * get_string_token_type(token_t type)
 {
-    if (type >= TOK_EOF && type <= TOK_EXP)
+    if (type >= TOK_EOF && type <= TOK_UNARY_MINUS)
         return token_type_strings[type];
     else
         return "Unknown type";
@@ -73,6 +73,7 @@ static void skip_spaces(const char ** s)
 ErrorCode lexicalAnalysis(TokenList * token_list)
 {
     assert(token_list);
+    DEBUG_PRINT("[INFO] LEXICAL_ANALYSIS START");
 
     char * buffer = NULL;
     ErrorCode error = load_to_buffer(EXPRESSION_INPUT, &buffer);
@@ -89,6 +90,13 @@ ErrorCode lexicalAnalysis(TokenList * token_list)
     while (*p != '\0') 
     {
         skip_spaces(&p);
+
+        if (*p == 'u' && *(p + 1) == '-')
+        {
+            token_list_push(token_list, make_token(TOK_UNARY_MINUS, p, 2));
+            p += 2;
+            continue;
+        }
 
         // identifiers or keywords
         if (isalpha((unsigned char)*p) || *p == '_') 
@@ -205,7 +213,7 @@ ErrorCode lexicalAnalysis(TokenList * token_list)
                     continue;
                 }
                 else    
-                    printf("Unknown char: %d\n", *p); 
+                    DEBUG_PRINT("Unknown char: %d\n", *p); 
                 break;
             }
         }
@@ -310,78 +318,6 @@ void destroy_tokens(TokenList * token_list)
     
     free(token_list->data);
     token_list->data = NULL;
-}
-
-
-int symbol_table_find(const char * name, sb_mode_t mode)
-{
-    for (size_t i = 0; i < symbols_table[mode].count; i++)
-    {
-        if (strcmp(symbols_table[mode].names[i], name) == 0)
-            return (int)i;
-    }
-    return -1;
-}
-
-
-const char * get_id_name(size_t id_index, sb_mode_t mode)
-{
-    if (id_index >= 0 && id_index < symbols_table[mode].count)
-        return symbols_table[mode].names[id_index];
-    else    
-        return NULL;
-}
-
-
-int symbol_table_add(const char * name, sb_mode_t mode)
-{
-    if (symbols_table[mode].count == symbols_table[mode].capasity)
-    {
-        if (!symbol_table_resize(&symbols_table[mode], mode))
-            return -1;
-    }
-
-    symbols_table[mode].names[symbols_table[mode].count] = strdup(name);
-    if (!symbols_table[mode].names[symbols_table[mode].count])
-        return -1;
-
-    return (int)symbols_table[mode].count++;
-}
-
-
-int symbol_table_resize(SymbolTable *sb, sb_mode_t mode)
-{
-    size_t new_capacity = (sb->capasity == 0) ? 8 : sb -> capasity * 2;
-    char ** new_names = (char **)realloc(sb->names, new_capacity * sizeof(char *));
-    if (!new_names)     return 0;
-
-    sb -> names = new_names;
-    sb -> capasity = new_capacity;
-    return 1;
-}
-
-
-int symbol_table_get_or_add(const char * name, sb_mode_t mode)
-{
-    int index = symbol_table_find(name, mode);
-    if (index >= 0)
-        return index;
-    else
-        return symbol_table_add(name, mode);
-}
-
-
-void symbol_table_destroy(SymbolTable * sb)
-{
-    assert(sb);
-
-    for (size_t i = 0; i < sb->count; i++)
-    {
-        if (sb->names[i])
-            free(sb->names[i]);
-    }
-    if (sb->names)
-        free(sb->names);
 }
 
 

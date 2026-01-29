@@ -35,7 +35,7 @@ Spu_Err spu_init(spu_t * spu)
     spu -> code_size = 0;
     spu -> instructor_ptr = 0;
 
-    spu -> code = load_bytecode("byte_code.txt", &(spu -> code_size));
+    spu -> code = load_bytecode("output/byte_code.txt", &(spu -> code_size));
     
     spu -> stack = {};
     if((stack_init(&(spu -> stack), 8)) != STACK_OK) errors |= SPU_STACK_ERROR;
@@ -54,7 +54,7 @@ Spu_Err run_spu(spu_t * spu)
     Spu_Err spu_errors = SPU_OK;
     Stack_Err stack_errors = STACK_OK;
 
-    printf("stack.data = %p, capacity = %zu, size = %zu\n", 
+    DEBUG_PRINT("stack.data = %p, capacity = %zu, size = %zu\n", 
        spu->stack.data, spu->stack.capacity, spu->stack.size);
 
     while ((spu -> instructor_ptr) < (spu -> code_size))
@@ -172,7 +172,7 @@ Spu_Err run_spu(spu_t * spu)
                 StackElem a = 0, b = 0;
                 stack_errors = stack_pop(&(spu -> stack), &a);                                              IF_THERE_IS_STACK_ERROR(stack_errors, "Error during spu running: DIV");
                 stack_errors = stack_pop(&(spu -> stack), &b);                                              IF_THERE_IS_STACK_ERROR(stack_errors, "Error during spu running: DIV");
-                if (a == 0)
+                if (is_zero_double(a))
                 {
                     DEBUG_PRINT("Error: division by zero\n"); 
                     spu_errors |= SPU_DIVISION_BY_ZERO;
@@ -186,7 +186,7 @@ Spu_Err run_spu(spu_t * spu)
             {
                 StackElem a = 0;
                 stack_errors = stack_pop(&(spu -> stack), &a);                                              IF_THERE_IS_STACK_ERROR(stack_errors, "Error during spu running: POP");
-                if (a < 0) 
+                if (!is_positive_double(a)) 
                 {
                     spu_errors |= SPU_INVALID_COMMAND;
                     DEBUG_PRINT("Error: sqrt of negative number\n"); 
@@ -210,7 +210,7 @@ Spu_Err run_spu(spu_t * spu)
                     print_count++;
                 }
                 OUTPUT("\n");
-                OUTPUT("OUT: %d\n", a);
+                OUTPUT("OUT: %lg\n", a);
                 break;
             }
             case JB:                                                    //jump if below
@@ -219,7 +219,7 @@ Spu_Err run_spu(spu_t * spu)
                 StackElem target = spu->code[spu->instructor_ptr++];
                 stack_errors = stack_pop(&(spu->stack), &b);                                               IF_THERE_IS_STACK_ERROR(stack_errors, "Error during spu running: POP");
                 stack_errors = stack_pop(&(spu->stack), &a);                                               IF_THERE_IS_STACK_ERROR(stack_errors, "Error during spu running: POP");
-                if (a < b) spu->instructor_ptr = (size_t)target;
+                if (is_positive_double(b-a)) spu->instructor_ptr = (size_t)target;
                 break;
             }
             case JBE:                                                   // jump if below or equal
@@ -228,7 +228,7 @@ Spu_Err run_spu(spu_t * spu)
                 StackElem target = spu->code[spu->instructor_ptr++];
                 stack_errors = stack_pop(&(spu->stack), &b);                                               IF_THERE_IS_STACK_ERROR(stack_errors, "Error during spu running: POP");
                 stack_errors = stack_pop(&(spu->stack), &a);                                               IF_THERE_IS_STACK_ERROR(stack_errors, "Error during spu running: POP");
-                if (a <= b) spu->instructor_ptr = (size_t)target;
+                if (is_positive_double(b-a) || is_zero_double(b-a)) spu->instructor_ptr = (size_t)target;
                 break;
             }
             case JA:
@@ -237,7 +237,7 @@ Spu_Err run_spu(spu_t * spu)
                 StackElem target = spu->code[spu->instructor_ptr++];
                 stack_errors = stack_pop(&(spu->stack), &b);                                               IF_THERE_IS_STACK_ERROR(stack_errors, "Error during spu running: POP");
                 stack_errors = stack_pop(&(spu->stack), &a);                                               IF_THERE_IS_STACK_ERROR(stack_errors, "Error during spu running: POP");
-                if (a > b) spu->instructor_ptr = (size_t)target;
+                if (is_positive_double(a-b)) spu->instructor_ptr = (size_t)target;
                 break;
             }
             case JAE:                                                  // jump if above or equal                     
@@ -246,7 +246,7 @@ Spu_Err run_spu(spu_t * spu)
                 StackElem target = spu->code[spu->instructor_ptr++];
                 stack_errors = stack_pop(&(spu->stack), &b);                                               IF_THERE_IS_STACK_ERROR(stack_errors, "Error during spu running: POP");
                 stack_errors = stack_pop(&(spu->stack), &a);                                               IF_THERE_IS_STACK_ERROR(stack_errors, "Error during spu running: POP");
-                if (a >= b) spu->instructor_ptr = (size_t)target;
+                if (is_positive_double(a-b) || is_zero_double(a-b)) spu->instructor_ptr = (size_t)target;
                 break;
             }
             case JE:                                                   // jump if equal
@@ -255,7 +255,7 @@ Spu_Err run_spu(spu_t * spu)
                 StackElem target = spu->code[spu->instructor_ptr++];
                 stack_errors = stack_pop(&(spu->stack), &b);                                               IF_THERE_IS_STACK_ERROR(stack_errors, "Error during spu running: POP");
                 stack_errors = stack_pop(&(spu->stack), &a);                                               IF_THERE_IS_STACK_ERROR(stack_errors, "Error during spu running: POP");
-                if (a == b) spu->instructor_ptr = (size_t)target;
+                if (double_comparison(a,b)) spu->instructor_ptr = (size_t)target;
                 break;
             }
             case JNE:                                                   // jump if not equal
@@ -264,7 +264,7 @@ Spu_Err run_spu(spu_t * spu)
                 StackElem target = spu->code[spu->instructor_ptr++];
                 stack_errors = stack_pop(&(spu->stack), &b);                                               IF_THERE_IS_STACK_ERROR(stack_errors, "Error during spu running: POP");
                 stack_errors = stack_pop(&(spu->stack), &a);                                               IF_THERE_IS_STACK_ERROR(stack_errors, "Error during spu running: POP");
-                if (a != b) spu->instructor_ptr = (size_t)target;
+                if (!double_comparison(a,b)) spu->instructor_ptr = (size_t)target;
                 break;
             }
             case JMP:                                                   //just jump
@@ -276,8 +276,8 @@ Spu_Err run_spu(spu_t * spu)
             case IN:
             {
                 printf("Enter number: ");
-                int n = 0;
-                while (scanf("%d", &n) != 1)
+                double n = 0;
+                while (scanf("%lg", &n) != 1)
                 {
                     printf("Invalid number. Please try again\n");
                     continue;
@@ -346,9 +346,9 @@ Spu_Err run_spu(spu_t * spu)
                     print_count++;
                 }
                 OUTPUT("\n");
-                while (spu->RAM[addr] != 0)
+                while (!is_zero_double(spu->RAM[(int)addr]))
                 {
-                    OUTPUT("%c", (char) spu->RAM[addr]);
+                    OUTPUT("%c", (char) spu->RAM[(int)addr]);
                     addr++;
                 }
                 OUTPUT("\n");
@@ -370,7 +370,7 @@ Spu_Err run_spu(spu_t * spu)
         }
     }
     
-    printf("spu running is finished!\n");
+    DEBUG_PRINT("spu running is finished!\n");
     return spu_errors;
 }
 

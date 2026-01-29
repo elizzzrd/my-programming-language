@@ -15,24 +15,16 @@ typedef enum
 
 
 void to_upper_str(const char * input, char * output);
-size_t get_file_size(const char * filename);
 int check_option_with_stack_commands(char * option);
 int check_register(const char * reg_buffer);
 bool is_number(const char *str);
 
 
+static const double EPSILON = 1e-12;
 
-// extern const char *stack_commands[];
-// typedef Stack_Err (*stack_function_t)(stack_t *stack, StackElem value);
 
-// Stack_Err cmd_push(stack_t *stack, StackElem value);
-// Stack_Err cmd_dump(stack_t *stack, StackElem value);
-// Stack_Err cmd_add(stack_t *stack, StackElem value);
-// Stack_Err cmd_sub(stack_t *stack, StackElem value);
-// Stack_Err cmd_mul(stack_t *stack, StackElem value);
-// Stack_Err cmd_div(stack_t *stack, StackElem value);
-// Stack_Err cmd_sqrt(stack_t *stack, StackElem value);
-// Stack_Err cmd_out(stack_t *stack, StackElem value);
-// Stack_Err cmd_hlt(stack_t *stack, StackElem value);
+bool is_zero_double(double num);
+bool is_positive_double(double num);
+void clamp_to_zero_double(double * number);
+bool double_comparison(double number1, double number2);
 
-// extern stack_function_t operators[NCOMMANDS];

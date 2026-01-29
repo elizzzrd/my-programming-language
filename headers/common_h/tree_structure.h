@@ -24,7 +24,8 @@ typedef enum
     LEXER_ERROR,
     PARSER_ERROR,
     TRANSLATING_TO_ASM_ERROR,
-    SYNTAX_ERROR
+    SYNTAX_ERROR,
+    SEMANTIC_ERROR
 } ErrorCode;
 
 
@@ -40,6 +41,7 @@ typedef struct treenode
     struct treenode * prev;
 
     bool is_unary;
+    identifier_t id;
 
     size_t param_count;
 } Node_t;

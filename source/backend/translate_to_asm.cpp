@@ -21,14 +21,15 @@ ErrorCode translate_to_asm(Tree_t * tree, const char * filename)
 {
     assert(tree && filename);
     ErrorCode error = SUCCESS; 
-
+    
     FILE * file_ptr = fopen(filename, "w");
     if (!file_ptr)
     {
         ERROR_MESSAGE(OPENING_FILE_ERROR, error);
         return error;
     }
-
+    
+    DEBUG_PRINT("[INFO] TRANSLATION START\n");
     if (tree->root)
     {
         error = translate_node(tree->root, file_ptr);
@@ -40,11 +41,13 @@ ErrorCode translate_to_asm(Tree_t * tree, const char * filename)
         }
         fprintf(file_ptr, "hlt\n");
         fclose(file_ptr);
+        DEBUG_PRINT("[DEBUG] TRANSLATION COMPLETED");
         return SUCCESS;
     }
     else
     {
         fclose(file_ptr);
+        DEBUG_PRINT("[DEBUG] ERROR DURING TRANSLATION");
         return TRANSLATING_TO_ASM_ERROR;
     }
 }
@@ -56,6 +59,8 @@ ErrorCode translate_node(Node_t * node, FILE * file_ptr)
         return TREE_NULL_POINTER;
     ErrorCode error = SUCCESS;
 
+
+    DEBUG_PRINT("[DEBUG] translate_node: type = %s", get_string_type(node->type));
     switch (node->type)
     {
         case ROOT:
@@ -80,8 +85,9 @@ ErrorCode translate_node(Node_t * node, FILE * file_ptr)
         }
         case IDENTIFIER:
         {
-            int index = get_id_address(get_id_name(node->value.id_index, SB_VAR));
-            if (index < 0)      
+            DEBUG_PRINT("%s -- %d\n", node->id.name, node->id.id_index);
+            int index = node->id.id_index;
+            if (index < -1)      
                 error = TRANSLATING_TO_ASM_ERROR;    
             IF_THERE_IS_TRANSLATE_ERROR(error);
             fprintf(file_ptr, "pushm [%d]\n", index);
@@ -115,21 +121,6 @@ ErrorCode translate_node(Node_t * node, FILE * file_ptr)
 }
 
 
-int get_id_address(const char * name)
-{
-    assert(name);
-
-    int index = symbol_table_find(name, SB_VAR);
-    if (index < 0)
-    {
-        ErrorCode error = SUCCESS;
-        ERROR_MESSAGE(TRANSLATING_TO_ASM_ERROR, error);
-        return -1;
-    }
-
-    return index;
-}
-
 
 ErrorCode translate_operator(Node_t * node, FILE * file_ptr)
 {
@@ -140,10 +131,12 @@ ErrorCode translate_operator(Node_t * node, FILE * file_ptr)
     
     if (is_binary_operator(op))
     {
-        error = translate_node(node->left, file_ptr);
+        if (node->left)
+            error = translate_node(node->left, file_ptr);
         IF_THERE_IS_TRANSLATE_ERROR(error);
 
-        error = translate_node(node->right, file_ptr);
+        if (node->right)
+            error = translate_node(node->right, file_ptr);
         IF_THERE_IS_TRANSLATE_ERROR(error);
 
         switch (op)
@@ -172,15 +165,32 @@ ErrorCode translate_operator(Node_t * node, FILE * file_ptr)
 
     if (is_unary_operator(op))
     {
-        error = translate_node(node->right, file_ptr);
+        if (node->left)
+            error = translate_node(node->left, file_ptr);
+        else
+            error = translate_node(node->right, file_ptr);
         IF_THERE_IS_TRANSLATE_ERROR(error);
         
         switch (op)
         {
+        case OP_READ:
+        {
+            fprintf(file_ptr, "in\n");
+            break;
+        }
             case OP_UNARY_MINUS:
             {
+                fprintf(file_ptr, "popr rax\n");
+                // Создаем -1
                 fprintf(file_ptr, "push 0\n");
-                fprintf(file_ptr, "sub\n");
+                fprintf(file_ptr, "push 1\n");
+                fprintf(file_ptr, "sub\n");  // 0 - 1 = -1
+                
+                // Кладем операнд обратно
+                fprintf(file_ptr, "pushr rax\n");
+                
+                // Умножаем: операнд * -1
+                fprintf(file_ptr, "mul\n");
                 break;
             }
             case OP_SQRT:   fprintf(file_ptr, "sqrt\n"); break;
@@ -255,7 +265,11 @@ ErrorCode translate_statement(Node_t * node, FILE * file_ptr)
         }
         case OP_PRINT:
         {
-            Node_t * arg = node->right;
+            Node_t * arg = NULL;
+            if (node->left)
+                arg = node->left;
+            else if (node->right)
+                arg = node->right;
 
             error = translate_node(arg, file_ptr);              
             IF_THERE_IS_TRANSLATE_ERROR(error);
@@ -270,7 +284,7 @@ ErrorCode translate_statement(Node_t * node, FILE * file_ptr)
         case OP_VAR_DEF:
         {
             error = translate_node(node->right, file_ptr);
-            int index = get_id_address(get_id_name(node->left->value.id_index, SB_VAR));
+            int index = node->left->id.id_index;
             if (index < 0)      
                 error = TRANSLATING_TO_ASM_ERROR;
             IF_THERE_IS_TRANSLATE_ERROR(error);
@@ -321,36 +335,19 @@ ErrorCode translate_statement(Node_t * node, FILE * file_ptr)
             IF_THERE_IS_TRANSLATE_ERROR(error);
             break;
         }
-        case OP_INPUT:
-        {
-            Node_t * arg = node->right;
-
-            error = translate_node(arg, file_ptr);              
-            IF_THERE_IS_TRANSLATE_ERROR(error);
-
-            if (arg->type == NUMBER)
-                fprintf(file_ptr, "in\n");
-            else
-            {
-                ERROR_MESSAGE(TRANSLATING_TO_ASM_ERROR, error);
-                DEBUG_PRINT("Can not read non-number\n");
-                return error;
-            }
-            break;
-        }
         case OP_FUNC_DEF:
         {
-            fprintf(file_ptr, "%s:\n", get_id_name(node->value.id_index, SB_FUNC));
+            fprintf(file_ptr, "%s:\n", node->id.name);
             Node_t * params = node -> left;
             int param_count = 0;
             Node_t * param_list[16];
 
             if (params && params->type == STATEMENT && params->value.stmt == OP_PARAMS)
             {
-                Node_t * param = param->right;
+                Node_t * param = params->right;
                 while (param && param_count < 16)
                 {
-                    if (param->type == IDENTIFIER)      param_list[param_count] = param;
+                    if (param->type == IDENTIFIER)      param_list[param_count++] = param;
                     param = param -> right;
                 }
             }
@@ -358,7 +355,7 @@ ErrorCode translate_statement(Node_t * node, FILE * file_ptr)
             // pop arguments from stack and assign them to params
             for (int i = param_count - 1; i >= 0; i--)
             {
-                int param_index = param_list[i]->value.id_index;
+                int param_index = param_list[i]->id.id_index;
                 if (param_index < 0)
                 {
                     ERROR_MESSAGE(TRANSLATING_TO_ASM_ERROR, error);
@@ -401,7 +398,7 @@ ErrorCode translate_statement(Node_t * node, FILE * file_ptr)
                 IF_THERE_IS_TRANSLATE_ERROR(error);
             }
             
-            fprintf(file_ptr, "call %s\n", get_id_name(node->value.id_index, SB_FUNC));
+            fprintf(file_ptr, "call %s\n", node->id.name);
             break;
         }
         case OP_RETURN:
@@ -508,7 +505,7 @@ void emit_op_pow(FILE * file_ptr)
     "push 1\n"
     "jmp END_%d\n\n"
     "END_%d:\n"
-    "out\n"
+    //"out\n"
     "push 0\npopr rax\npush 0\npopr rbx\npush 0\npopr rcx\npush 0\npopr rdx\n",
     id, id, id, id, id, id, id, id, id, id, id, id, id);
 }

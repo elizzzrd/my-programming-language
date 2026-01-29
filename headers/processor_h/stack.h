@@ -2,7 +2,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-typedef int StackElem;
+typedef double StackElem;
 
 typedef struct 
 {

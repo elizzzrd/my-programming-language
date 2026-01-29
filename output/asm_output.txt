@@ -1,0 +1,82 @@
+push 1
+popm [0]
+push 12
+popm [1]
+push 35
+popm [2]
+pushm [1]
+pushm [1]
+mul
+push 4
+pushm [0]
+mul
+pushm [2]
+mul
+sub
+sqrt
+popm [3]
+pushm [1]
+popr rax
+push 0
+push 1
+sub
+pushr rax
+mul
+pushm [3]
+add
+push 2
+pushm [0]
+mul
+div
+popm [4]
+push 120
+popm [256]
+push 49
+popm [257]
+push 95
+popm [258]
+push 105
+popm [259]
+push 115
+popm [260]
+push 58
+popm [261]
+push 0
+popm [262]
+push 256
+puts
+pushm [4]
+out
+pushm [1]
+popr rax
+push 0
+push 1
+sub
+pushr rax
+mul
+pushm [3]
+sub
+push 2
+pushm [0]
+mul
+div
+popm [5]
+push 120
+popm [263]
+push 50
+popm [264]
+push 95
+popm [265]
+push 105
+popm [266]
+push 115
+popm [267]
+push 58
+popm [268]
+push 0
+popm [269]
+push 263
+puts
+pushm [5]
+out
+hlt

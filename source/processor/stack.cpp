@@ -51,8 +51,6 @@ Stack_Err stack_push(stack_t *stack, StackElem value)
     }
 
     stack->data[stack->size++] = value;
-    //printf("[STACK_PUSH] pushed %d (size=%lu, cap=%lu)\n", value, stack->size, stack->capacity);
-
     return errors;
 }
 
@@ -67,8 +65,6 @@ Stack_Err stack_pop(stack_t *stack, StackElem *value)
     }
 
     *value = stack->data[--stack->size];
-    //printf("[STACK_POP] popped %d (size=%lu, cap=%lu)\n", *value, stack->size, stack->capacity);
-
     
     if (stack->size > 0 && stack->size < stack->capacity / 4)
     {

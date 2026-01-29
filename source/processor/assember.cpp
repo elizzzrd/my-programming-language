@@ -18,7 +18,7 @@
 
 static label_t g_labels[MAX_LABELS];
 static size_t labels_count = 0;
-static int code_buffer[MAX_CODE_SIZE];
+static double code_buffer[MAX_CODE_SIZE];
 static size_t code_size = 0;
 
 
@@ -114,7 +114,8 @@ void destroy_labels(label_t * labels)
 }
 
 
-Spu_Err parse_argument(const char * arg, int * value, type_arg * type) 
+/*
+Spu_Err parse_argument(const char * arg, double * value, type_arg * type) 
 {
     assert(value && type);
     Spu_Err errors = SPU_OK;
@@ -123,7 +124,7 @@ Spu_Err parse_argument(const char * arg, int * value, type_arg * type)
 
     if (is_number(arg)) 
     {
-        *value = atoi(arg);
+        *value = atoll(arg);
         *type = NUM;
         return SPU_OK;
     }
@@ -179,7 +180,82 @@ Spu_Err parse_argument(const char * arg, int * value, type_arg * type)
     *type = UNKNOWN_TYPE;
     return SPU_INVALID_COMMAND;
 }
+*/
 
+
+Spu_Err parse_argument(const char * arg, double * value, type_arg * type) 
+{
+    assert(value && type);
+    Spu_Err errors = SPU_OK;
+    *type = UNKNOWN_TYPE;
+    if (!arg || !*arg) return SPU_INVALID_COMMAND;
+
+    // Пробуем распарсить как число (целое или вещественное)
+    char *endptr = NULL;
+    double num = strtod(arg, &endptr);
+    
+    if (endptr != arg && *endptr == '\0') 
+    {
+        // Это число (целое или вещественное)
+        *value = num;  // Сохраняем как double с дробной частью
+        *type = NUM;
+        return SPU_OK;
+    }
+    else if (arg[0] == 'r' && isalpha((unsigned char)arg[1])) 
+    {
+        int reg_num = (toupper(arg[1]) - 'A') + 1;
+        if (strlen(arg) != 3 || (reg_num < 1 || reg_num > 16)) 
+        {
+            DEBUG_PRINT("[ERROR] Invalid register name");
+            return SPU_INVALID_COMMAND;
+        }
+        *value = (double)reg_num;  // Регистр тоже как double
+        *type = REG;
+        return errors;
+    } 
+    else if (arg[0] == '[' && arg[strlen(arg) - 1] == ']')
+    {
+        char inside[50] = {};
+        size_t len = strlen(arg);
+
+        if (len <= 2)
+        {
+            DEBUG_PRINT("[ERROR] Empty brackets in pushm/popm");
+            errors |= SPU_INVALID_COMMAND;
+            return errors;
+        }
+
+        strncpy(inside, arg + 1, len - 2);
+        inside[len - 2] = '\0';
+        
+        // Пробуем распарсить как число для адреса
+        num = strtod(inside, &endptr);
+        if (endptr != inside && *endptr == '\0')
+        {
+            // Адрес тоже может быть double, но обычно целый
+            if (num < 0)
+            {
+                DEBUG_PRINT("[ERROR] Negative RAM address");
+                return SPU_INVALID_COMMAND;
+            }
+            *value = num;  // Сохраняем как double
+            *type = RAM;
+            return errors;
+        }
+    }
+
+    int id = find_label(arg);
+    if (id != -1) 
+    {
+        *value = (double)g_labels[id].instructor_ptr;  // Приведение к double
+        *type = LABEL;
+        return errors;
+    }
+
+    DEBUG_PRINT("[ERROR] Unrecognized argument type '%s'", arg);
+    *type = UNKNOWN_TYPE;
+    return SPU_INVALID_COMMAND;
+}
 
 
 // узнать, где что находиться
@@ -295,7 +371,7 @@ Spu_Err second_pass(const char * txt_filename)
         char arg[NMAX] = {};
         if (sscanf(cmd_command + strlen(option), "%s", arg) == 1) 
         {
-            int value = 0;
+            double value = 0;
             type_arg type = UNKNOWN_TYPE;
             errors |= parse_argument(arg, &value, &type);
 
@@ -322,7 +398,7 @@ Spu_Err second_pass(const char * txt_filename)
 }
 
 
-int * load_bytecode(const char * file_byte, size_t * size)
+StackElem * load_bytecode(const char * file_byte, size_t * size)
 {
     assert(file_byte != NULL);
     assert(size != NULL);
@@ -335,10 +411,10 @@ int * load_bytecode(const char * file_byte, size_t * size)
     }
 
     #define MAX_TEMP 1024
-    int temp_buffer[MAX_TEMP];
+    double temp_buffer[MAX_TEMP];
     size_t count = 0;
     
-    while (count < MAX_TEMP && fscanf(file, "%d", &temp_buffer[count]) == 1) 
+    while (count < MAX_TEMP && fscanf(file, "%lg", &temp_buffer[count]) == 1) 
         count++;
     
     
@@ -349,7 +425,7 @@ int * load_bytecode(const char * file_byte, size_t * size)
         return NULL;
     }
     
-    int * code = (int *) malloc(count * sizeof(int));  
+    StackElem * code = (StackElem *) malloc(count * sizeof(StackElem));  
     if (!code) 
     { 
         return NULL; 
@@ -393,7 +469,7 @@ Spu_Err assembler(const char * txt_filename, const char * byte_filename)
     }
 
     for (size_t i = 0; i < code_size; i++)
-        fprintf(out, "%d\n", code_buffer[i]);
+        fprintf(out, "%lg\n", code_buffer[i]);
 
     destroy_labels(g_labels);
     fclose(out);

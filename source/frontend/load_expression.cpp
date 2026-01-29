@@ -29,7 +29,7 @@ void savenode(Node_t *node, FILE *f)
             break;
 
         case IDENTIFIER:
-            fprintf(f, "%s", get_id_name(node->value.id_index, SB_VAR));
+            fprintf(f, "%s##%d", node->id.name, node->id.id_index);
             break;
 
         case OPERATOR:
@@ -75,13 +75,13 @@ ErrorCode save_tree(Tree_t * tree, const char * filename)
 
     savenode(tree->root->right, file_ptr);
 
-
     fclose(file_ptr);
+    DEBUG_PRINT("[INFO] TREE SAVED IN %s", filename);
     return error;
 }
 
 
-ErrorCode load_expression_prefix(Tree_t * tree, const char * expression_input)
+ErrorCode build_middleend_tree(Tree_t * tree, const char * expression_input)
 {
     assert(tree);
 
@@ -103,6 +103,7 @@ ErrorCode load_expression_prefix(Tree_t * tree, const char * expression_input)
         free(buffer);
         return error;
     }
+    DEBUG_PRINT("[DEBUG] all nodes was read");
 
     tree -> root -> right = first_node;
     error = build_parent_links(tree);
@@ -113,9 +114,6 @@ ErrorCode load_expression_prefix(Tree_t * tree, const char * expression_input)
         free(buffer);
         return error;
     }
-
-    DEBUG_PRINT("[DEBUG] root->value.root after loading: %s\n", tree->root->value.root);
-    GRAPH_DUMP(tree);
     
     free(buffer);
     return error;
@@ -137,6 +135,7 @@ Node_t * read_node(char * buffer, size_t * pos, Tree_t * tree)
         while (isspace(buffer[*pos])) (*pos)++;                     // пропускаем пробелы после '('
                                         
         token_res token = define_token_type(buffer, pos);
+        //DEBUG_PRINT("[DEBUG] %s", get_string_type(token.type));
         if (token.type == ROOT)
         {
             ERROR_MESSAGE(LOADING_EXPRESSION_ERROR, error);
@@ -150,12 +149,15 @@ Node_t * read_node(char * buffer, size_t * pos, Tree_t * tree)
         {
             case IDENTIFIER:  
             {
-                current = create_identifier_node(tree, token.value.id_index);
+                current = create_identifier_node(tree, token.id.name);
+                current.node->id.id_index = token.id.id_index;
                 if (current.error != SUCCESS)
                 {
                     ERROR_MESSAGE(TREE_CREATING_NODE_ERROR, error);
                     return NULL;
                 }
+
+                free((void *)token.id.name);
                 break;
             }
             case NUMBER:
@@ -274,6 +276,7 @@ token_res define_token_type(char * buffer, size_t * pos)
         (*pos)++;
 
     char * token = get_token(buffer, pos);
+    //DEBUG_PRINT("[DEBUG] %s", token);
 
     size_t len = strlen(token);
 

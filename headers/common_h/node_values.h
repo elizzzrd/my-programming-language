@@ -22,6 +22,8 @@ typedef enum
     OP_SUB,
     OP_POW,
 
+    OP_READ,
+
     OP_EQUAL,
     OP_NON_EQUAL,
     OP_BELOW,
@@ -58,7 +60,6 @@ typedef enum
     OP_STATEMENT,
     OP_END,
     OP_PRINT,
-    OP_INPUT,
     OP_ASSIGNMENT,
     OP_IF,
     OP_WHILE,
@@ -72,6 +73,12 @@ typedef enum
     OP_PARAMS,
     OP_ARGS
 } statement_t;
+
+typedef struct 
+{
+    int id_index;
+    char * name;
+} identifier_t;
 
 typedef union 
 {
@@ -87,7 +94,9 @@ typedef struct
 {
     type_t type;
     value_t value;
+    identifier_t id;
 } token_res;
+
 
 
 

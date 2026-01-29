@@ -96,7 +96,7 @@ void stack_dump(const stack_t * stack, Stack_Err error, const char * file, int l
         size_t i = 0;
         for (i = 0; i < stack -> size; i++)
         {
-            DEBUG_PRINT("\t*[%zu] = %d\n", i, stack -> data[i]);
+            DEBUG_PRINT("\t*[%zu] = %lg\n", i, stack -> data[i]);
         }
         for (; i < stack->capacity; i++)
         {
@@ -145,14 +145,14 @@ void spu_dump(const spu_t * spu, Spu_Err err, const char * file, int line)
         size_t i = 0;
         for (i = 0; i < (spu -> code_size); i++)
         {
-            DEBUG_PRINT("\t*[%zu] = %d\n", i, spu -> code[i]);
+            DEBUG_PRINT("\t*[%zu] = %lg\n", i, spu -> code[i]);
         }
         DEBUG_PRINT("}\n");
     }
 
     DEBUG_PRINT("\n    Registers:\n");
     for (size_t i = 0; i < REGS_COUNT; i++)
-        DEBUG_PRINT("        R[%zu] = %d\n", i, spu->regs[i]);
+        DEBUG_PRINT("        R[%zu] = %lg\n", i, spu->regs[i]);
 
     DEBUG_PRINT("\n    Stack state:\n");
     stack_dump(&(spu->stack), STACK_OK, file, line);
@@ -196,8 +196,6 @@ const char * get_string_type_arg(type_arg type)
     
     return type_arg_strings[type];
 }
-
-
 
 
 void finish_program(spu_t * spu)

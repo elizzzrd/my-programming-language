@@ -11,8 +11,9 @@
             } \
     } while(0)
 
+#define ASM_OUTPUT "output/asm_output.txt"
 
-#define OUTPUT_FILE "output.txt"    
+#define OUTPUT_FILE "output/output.txt"    
 #define OUTPUT(fmt, ...)                                               \
     do {                                                                    \
         FILE *fp = fopen(OUTPUT_FILE, "a");                         \

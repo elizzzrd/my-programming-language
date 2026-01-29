@@ -3,7 +3,8 @@
 
 #include "tree_structure.h"
 #define EXPRESSION_INPUT "expression.txt"
-#define AST_OUTPUT "ast_output.txt"
+#define AST_OUTPUT_FRONTEND "output/ast_output_frontend.txt"
+#define AST_OUTPUT_MIDDLEEND "output/ast_output_middleend.txt"
 
 typedef token_res (*check_func_t)(const char * token);
     
@@ -15,7 +16,7 @@ char ** collect_path(Node_t * node, size_t tree_size, size_t * path_size, Tree_t
 ErrorCode save_tree(Tree_t * tree, const char * filename);
 void savenode(Node_t *node, FILE *f);
 
-ErrorCode load_expression_prefix(Tree_t * tree, const char * expression_input);
+ErrorCode build_middleend_tree(Tree_t * tree, const char * expression_input);
 Node_t * read_node(char * buffer, size_t * pos, Tree_t * tree);
 
 token_res define_token_type(char * buffer, size_t * pos);

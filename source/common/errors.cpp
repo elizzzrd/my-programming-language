@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdlib.h>
 #include <assert.h>
 #include <string.h>
 
@@ -7,8 +8,9 @@
 #include "errors.h"
 #include "lexer.h"
 #include "utils.h"
+#include "math_functions.h"
 
-#define HTML_FILE "page.html"
+#define HTML_FILE "logger/page.html"
 
 
 const char * tree_error_string(ErrorCode error) 
@@ -34,17 +36,18 @@ const char * tree_error_string(ErrorCode error)
         "Error during lexical analysis",                // [13] LEXER_ERROR
         "Error during syntax analysis"                  // [14] PARSER_ERROR
         "Error during traslating to asm"                // [15] TRANSLATING_TO_ASM_ERROR
-        "Syntax error"                                  // [16] SYNTAX_ERROR
+        "Syntax error",                                 // [16] SYNTAX_ERROR
+        "Semantic error"                                // [17] SEMANTIC_ERROR
     };
     
-    if (error < SUCCESS || error > SYNTAX_ERROR) 
+    if (error < SUCCESS || error > SEMANTIC_ERROR) 
         return "Unknown error";
     
     return tree_error_strings[error];
 }
 
 
-void tree_graph_dump_nodes(FILE * dot_fp, const Node_t * node)
+void tree_graph_dump_nodes(FILE * dot_fp, const Node_t * node, const char * suffix)
 {
     assert(dot_fp);
 
@@ -57,40 +60,45 @@ void tree_graph_dump_nodes(FILE * dot_fp, const Node_t * node)
 
     if (!type_str) 
     {
-        DEBUG_PRINT("WARNING: Unknown node type: %d\n", type);
+        DEBUG_PRINT("[WARNING]: Unknown node type: %d\n", type);
         type_str = "UNKNOWN";
     }
 
-    //DEBUG_PRINT("in graph_dump: type = %s", type_str);
     define_node_type_for_dump(type, &fillcolor, &value_str, (const Node_t *)node);
     if (!fillcolor) fillcolor = "#ffffff";
     if (!value_str) value_str = "NULL";
-    //DEBUG_PRINT("define_node_type_for_dump: type = %s, value_str = %s", type_str, value_str);
 
 
-    if (node->left == NULL && node->right == NULL && type != STRING)
+    if (node->left == NULL && node->right == NULL && type == NUMBER)
         fprintf(dot_fp, 
-        "    node_%p [fillcolor = \"%s\", label=\"{ <t> %s | <v> %s | { <l> %s | <r> %s}}\"];\n", 
-        (const void*)node, fillcolor, type_str, value_str, "0", "0");
+        "    node_%p%s [fillcolor = \"%s\", label=\"{ <t> %s | <v> %s | { <l> %s | <r> %s}}\"];\n", 
+        (const void*)node, suffix, fillcolor, type_str, value_str, "0", "0");
     else if (type == ROOT)
         fprintf(dot_fp, 
-        "    node_%p [fillcolor = \"%s\", label=\"{ <t> %s }\"];\n", 
-        (const void*)node, fillcolor, get_statement_name(OP_PROGRAM));
+        "    node_%p%s [fillcolor = \"%s\", label=\"{ <t> %s }\"];\n", 
+        (const void*)node, suffix, fillcolor, get_statement_name(OP_PROGRAM));
+    else if (type == STATEMENT && node->id.name)
+        fprintf(dot_fp, 
+        "    node_%p%s [fillcolor = \"%s\", label=\"{ <t> %s | <v> %s | <i> %s}\"];\n", 
+        (const void*)node, suffix, fillcolor, type_str, value_str, node->id.name);
+    else if (type == IDENTIFIER)
+        fprintf(dot_fp, 
+        "    node_%p%s [fillcolor = \"%s\", label=\"{ <t> %s | <i> %s | <n> %d}\"];\n", 
+        (const void*)node, suffix, fillcolor, type_str,  node->id.name, node->id.id_index);
     else
         fprintf(dot_fp, 
-        "    node_%p [fillcolor = \"%s\", label=\"{ <t> %s | <v> %s}\"];\n", 
-        (const void*)node, fillcolor, type_str, value_str);
+        "    node_%p%s [fillcolor = \"%s\", label=\"{ <t> %s | <v> %s}\"];\n", 
+        (const void*)node, suffix, fillcolor, type_str, value_str);
     
-    //DEBUG_PRINT("node with type %s drawn", type_str);
 
     if (node -> left)
-        tree_graph_dump_nodes(dot_fp, node -> left);
+        tree_graph_dump_nodes(dot_fp, node -> left, suffix);
     if (node -> right)
-        tree_graph_dump_nodes(dot_fp, node -> right);    
+        tree_graph_dump_nodes(dot_fp, node -> right, suffix);    
 }
 
 
-void tree_graph_dump_edges(FILE * dot_fp, const Node_t * node)
+void tree_graph_dump_edges(FILE * dot_fp, const Node_t * node, const char * suffix)
 {
     assert(dot_fp);
 
@@ -98,24 +106,25 @@ void tree_graph_dump_edges(FILE * dot_fp, const Node_t * node)
 
     if (node->left)
         fprintf(dot_fp, 
-        "    node_%p -> node_%p [color=\"#0e0246ff\", penwidth=1];\n",
-    (const void*)node, (const void*)node->left);
+        "    node_%p%s -> node_%p%s [color=\"#0e0246ff\", penwidth=1];\n",
+    (const void*)node, suffix, (const void*)node->left, suffix);
 
     if (node->right)
         fprintf(dot_fp, 
-        "    node_%p -> node_%p [color=\"#0e0246ff\", penwidth=1];\n",
-    (const void*)node, (const void*)node->right);
+        "    node_%p%s -> node_%p%s [color=\"#0e0246ff\", penwidth=1];\n",
+    (const void*)node, suffix, (const void*)node->right, suffix);
 
-    tree_graph_dump_edges(dot_fp, node->left);
-    tree_graph_dump_edges(dot_fp, node->right);
+    tree_graph_dump_edges(dot_fp, node->left, suffix);
+    tree_graph_dump_edges(dot_fp, node->right, suffix);
 }
+
 
 
 ErrorCode tree_graph_dump(Tree_t * tree, const char * filename_dot, const char * filename_png, const char * file_called, int line_called)
 {
     assert(filename_dot && filename_png && tree); ;
 
-    DEBUG_PRINT("Starting graph dump to %s and %s\n", filename_dot, filename_png);
+    DEBUG_PRINT("[INFO] Starting graph dump to %s and %s\n", filename_dot, filename_png);
 
     ErrorCode error = SUCCESS;
     if (!tree)
@@ -143,8 +152,8 @@ ErrorCode tree_graph_dump(Tree_t * tree, const char * filename_dot, const char *
 
     if (tree -> root)
     {
-        tree_graph_dump_nodes(dot_fp, tree->root);
-        tree_graph_dump_edges(dot_fp, tree->root);
+        tree_graph_dump_nodes(dot_fp, tree->root, "");
+        tree_graph_dump_edges(dot_fp, tree->root, "");
     }
 
     fprintf(dot_fp, "}\n");
@@ -165,12 +174,11 @@ ErrorCode tree_graph_dump(Tree_t * tree, const char * filename_dot, const char *
 }
 
 
-ErrorCode tree_graph_dump_diff(Tree_t * source_tree, Tree_t * diff_tree, const char * filename_dot, const char * filename_png, const char * file_called, int line_called)
+ErrorCode tree_graph_middleend(Tree_t * original_tree, const char * filename_dot, const char * filename_png, const char * file_called, int line_called)
 {
-    assert(filename_dot && filename_png && source_tree && diff_tree); ;
+    assert(filename_dot && filename_png && original_tree); ;
 
-    DEBUG_PRINT("Starting graph dump of source and diff trees to %s and %s\n", filename_dot, filename_png);
-
+    DEBUG_PRINT("[INFO] Starting graph dump in middleend to %s and %s\n", filename_dot, filename_png);
     ErrorCode error = SUCCESS;
     
     FILE * dot_fp = fopen(filename_dot, "w");
@@ -182,7 +190,7 @@ ErrorCode tree_graph_dump_diff(Tree_t * source_tree, Tree_t * diff_tree, const c
 
     fprintf(dot_fp, "// Graphiz was called from %s:%d\n", file_called, line_called);
     fprintf(dot_fp,
-        "digraph DiffTreeGraph {\n"
+        "digraph MiddleendTreeGraph {\n"
         "    bgcolor=\"#ffffff\";\n"
         "    fontname=\"Consolas\";\n"
         "    nodesep=0.6;\n"
@@ -190,22 +198,28 @@ ErrorCode tree_graph_dump_diff(Tree_t * source_tree, Tree_t * diff_tree, const c
         "    edge [fontname=\"Consolas\", arrowsize=0.8];\n\n");
     fprintf(dot_fp, "\n");
 
-    fprintf(dot_fp, "subgraph cluster_source_tree {\n");
-    fprintf(dot_fp, "label = \"Source Tree\";\n");
-    if (source_tree -> root)
+    fprintf(dot_fp, "subgraph cluster_original_tree {\n");
+    fprintf(dot_fp, "label = \"Original Tree\";\n");
+    if (original_tree -> root)
     {
-        tree_graph_dump_nodes(dot_fp, source_tree->root);
-        tree_graph_dump_edges(dot_fp, source_tree->root);
+        tree_graph_dump_nodes(dot_fp, original_tree->root, "");
+        tree_graph_dump_edges(dot_fp, original_tree->root, "");
     }
     fprintf(dot_fp, "}\n");
 
-
-    fprintf(dot_fp, "subgraph cluster_diff_tree {\n");
-    fprintf(dot_fp, "label = \"Derivative Tree\";\n");
-    if (diff_tree -> root)
+    
+    fprintf(dot_fp, "subgraph cluster_optimized_tree {\n");
+    fprintf(dot_fp, "label = \"Optimized Tree\";\n");
+    error = optimize_tree_recursive(original_tree);
+    if (error != SUCCESS)
     {
-        tree_graph_dump_nodes(dot_fp, diff_tree->root);
-        tree_graph_dump_edges(dot_fp, diff_tree->root);
+        ERROR_MESSAGE(GRAPH_DUMP_ERROR, error);
+        fprintf(dot_fp, "node_* [label = \"No optimization\"];\n");
+    }
+    if (original_tree -> root)
+    {
+        tree_graph_dump_nodes(dot_fp, original_tree->root, "_opt");
+        tree_graph_dump_edges(dot_fp, original_tree->root, "_opt");
     }
     fprintf(dot_fp, "}\n");
     fprintf(dot_fp, "}\n");
@@ -222,19 +236,18 @@ ErrorCode tree_graph_dump_diff(Tree_t * source_tree, Tree_t * diff_tree, const c
         return error;
     }
 
-    DEBUG_PRINT("Graph dump of source and diff trees completed: %s and %s have been created\n", filename_dot, filename_png);
+    DEBUG_PRINT("[INFO] Graph dump of middleend tree completed: %s and %s have been created\n", filename_dot, filename_png);
 
     return error;
 }
 
 
 
-
 void define_node_type_for_dump(type_t type, const char ** fillcolor, const char ** value_str, const Node_t * node)
 {
     assert(fillcolor && value_str && node);
-    *fillcolor = "#ffffff";
-    *value_str = "ERROR";
+    * fillcolor = "#ffffff";
+    * value_str = "ERROR";
 
     switch (type)
     {
@@ -247,12 +260,12 @@ void define_node_type_for_dump(type_t type, const char ** fillcolor, const char 
         case IDENTIFIER:
         {
             *fillcolor = "#f7d598ff";
-            *value_str = get_id_name(node->value.id_index, SB_VAR);
+            *value_str = node->id.name;
             break;
         }
         case NUMBER:
         {
-             *fillcolor = "#98f7aaff";
+            *fillcolor = "#98f7aaff";
 
             static char buf[64];  
 
@@ -269,7 +282,10 @@ void define_node_type_for_dump(type_t type, const char ** fillcolor, const char 
         case STATEMENT:
         {
             *fillcolor = "#d29bdaff";
-            *value_str = get_statement_name(node->value.stmt);
+            if (node->id.name)
+                *value_str = node->id.name;
+            else
+                *value_str = get_statement_name(node->value.stmt);
             break;
         }
         case STRING:

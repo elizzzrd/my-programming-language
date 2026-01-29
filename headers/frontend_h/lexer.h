@@ -3,12 +3,6 @@
 #include <stdio.h>
 #include "errors.h"
 
-typedef struct 
-{
-    char **names;
-    size_t count;
-    size_t capasity;
-} SymbolTable;
 
 
 typedef enum
@@ -53,14 +47,10 @@ typedef enum
     TOK_TG,
     TOK_LN,
     TOK_SQRT,
-    TOK_EXP
+    TOK_EXP,
+    TOK_UNARY_MINUS
 } token_t;
 
-typedef enum
-{
-    SB_VAR  = 0,
-    SB_FUNC = 1
-} sb_mode_t;
 
 typedef struct 
 {
@@ -76,6 +66,21 @@ typedef struct
     size_t capasity;
 } TokenList;
 
+
+#define LEXICAL_ANALYSIS_ERROR(error) \
+    do { \
+        if (error != SUCCESS) {\
+            DEBUG_PRINT("[ERROR] LEXICAL_ANALYSIS END WITH ERROR"); \
+            fprintf(stderr, "[INFO] ERROR DURING FRONTEND\n"); \
+            destroy_tokens(&token_list); \
+            return -1; }\
+        else { \
+            DEBUG_PRINT("[INFO] LEXICAL_ANALYSIS END");\
+            lexer_dump(&token_list);\
+        }\
+    } while (0)
+
+
 ErrorCode lexicalAnalysis(TokenList * token_list);
 void destroy_tokens(TokenList * token_list);
 void token_list_init(TokenList * token_list);
@@ -86,14 +91,4 @@ Token make_token(token_t type, const char * start, size_t len);
 Token make_token_number(const char * start, size_t len);
 void lexer_dump(const TokenList * token_list);
 const char * get_string_token_type(token_t type);
-
-extern SymbolTable symbols_table[2];
-
-int symbol_table_find(const char * name, sb_mode_t mode);
-int symbol_table_add(const char * name, sb_mode_t mode);
-int symbol_table_resize(SymbolTable *sb, sb_mode_t mode);
-int symbol_table_get_or_add(const char * name, sb_mode_t mode);
-void symbol_table_destroy(SymbolTable * sb);
-const char * get_id_name(size_t id_index, sb_mode_t mode);
-
 
