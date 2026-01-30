@@ -10,7 +10,8 @@ typedef enum
     IDENTIFIER,
     NUMBER,
     STATEMENT,
-    STRING
+    STRING,
+    INVALID
 } type_t;
 
 
@@ -62,6 +63,7 @@ typedef enum
     OP_PRINT,
     OP_ASSIGNMENT,
     OP_IF,
+    OP_ELSE,
     OP_WHILE,
     OP_BLOCK,
 

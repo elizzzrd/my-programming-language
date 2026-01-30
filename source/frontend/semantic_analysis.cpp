@@ -30,9 +30,9 @@ const char * get_id_name(size_t id_index, SymbolTable * st, st_mode_t mode)
 
 int symbol_table_add(const char * name, SymbolTable * st, st_mode_t mode)
 {
-    if (st[mode].count == st[mode].capasity)
+    if (st[mode].count == st[mode].capacity)
     {
-        if (!symbol_table_resize(&st[mode], mode))
+        if (!symbol_table_resize(&st[mode]))
             return -1;
     }
 
@@ -44,15 +44,25 @@ int symbol_table_add(const char * name, SymbolTable * st, st_mode_t mode)
 }
 
 
-int symbol_table_resize(SymbolTable *st, st_mode_t mode)
+int symbol_table_resize(SymbolTable *st)
 {
-    size_t new_capacity = (st[mode].capasity == 0) ? 8 : st[mode].capasity * 2;
-    char ** new_names = (char **)realloc(st[mode].names, new_capacity * sizeof(char *));
-    if (!new_names)     return 0;
+    size_t new_capacity = (st->capacity == 0) ? 8 : st->capacity * 2;
 
-    st[mode].names = new_names;
-    st[mode].capasity = new_capacity;
+    char **new_names = (char **)realloc(st->names,
+                                        new_capacity * sizeof(char *));
+    if (!new_names)
+        return 0;
+
+    st->names = new_names;
+    st->capacity = new_capacity;
     return 1;
+}
+
+void symbol_table_init(SymbolTable *st)
+{
+    st->names = NULL;
+    st->count = 0;
+    st->capacity = 0;
 }
 
 
@@ -61,6 +71,9 @@ SymbolTable * st_init(void)
     SymbolTable * st = (SymbolTable *) calloc(2, sizeof(SymbolTable));
     if (!st)
         return NULL;
+
+    symbol_table_init(&st[ST_FUNC]);
+    symbol_table_init(&st[ST_VAR]);
 
     return st;
 }
@@ -153,6 +166,10 @@ ErrorCode collect_definitions(Node_t * node, SymbolTable * st)
             node->left->id.id_index = index;
         }
     }
+    else if (node->value.stmt == OP_READ)
+    {
+        ;
+    }
 
     error = collect_definitions(node->left, st);
     if (error != SUCCESS)
@@ -162,7 +179,7 @@ ErrorCode collect_definitions(Node_t * node, SymbolTable * st)
     return error;
 }
 
-
+/*
 ErrorCode check_semantics(Node_t * node, SymbolTable * st)
 {
     assert(st);
@@ -170,6 +187,70 @@ ErrorCode check_semantics(Node_t * node, SymbolTable * st)
     if (!node)
         return SUCCESS;
     ErrorCode error = SUCCESS;
+
+    if (node->type == STATEMENT && node->value.stmt == OP_FUNC_DEF)
+    {
+        size_t old_var_count = st[ST_VAR].count;
+
+        Node_t * params = node->left;
+        if (params)
+        {
+            Node_t * p = params->left;
+            while (p)
+            {
+                const char * name = p->id.name;
+
+                if (symbol_table_find(name, st, ST_VAR) >= 0)
+                {
+                    DEBUG_PRINT("[ERROR] parameter shadows variable %s", name);
+                    ERROR_MESSAGE(SEMANTIC_ERROR, error);
+                    return error;
+                }
+
+                int index = symbol_table_add(name, st, ST_VAR);
+                p->id.id_index = index;
+
+                p = p->left;
+            }
+        }
+
+        error = check_semantics(node->right, st);
+        if (error != SUCCESS)
+            return error;
+
+        for (size_t i = old_var_count; i < st[ST_VAR].count; ++i)
+        {
+            free(st[ST_VAR].names[i]);
+            st[ST_VAR].names[i] = NULL;
+        }
+
+        st[ST_VAR].count = old_var_count;
+
+        return SUCCESS;
+    }
+
+    if (node->type == STATEMENT && node->value.stmt == OP_READ)
+    {
+        if (!node->left || node->left->type != IDENTIFIER)
+        {
+            DEBUG_PRINT("[ERROR] read statement must have a variable");
+            ERROR_MESSAGE(SEMANTIC_ERROR, error);
+            return error;
+        }
+
+        const char * name = node->left->id.name;
+        int index = symbol_table_find(name, st, ST_VAR);
+
+        if (index < 0)
+        {
+            DEBUG_PRINT("[ERROR] read variable '%s' not declared", name);
+            ERROR_MESSAGE(SEMANTIC_ERROR, error);
+            return error;
+        }
+
+        node->left->id.id_index = index;
+    }
+
 
     if (node->type == IDENTIFIER)
     {
@@ -187,10 +268,70 @@ ErrorCode check_semantics(Node_t * node, SymbolTable * st)
     }
 
 
+    error = check_semantics(node->left, st);
+    if (error != SUCCESS)
+        return error;
+    
+    error = check_semantics(node->right, st);
+    return error;
+}
+*/
+
+ErrorCode check_semantics(Node_t * node, SymbolTable * st)
+{
+    if (!node)
+        return SUCCESS;
+
+    ErrorCode error = SUCCESS;
+
+    // --- Функция ---
+    if (node->type == STATEMENT && node->value.stmt == OP_FUNC_DEF)
+    {
+        size_t old_var_count = st[ST_VAR].count;
+
+        // добавляем параметры функции в таблицу локальных переменных
+        Node_t * params = node->left;
+        if (params)
+        {
+            Node_t * p = params->right;
+            while (p)
+            {
+                const char * name = p->id.name;
+
+                if (symbol_table_find(name, st, ST_VAR) >= 0)
+                {
+                    DEBUG_PRINT("[ERROR] parameter shadows variable %s", name);
+                    ERROR_MESSAGE(SEMANTIC_ERROR, error);
+                    return error;
+                }
+
+                int index = symbol_table_add(name, st, ST_VAR);
+                p->id.id_index = index;
+
+                p = p->right;
+            }
+        }
+
+        // проверяем тело функции
+        error = check_semantics(node->right, st);
+        if (error != SUCCESS)
+            return error;
+
+        // очищаем локальные параметры после проверки
+        for (size_t i = old_var_count; i < st[ST_VAR].count; ++i)
+        {
+            free(st[ST_VAR].names[i]);
+            st[ST_VAR].names[i] = NULL;
+        }
+        st[ST_VAR].count = old_var_count;
+
+        return SUCCESS;
+    }
+
+    // --- Вызов функции (может быть в выражении) ---
     if (node->type == STATEMENT && node->value.stmt == OP_CALL)
     {
         const char * name = node->id.name;
-
         int index = symbol_table_find(name, st, ST_FUNC);
         if (index < 0)
         {
@@ -198,14 +339,68 @@ ErrorCode check_semantics(Node_t * node, SymbolTable * st)
             ERROR_MESSAGE(SEMANTIC_ERROR, error);
             return error;
         }
+        node->id.id_index = index;
 
+        // проверяем аргументы функции
+        if (node->left)
+        {
+            error = check_semantics(node->left, st);
+            if (error != SUCCESS)
+                return error;
+        }
+    }
+
+    // --- Выражение в out(...) ---
+    if (node->type == STATEMENT && node->value.stmt == OP_RETURN)
+    {
+        if (node->left)
+        {
+            error = check_semantics(node->left, st);
+            if (error != SUCCESS)
+                return error;
+        }
+    }
+
+    // --- read (только если это чистый read) ---
+    if (node->type == OPERATOR && node->value.op == OP_READ)
+    {
+        if (!node->left || node->left->type != IDENTIFIER)
+        {
+            DEBUG_PRINT("[ERROR] read statement must have a variable");
+            ERROR_MESSAGE(SEMANTIC_ERROR, error);
+            return error;
+        }
+
+        const char * name = node->left->id.name;
+        int index = symbol_table_find(name, st, ST_VAR);
+        if (index < 0)
+        {
+            DEBUG_PRINT("[ERROR] read variable '%s' not declared", name);
+            ERROR_MESSAGE(SEMANTIC_ERROR, error);
+            return error;
+        }
+        node->left->id.id_index = index;
+    }
+
+    // --- Идентификатор ---
+    if (node->type == IDENTIFIER)
+    {
+        const char * name = node->id.name;
+        int index = symbol_table_find(name, st, ST_VAR);
+        if (index < 0)
+        {
+            DEBUG_PRINT("[ERROR] undefined variable %s", name);
+            ERROR_MESSAGE(SEMANTIC_ERROR, error);
+            return error;
+        }
         node->id.id_index = index;
     }
 
+    // --- Рекурсивно проверяем левое и правое поддерево ---
     error = check_semantics(node->left, st);
     if (error != SUCCESS)
         return error;
-    
+
     error = check_semantics(node->right, st);
     return error;
 }

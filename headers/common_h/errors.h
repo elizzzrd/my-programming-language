@@ -47,11 +47,12 @@ extern int graph_dump_diff;
 const char * tree_error_string(ErrorCode error); 
 
 ErrorCode tree_graph_dump(Tree_t * tree, const char * filename_dot, const char * filename_png, const char * file_called, int line_called);
-ErrorCode graph_dump_node(const Node_t * node, const char * filename_dot, const char * filename_png, const char * file_called, int line_called);
 ErrorCode tree_graph_middleend(Tree_t * original_tree, const char * filename_dot, const char * filename_png, const char * file_called, int line_called);
 void tree_graph_dump_nodes(FILE * dot_fp, const Node_t * node, const char * suffix);
 void tree_graph_dump_edges(FILE * dot_fp, const Node_t * node, const char * suffix);
 
-
 void define_node_type_for_dump(type_t type, const char ** fillcolor, const char ** value_str, const Node_t * node);
+
 void make_html(void);
+void fprintf_escaped_symbols(FILE *fp, const char *str);
+const char * get_node_fillcolor(const Node_t * node);

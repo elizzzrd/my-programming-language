@@ -42,6 +42,7 @@ const char * token_type_strings[] =
     "TOK_PRINT",
     "TOK_WHILE",
     "TOK_IF",
+    "TOK_ELSE",
     "TOK_READ",
     "TOK_DEF",
     "TOK_ID_DEF",
@@ -263,6 +264,7 @@ token_t keyword(const char * word)
 {
     if (strcmp(word, "while")  == 0)     return TOK_WHILE;
     if (strcmp(word, "if")     == 0)     return TOK_IF;
+    if (strcmp(word, "else")   == 0)     return TOK_ELSE;
     if (strcmp(word, "print")  == 0)     return TOK_PRINT;
     if (strcmp(word, "out")    == 0)     return TOK_OUT;
     if (strcmp(word, "read")   == 0)     return TOK_READ;

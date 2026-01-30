@@ -17,7 +17,8 @@ const char * type_strings[] =
     "IDENTIFIER",
     "NUMBER",
     "STATEMENT",
-    "STRING"
+    "STRING",
+    "INVALID"
 };
 
 
@@ -77,12 +78,15 @@ const char * statement_strings[] =
     "print",        // PRINT
     "assignment",   // ASSIGNMENT
     "if",           // IF
+    "else",         // ELSE
     "while",        // WHILE
     "block",        // BLOCK
+
     "func_def",     // OP_FUNC_DEF
     "func_call",    // OP_CALL
     "return",       // OP_RETURN 
     "var_def",      // OP_VAR_DEF
+
     "params",       // OP_PARAMS
     "args",         // OP_ARGS
 };
@@ -90,7 +94,7 @@ const char * statement_strings[] =
 
 const char * get_statement_name(statement_t op)
 {
-    if (op >= OP_PROGRAM && op <= OP_VAR_DEF)
+    if (op >= OP_PROGRAM && op <= OP_ARGS)
     return statement_strings[op];
     else
     return "Unknown statement";
@@ -134,19 +138,65 @@ token_res check_for_statement(const char * token)
     assert(token);
 
     token_res res = {.type = ROOT};
-    if      (strcmp(token, "program")    == 0)   { res.type = STATEMENT; res.value.stmt = OP_PROGRAM; }
-    else if (strcmp(token, "print")      == 0)   { res.type = STATEMENT; res.value.stmt = OP_PRINT; }
-    else if (strcmp(token, "assignment") == 0)   { res.type = STATEMENT; res.value.stmt = OP_ASSIGNMENT; }
-    else if (strcmp(token, "if")         == 0)   { res.type = STATEMENT; res.value.stmt = OP_IF; }
-    else if (strcmp(token, "while")      == 0)   { res.type = STATEMENT; res.value.stmt = OP_WHILE; }
-    else if (strcmp(token, "block")      == 0)   { res.type = STATEMENT; res.value.stmt = OP_BLOCK; }
-    else if (strcmp(token, "op_end")        == 0)   { res.type = STATEMENT; res.value.stmt = OP_END; }
-    else if (strcmp(token, "func_def")   == 0)   { res.type = STATEMENT; res.value.stmt = OP_FUNC_DEF; }
-    else if (strcmp(token, "func_call")  == 0)   { res.type = STATEMENT; res.value.stmt = OP_CALL; }
-    else if (strcmp(token, "return")     == 0)   { res.type = STATEMENT; res.value.stmt = OP_RETURN; }
-    else if (strcmp(token, "var_def")    == 0)   { res.type = STATEMENT; res.value.stmt = OP_VAR_DEF; }
-    else if (strcmp(token, "params")     == 0)   { res.type = STATEMENT; res.value.stmt = OP_PARAMS; }
-    else if (strcmp(token, "args")       == 0)   { res.type = STATEMENT; res.value.stmt = OP_ARGS; }
+    if      (strcmp(token, "program")           == 0)   { res.type = STATEMENT; res.value.stmt = OP_PROGRAM; }
+    else if (strcmp(token, "print")             == 0)   { res.type = STATEMENT; res.value.stmt = OP_PRINT; }
+    else if (strcmp(token, "assignment")        == 0)   { res.type = STATEMENT; res.value.stmt = OP_ASSIGNMENT; }
+    else if (strcmp(token, "if")                == 0)   { res.type = STATEMENT; res.value.stmt = OP_IF; }
+    else if (strcmp(token, "else")              == 0)   { res.type = STATEMENT; res.value.stmt = OP_ELSE; }
+    else if (strcmp(token, "while")             == 0)   { res.type = STATEMENT; res.value.stmt = OP_WHILE; }
+    else if (strcmp(token, "block")             == 0)   { res.type = STATEMENT; res.value.stmt = OP_BLOCK; }
+    else if (strcmp(token, "op_end")            == 0)   { res.type = STATEMENT; res.value.stmt = OP_END; }
+    else if (strcmp(token, "return")            == 0)   { res.type = STATEMENT; res.value.stmt = OP_RETURN; }
+    else if (strcmp(token, "var_def")           == 0)   { res.type = STATEMENT; res.value.stmt = OP_VAR_DEF; }
+    else if (strcmp(token, "params")            == 0)   { res.type = STATEMENT; res.value.stmt = OP_PARAMS; }
+    else if (strcmp(token, "args")              == 0)   { res.type = STATEMENT; res.value.stmt = OP_ARGS; }
+    else if (strcmp(token, "op_statement")      == 0)   { res.type = STATEMENT; res.value.stmt = OP_STATEMENT; }
+    else if (strncmp(token, "func_call##", 11)  == 0)   
+    { 
+        token_res res = {.type = ROOT};
+
+        const char * delimiter = "##";
+        const char * pos = strstr(token, delimiter);
+        if (pos == NULL)
+            return res;
+        
+        int name_len = strlen(token) - 2 - strlen("func_call");
+        char * name_buffer = (char *) calloc(name_len + 1, 1);
+        if (!name_buffer)
+            return res;
+    
+        strncpy(name_buffer, pos + 2, name_len);
+        name_buffer[name_len] = '\0';
+
+        res.id.name = name_buffer;
+        res.type = STATEMENT; 
+        res.value.stmt = OP_CALL; 
+
+        return res;
+    }
+    else if (strncmp(token, "func_def##", 10)   == 0)   
+    { 
+        token_res res = {.type = ROOT};
+
+        const char * delimiter = "##";
+        const char * pos = strstr(token, delimiter);
+        if (pos == NULL)
+            return res;
+        
+        int name_len = strlen(token) - 2 - strlen("func_def");
+        char * name_buffer = (char *) calloc(name_len + 1, 1);
+        if (!name_buffer)
+            return res;
+    
+        strncpy(name_buffer, pos + 2, name_len);
+        name_buffer[name_len] = '\0';
+
+        res.type = STATEMENT; 
+        res.value.stmt = OP_FUNC_DEF; 
+        res.id.name = name_buffer;
+
+        return res;
+    }
 
 
     return res;
@@ -223,8 +273,9 @@ const char* get_string_operator(operator_t op)
 
 bool is_binary_operator(operator_t op) 
 {
-    return (op >= OP_ADD && op <= OP_POW);
+    return ((op >= OP_ADD && op <= OP_POW) || (op >= OP_EQUAL && op <= OP_ABOVE_EQUAL));
 }
+
 
 bool is_unary_operator(operator_t op) 
 {

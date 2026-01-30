@@ -275,13 +275,14 @@ Spu_Err run_spu(spu_t * spu)
             }
             case IN:
             {
-                printf("Enter number: ");
+                printf("\nEnter number: ");
                 double n = 0;
                 while (scanf("%lg", &n) != 1)
                 {
                     printf("Invalid number. Please try again\n");
                     continue;
                 }
+                printf("\n");
                 stack_errors |= stack_push(&(spu -> stack), n);                                             IF_THERE_IS_STACK_ERROR(stack_errors, "Error during spu running: PUSH");
                 break;
             }

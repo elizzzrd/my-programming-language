@@ -314,7 +314,7 @@ Spu_Err first_pass(const char * txt_filename)
         //printf("assembler 181: option: %s - cmd: %d \n", option, cmd);
         if (cmd == -1) 
         {
-            DEBUG_PRINT("[ERROR] Unknown command in text file\n");
+            DEBUG_PRINT("[ERROR] Unknown command in text file, option -- %s\n", option);
             errors |= SPU_UNKNOWN_COMMAND;
         }
 

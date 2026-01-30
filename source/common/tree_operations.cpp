@@ -150,6 +150,9 @@ void destroy_node(Node_t * node)
         free((void *)node->value.string_value);
     if (node->type == IDENTIFIER && node->id.name)
         free((void *)node->id.name);
+    if (node->type == STATEMENT && (node->value.stmt == OP_FUNC_DEF || node->value.stmt == OP_CALL))
+        free(node->id.name);
+    
 
     DEBUG_PRINT("Destroying node %p, type=%s", (void*)node, get_string_type(node->type));
     free(node);

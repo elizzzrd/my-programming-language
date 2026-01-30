@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "errors.h"
 #include "tree_structure.h"
@@ -28,18 +29,21 @@ ErrorCode translate_to_asm(Tree_t * tree, const char * filename)
         ERROR_MESSAGE(OPENING_FILE_ERROR, error);
         return error;
     }
-    
+
     DEBUG_PRINT("[INFO] TRANSLATION START\n");
     if (tree->root)
     {
-        error = translate_node(tree->root, file_ptr);
-        if (error != SUCCESS)
-        {
-            ERROR_MESSAGE(TRANSLATING_TO_ASM_ERROR, error);
-            fclose(file_ptr);
-            return error;
-        }
+        fprintf(file_ptr, "jmp MAIN\n\n");
+
+        error = translate_functions(tree->root, file_ptr);
+        IF_THERE_IS_TRANSLATE_ERROR(error);
+
+        fprintf(file_ptr, "\nMAIN:\n");
+        error = translate_main(tree->root, file_ptr);
+        IF_THERE_IS_TRANSLATE_ERROR(error);
+
         fprintf(file_ptr, "hlt\n");
+
         fclose(file_ptr);
         DEBUG_PRINT("[DEBUG] TRANSLATION COMPLETED");
         return SUCCESS;
@@ -51,6 +55,71 @@ ErrorCode translate_to_asm(Tree_t * tree, const char * filename)
         return TRANSLATING_TO_ASM_ERROR;
     }
 }
+
+ErrorCode translate_functions(Node_t * node, FILE * file_ptr)
+{
+    assert(file_ptr);
+    if (!node)
+        return SUCCESS;
+
+    ErrorCode error = SUCCESS;
+
+    if (node->type == STATEMENT && node->value.stmt == OP_FUNC_DEF)
+    {
+        error = translate_statement(node, file_ptr);
+        IF_THERE_IS_TRANSLATE_ERROR(error);
+        return SUCCESS;
+    }
+
+    error = translate_functions(node->left, file_ptr);
+    IF_THERE_IS_TRANSLATE_ERROR(error);
+
+    error = translate_functions(node->right, file_ptr);
+    IF_THERE_IS_TRANSLATE_ERROR(error);
+
+    return SUCCESS;
+}
+
+ErrorCode translate_main(Node_t * node, FILE * file_ptr)
+{
+    assert(file_ptr);
+    if (!node)
+        return SUCCESS;
+
+    ErrorCode error = SUCCESS;
+
+    if (node->type == ROOT)
+    {
+        error = translate_main(node->left, file_ptr);
+        IF_THERE_IS_TRANSLATE_ERROR(error);
+
+        error = translate_main(node->right, file_ptr);
+        IF_THERE_IS_TRANSLATE_ERROR(error);
+
+        return SUCCESS;
+    }
+
+    if (node->type == STATEMENT && node->value.stmt == OP_FUNC_DEF)
+        return SUCCESS;
+    
+    if (node->type == STATEMENT && (node->value.stmt == OP_END ||
+                                    node->value.stmt == OP_STATEMENT))
+    {
+        error = translate_main(node->left, file_ptr);
+        IF_THERE_IS_TRANSLATE_ERROR(error);
+
+        error = translate_main(node->right, file_ptr);
+        IF_THERE_IS_TRANSLATE_ERROR(error);
+
+        return SUCCESS;
+    }
+
+    error = translate_node(node, file_ptr);
+    IF_THERE_IS_TRANSLATE_ERROR(error);
+
+    return SUCCESS;
+}
+
 
 ErrorCode translate_node(Node_t * node, FILE * file_ptr)
 {
@@ -147,12 +216,12 @@ ErrorCode translate_operator(Node_t * node, FILE * file_ptr)
             case OP_DIV:            fprintf(file_ptr, "div\n"); break;
             case OP_POW:            emit_op_pow(file_ptr); break;
 
-            case OP_EQUAL:          emit_cmp(file_ptr, "je\n"); break;
-            case OP_NON_EQUAL:      emit_cmp(file_ptr, "jne\n"); break;
-            case OP_BELOW:          emit_cmp(file_ptr, "jb\n"); break;
-            case OP_BELOW_EQUAL:    emit_cmp(file_ptr, "jbe\n"); break;
-            case OP_ABOVE:          emit_cmp(file_ptr, "ja\n"); break;
-            case OP_ABOVE_EQUAL:    emit_cmp(file_ptr, "jae\n"); break;
+            case OP_EQUAL:          emit_cmp(file_ptr, "je"); break;
+            case OP_NON_EQUAL:      emit_cmp(file_ptr, "jne"); break;
+            case OP_BELOW:          emit_cmp(file_ptr, "jb"); break;
+            case OP_BELOW_EQUAL:    emit_cmp(file_ptr, "jbe"); break;
+            case OP_ABOVE:          emit_cmp(file_ptr, "ja"); break;
+            case OP_ABOVE_EQUAL:    emit_cmp(file_ptr, "jae"); break;
 
             default:
             {
@@ -176,20 +245,21 @@ ErrorCode translate_operator(Node_t * node, FILE * file_ptr)
         case OP_READ:
         {
             fprintf(file_ptr, "in\n");
+            if (node->left && node->left->type == IDENTIFIER)
+            {
+                int addr = node->left->id.id_index;
+                fprintf(file_ptr, "popm [%d]\n", addr);
+            }
             break;
         }
             case OP_UNARY_MINUS:
             {
                 fprintf(file_ptr, "popr rax\n");
-                // Создаем -1
                 fprintf(file_ptr, "push 0\n");
                 fprintf(file_ptr, "push 1\n");
-                fprintf(file_ptr, "sub\n");  // 0 - 1 = -1
+                fprintf(file_ptr, "sub\n"); 
                 
-                // Кладем операнд обратно
                 fprintf(file_ptr, "pushr rax\n");
-                
-                // Умножаем: операнд * -1
                 fprintf(file_ptr, "mul\n");
                 break;
             }
@@ -297,14 +367,33 @@ ErrorCode translate_statement(Node_t * node, FILE * file_ptr)
             static int label_id = 0;
             int cur = label_id++;
 
-            error = translate_node(node->left, file_ptr); // условие
+            Node_t * condition = node->left;
+            Node_t * stmt = node->right;
+
+            Node_t * if_body = stmt->left;
+            Node_t * else_body = stmt->right; 
+
+            error = translate_node(condition, file_ptr); // condition
             IF_THERE_IS_TRANSLATE_ERROR(error);
 
             fprintf(file_ptr, "push 0\n");
-            fprintf(file_ptr, "je ENDIF_%d\n", cur);
 
-            error = translate_node(node->right, file_ptr); // тело
+            if (else_body)
+                fprintf(file_ptr, "je ELSE_%d\n", cur);     
+            else
+                fprintf(file_ptr, "je ENDIF_%d\n", cur);    
+
+            error = translate_node(if_body, file_ptr); // if_body
             IF_THERE_IS_TRANSLATE_ERROR(error);
+
+            if (else_body)
+            {
+                fprintf(file_ptr, "jmp ENDIF_%d\n", cur);
+                fprintf(file_ptr, "ELSE_%d:\n", cur);
+
+                error = translate_node(else_body, file_ptr);
+                IF_THERE_IS_TRANSLATE_ERROR(error);
+            }
 
             fprintf(file_ptr, "ENDIF_%d:\n", cur);
             break;
@@ -314,7 +403,7 @@ ErrorCode translate_statement(Node_t * node, FILE * file_ptr)
             static int label_id = 0;
             int cur = label_id++;
 
-            fprintf(file_ptr, "WHILE_%d\n", cur);
+            fprintf(file_ptr, "WHILE_%d:\n", cur);
 
             error = translate_node(node->left, file_ptr);
             IF_THERE_IS_TRANSLATE_ERROR(error);
@@ -331,24 +420,34 @@ ErrorCode translate_statement(Node_t * node, FILE * file_ptr)
         }
         case OP_BLOCK:
         {
-            error = translate_node(node->right, file_ptr);
-            IF_THERE_IS_TRANSLATE_ERROR(error);
+            if (node->left)
+            {
+                error = translate_node(node->left, file_ptr);
+                IF_THERE_IS_TRANSLATE_ERROR(error);
+            }
+            if (node->right)
+            {
+                error = translate_node(node->right, file_ptr);
+                IF_THERE_IS_TRANSLATE_ERROR(error);
+            }
             break;
         }
         case OP_FUNC_DEF:
         {
             fprintf(file_ptr, "%s:\n", node->id.name);
+
             Node_t * params = node -> left;
             int param_count = 0;
             Node_t * param_list[16];
 
             if (params && params->type == STATEMENT && params->value.stmt == OP_PARAMS)
             {
-                Node_t * param = params->right;
+                Node_t * param = params->left;
                 while (param && param_count < 16)
                 {
-                    if (param->type == IDENTIFIER)      param_list[param_count++] = param;
-                    param = param -> right;
+                    if (param->type == IDENTIFIER)      
+                        param_list[param_count++] = param;
+                    param = param -> left;
                 }
             }
 
@@ -377,19 +476,18 @@ ErrorCode translate_statement(Node_t * node, FILE * file_ptr)
         }
         case OP_CALL:
         {
-            Node_t * args = node->right;
+            Node_t * args = node->left;
             int arg_count = 0;
             Node_t * arg_list[16];
 
             if (args && args->type == STATEMENT && args->value.stmt == OP_ARGS)
             {
-                Node_t * arg = args->right;
+                Node_t * arg = args -> left;
                 while (arg && arg_count < 16)
                 {
                     arg_list[arg_count++] = arg;
-                    arg = arg->right;
+                    arg = arg->left;
                 }
-
             }
             // evalute args for pushing in stack
             for (int i = 0; i < arg_count; i++)
@@ -403,7 +501,7 @@ ErrorCode translate_statement(Node_t * node, FILE * file_ptr)
         }
         case OP_RETURN:
         {
-            Node_t * expr = node -> right;
+            Node_t * expr = node -> left;
             if (expr)
             {
                 error = translate_node(expr, file_ptr);

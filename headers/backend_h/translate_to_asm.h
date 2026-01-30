@@ -41,3 +41,6 @@ ErrorCode translate_string(Node_t * node, FILE * file_ptr);
 void emit_op_pow(FILE * file_ptr);
 int emit_strings(FILE * file_ptr, const char * s);
 void emit_cmp(FILE * file_ptr, const char * jmp);
+
+ErrorCode translate_functions(Node_t * node, FILE * file_ptr);
+ErrorCode translate_main(Node_t * node, FILE * file_ptr);

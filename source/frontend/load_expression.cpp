@@ -37,7 +37,10 @@ void savenode(Node_t *node, FILE *f)
             break;
 
         case STATEMENT:
-            fprintf(f, "%s", get_statement_name(node->value.stmt));
+            if (node->value.stmt == OP_FUNC_DEF || node->value.stmt == OP_CALL)
+                fprintf(f, "%s##%s", get_statement_name(node->value.stmt), node->id.name);
+            else
+                fprintf(f, "%s", get_statement_name(node->value.stmt));
             break;
 
         case STRING:
@@ -135,7 +138,6 @@ Node_t * read_node(char * buffer, size_t * pos, Tree_t * tree)
         while (isspace(buffer[*pos])) (*pos)++;                     // пропускаем пробелы после '('
                                         
         token_res token = define_token_type(buffer, pos);
-        //DEBUG_PRINT("[DEBUG] %s", get_string_type(token.type));
         if (token.type == ROOT)
         {
             ERROR_MESSAGE(LOADING_EXPRESSION_ERROR, error);
@@ -188,6 +190,11 @@ Node_t * read_node(char * buffer, size_t * pos, Tree_t * tree)
                     ERROR_MESSAGE(TREE_CREATING_NODE_ERROR, error);
                     return NULL;
                 }
+                if (token.value.stmt == OP_FUNC_DEF || token.value.stmt == OP_CALL)
+                {
+                    current.node->id.name = strdup(token.id.name);
+                    free(token.id.name);
+                }
                 break;
             }
             case STRING:
@@ -231,6 +238,8 @@ Node_t * read_node(char * buffer, size_t * pos, Tree_t * tree)
             current.node->left = read_node(buffer, pos, tree);
             current.node->right = read_node(buffer, pos, tree);
         }
+
+
         
         while (isspace(buffer[*pos]))                             // пробелы перед закрывающей скобкой
             (*pos)++;
@@ -262,7 +271,7 @@ char * get_token(const char * buffer, size_t * pos)
     token[len] = '\0';
 
     return token;
-} 
+}
 
 
 

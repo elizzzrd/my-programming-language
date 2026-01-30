@@ -85,6 +85,10 @@ void tree_graph_dump_nodes(FILE * dot_fp, const Node_t * node, const char * suff
         fprintf(dot_fp, 
         "    node_%p%s [fillcolor = \"%s\", label=\"{ <t> %s | <i> %s | <n> %d}\"];\n", 
         (const void*)node, suffix, fillcolor, type_str,  node->id.name, node->id.id_index);
+    else if (type == OPERATOR && (node->value.op >= OP_BELOW || node->value.op >= OP_ABOVE_EQUAL))
+        fprintf(dot_fp, 
+        "    node_%p%s [fillcolor = \"%s\", label=\"{ <t> %s | <v> \\%s}\"];\n", 
+        (const void*)node, suffix, fillcolor, type_str, value_str);
     else
         fprintf(dot_fp, 
         "    node_%p%s [fillcolor = \"%s\", label=\"{ <t> %s | <v> %s}\"];\n", 
@@ -106,12 +110,12 @@ void tree_graph_dump_edges(FILE * dot_fp, const Node_t * node, const char * suff
 
     if (node->left)
         fprintf(dot_fp, 
-        "    node_%p%s -> node_%p%s [color=\"#0e0246ff\", penwidth=1];\n",
+        "    node_%p%s -> node_%p%s [color=\"#da1616\", penwidth=1];\n",
     (const void*)node, suffix, (const void*)node->left, suffix);
 
     if (node->right)
         fprintf(dot_fp, 
-        "    node_%p%s -> node_%p%s [color=\"#0e0246ff\", penwidth=1];\n",
+        "    node_%p%s -> node_%p%s [color=\"#6110d3\", penwidth=1];\n",
     (const void*)node, suffix, (const void*)node->right, suffix);
 
     tree_graph_dump_edges(dot_fp, node->left, suffix);
@@ -282,6 +286,12 @@ void define_node_type_for_dump(type_t type, const char ** fillcolor, const char 
         case STATEMENT:
         {
             *fillcolor = "#d29bdaff";
+            if ((node->value.stmt == OP_FUNC_DEF || node->value.stmt == OP_CALL) && node->id.name)
+            {
+                *value_str = get_statement_name(node->value.stmt); 
+                break;
+            }
+
             if (node->id.name)
                 *value_str = node->id.name;
             else
@@ -306,148 +316,3 @@ void define_node_type_for_dump(type_t type, const char ** fillcolor, const char 
 }
 
 
-
-ErrorCode graph_dump_node(const Node_t * node, const char * filename_dot, const char * filename_png, const char * file_called, int line_called)
-{
-    assert(node && filename_dot && filename_png);
-
-    ErrorCode error = SUCCESS;
-    FILE * dot_fp = fopen(filename_dot, "w");
-    if (!dot_fp)
-    {
-        ERROR_MESSAGE(OPENING_FILE_ERROR, error);
-        return error;
-    }
-
-    fprintf(dot_fp, "// Graphiz was called from %s:%d\n", file_called, line_called);
-    fprintf(dot_fp,
-        "digraph NodeGraph {\n"
-        "    rankdir=TB"
-        "    bgcolor=\"#ffffff\";\n"
-        "    fontname=\"Consolas\";\n"
-        "    nodesep=0.6;\n"
-        "    node [shape=record, style=filled, fontname=\"Consolas\", margin=0.1, width=1.3, height=0.8];\n"
-        "    edge [fontname=\"Consolas\", arrowsize=0.8];\n\n");
-    fprintf(dot_fp, "\n");
-
-    type_t type = node->type;
-    const char * fillcolor = NULL;
-    const char * value_str = NULL;
-    const char * type_str = get_string_type(type);
-
-    define_node_type_for_dump(type, &fillcolor, &value_str, node);
-
-    if (type == ROOT)
-        fprintf(dot_fp, 
-        "    node_%p [fillcolor = \"%s\", label=\"{ <t> %s | <v> %s}}\"];\n", 
-        (const void*)node, fillcolor, type_str, value_str);
-    else if (node->left == NULL && node->right == NULL)
-        fprintf(dot_fp, 
-        "    node_%p [fillcolor = \"%s\", label=\"{ <t> %s | <v> %s | { <l> %s | <r> %s}}\"];\n", 
-        (const void*)node, fillcolor, type_str, value_str, "0", "0");
-    else
-        fprintf(dot_fp, 
-        "    node_%p [fillcolor = \"%s\", label=\"{ <t> %s | <v> %s}\"];\n", 
-        (const void*)node, fillcolor, type_str, value_str);
-    
-    fprintf(dot_fp, "}\n");
-    fclose(dot_fp);
-
-    char cmd[512];
-    snprintf(cmd, sizeof(cmd), "dot -Tpng \"%s\" -o \"%s\"", filename_dot, filename_png);
-    int ret = system(cmd);
-    if (ret != 0) 
-    {
-        ERROR_MESSAGE(GRAPH_DUMP_ERROR, error);
-        return error;
-    }
-
-
-    return error;
-}
-
-
-void make_html()
-{
-    FILE *html_fp = fopen(HTML_FILE, "w");
-    if (!html_fp)
-    {
-        fprintf(stderr, "Cannot open file %s\n", HTML_FILE);
-        return;
-    }
-
-    fprintf(html_fp,
-        "<!DOCTYPE html>\n"
-        "<html lang=\"en\">\n"
-        "<head>\n"
-        "\t<meta charset=\"UTF-8\">\n"
-        "\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n"
-        "\t<title>Struct of data: trees</title>\n"
-        "\t<style>\n"
-        "\tbody {\n"
-        "\t\tfont-family: Consolas, monospace;\n"
-        "\t\tbackground-color: #f4f4f8;\n"
-        "\t\tmargin: 0;\n"
-        "\t\tpadding: 20px;\n"
-        "\t\tcolor: #333;\n"
-        "\t}\n"
-        "\th1 {\n"
-        "\t\ttext-align: center;\n"
-        "\t\tcolor: #222;\n"
-        "\t\tmargin-bottom: 30px;\n"
-        "\t}\n"
-        "\t.container {\n"
-		"\tdisplay: flex;\n"
-		"flex-direction: column;\n" 
-		"align-items: center;\n"    
-		"gap: 20px;\n"  
-        "\t}\n"
-        "\t.card {\n"
-        "\t\tbackground: #fff;\n"
-        "\t\tborder-radius: 10px;\n"
-        "\t\tbox-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);\n"
-        "\t\tpadding: 15px;\n"
-        "\t\twidth: 100%%;\n"
-        "\t\tmax-width: 600px;\n"
-        "\t\ttext-align: center;\n"
-        "\t\ttransition: transform 0.2s ease-in-out;\n"
-        "\t}\n"
-        "\t.card:hover { transform: scale(1.02); }\n"
-        "\timg {\n"
-        "\t\twidth: 100%%;\n"
-		"\t\theight: auto;\n"
-		"\t\tmax-height: 600px;\n"
-        "\t\tobject-fit: contain;\n"
-        "\t\tbackground-color: #fafafa;\n"
-        "\t\tborder: 1px solid #ddd;\n"
-        "\t\tborder-radius: 6px;\n"
-        "\t}\n"
-        "\tp {\n"
-        "\t\tfont-size: 14px;\n"
-        "\t\tcolor: #555;\n"
-        "\t\tmargin: 10px 0;\n"
-        "\t}\n"
-        "\t</style>\n"
-        "</head>\n"
-        "<body>\n"
-        "\t<h1>Debug page</h1>\n"
-        "\t<div class=\"container\">\n");
-
-    extern int graph_dump_count;        
-    for (int i = 1; i <= graph_dump_count; i++)
-    {
-        fprintf(html_fp,
-            "\t\t<div class=\"card\">\n"
-            "\t\t\t<p>Dump call: %d</p>\n"
-            "\t\t\t<img src=\"logger/graph%d.png\" alt=\"graph%d\">\n"
-            "\t\t</div>\n",
-            i, i, i);
-    }
-
-    fprintf(html_fp,
-        "\t</div>\n"
-        "</body>\n"
-        "</html>\n");
-
-    fclose(html_fp);
-}

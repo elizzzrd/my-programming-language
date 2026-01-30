@@ -3,6 +3,7 @@
 #include "tree_structure.h"
 #include "tree_operations.h"
 
+
 #ifdef DIFFERENTIATION_TREE_OPERATIONS
 
 static inline Node_t * CREATE_BINARY(Tree_t* tree, operator_t op, Node_t* L, Node_t* R) 

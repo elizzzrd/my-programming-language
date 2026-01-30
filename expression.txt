@@ -1,0 +1,43 @@
+def solve_square{A,B, D}
+{{
+    ID_def SQRT_D = Sqrt{D};
+    ID_def x1 = (u-B + SQRT_D) / (2*A);
+    print {"x1_is:"};
+    print { x1 };
+
+    ID_def x2 = (u-B - SQRT_D) / (2*A);
+    print {"x2_is:"};
+    print { x2 };
+}};
+
+def solve_notsquare{A,B,D}
+{{
+    if {D == 0}
+    {{
+        ID_def x0 = (u-B)/(2*A);
+        print {"x0_is:"};
+        print { x0 };
+    }}
+    else
+    {{
+        print {"no valid roots"};
+    }}
+}};
+
+
+
+ID_def a = 1;
+ID_def b = 12;
+ID_def c = 35;
+ID_def d =  b*b - 4*a*c ;
+
+if {d > 0}
+{{
+    solve_square{a,b,d};
+}}
+else
+{{
+    solve_notsquare{a,b,d};
+}};
+
+$

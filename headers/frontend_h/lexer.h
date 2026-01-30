@@ -37,6 +37,7 @@ typedef enum
     TOK_PRINT,
     TOK_WHILE,
     TOK_IF,
+    TOK_ELSE,
     TOK_READ,
     TOK_DEF,
     TOK_ID_DEF,

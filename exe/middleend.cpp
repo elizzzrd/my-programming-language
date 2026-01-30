@@ -33,6 +33,6 @@ int main(void)
 
 
     DEBUG_PRINT("[INFO] MIDDLEEND END\n");
-    fprintf(stderr, "[INFO] MIDDLEEND COMPLETED\n");
+    fprintf(stderr, "[INFO] MIDDLEEND COMPLETED\n\n");
     return 0;
 }

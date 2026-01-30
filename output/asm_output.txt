@@ -1,34 +1,26 @@
-push 1
-popm [0]
-push 12
-popm [1]
-push 35
-popm [2]
-pushm [1]
-pushm [1]
-mul
-push 4
-pushm [0]
-mul
-pushm [2]
-mul
-sub
+jmp MAIN
+
+solve_square:
+popm [10]
+popm [9]
+popm [8]
+pushm [10]
 sqrt
-popm [3]
-pushm [1]
+popm [0]
+pushm [9]
 popr rax
 push 0
 push 1
 sub
 pushr rax
 mul
-pushm [3]
+pushm [0]
 add
 push 2
-pushm [0]
+pushm [8]
 mul
 div
-popm [4]
+popm [1]
 push 120
 popm [256]
 push 49
@@ -45,22 +37,22 @@ push 0
 popm [262]
 push 256
 puts
-pushm [4]
-out
 pushm [1]
+out
+pushm [9]
 popr rax
 push 0
 push 1
 sub
 pushr rax
 mul
-pushm [3]
+pushm [0]
 sub
 push 2
-pushm [0]
+pushm [8]
 mul
 div
-popm [5]
+popm [2]
 push 120
 popm [263]
 push 50
@@ -77,6 +69,55 @@ push 0
 popm [269]
 push 263
 puts
-pushm [5]
+pushm [2]
 out
-hlt
+push 0
+ret
+solve_notsquare:
+popm [10]
+popm [9]
+popm [8]
+pushm [10]
+push 0
+sub
+push 0
+je TRUE_CONDITION_0
+push 0
+jmp END_CONDITION_0
+TRUE_CONDITION_0:
+push 1
+END_CONDITION_0:
+push 0
+je ELSE_0
+pushm [9]
+popr rax
+push 0
+push 1
+sub
+pushr rax
+mul
+push 2
+pushm [8]
+mul
+div
+popm [3]
+push 120
+popm [270]
+push 48
+popm [271]
+push 95
+popm [272]
+push 105
+popm [273]
+push 115
+popm [274]
+push 58
+popm [275]
+push 0
+popm [276]
+push 270
+puts
+pushm [3]
+out
+jmp ENDIF_0
+ELSE_0:
