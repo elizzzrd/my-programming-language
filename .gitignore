@@ -1,3 +1,4 @@
 /build
-/logger
+/logger/dots
 /tests
+.vscode/

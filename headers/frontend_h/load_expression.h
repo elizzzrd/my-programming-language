@@ -2,7 +2,7 @@
 #include <stdio.h>
 
 #include "tree_structure.h"
-#define EXPRESSION_INPUT "expression.txt"
+#define EXPRESSION_INPUT "input_program.txt"
 #define AST_OUTPUT_FRONTEND "output/ast_output_frontend.txt"
 #define AST_OUTPUT_MIDDLEEND "output/ast_output_middleend.txt"
 

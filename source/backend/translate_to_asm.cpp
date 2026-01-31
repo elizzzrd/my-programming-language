@@ -254,12 +254,7 @@ ErrorCode translate_operator(Node_t * node, FILE * file_ptr)
         }
             case OP_UNARY_MINUS:
             {
-                fprintf(file_ptr, "popr rax\n");
-                fprintf(file_ptr, "push 0\n");
-                fprintf(file_ptr, "push 1\n");
-                fprintf(file_ptr, "sub\n"); 
-                
-                fprintf(file_ptr, "pushr rax\n");
+                fprintf(file_ptr, "push -1\n");
                 fprintf(file_ptr, "mul\n");
                 break;
             }

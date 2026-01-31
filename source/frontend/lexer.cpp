@@ -57,19 +57,26 @@ const char * token_type_strings[] =
     "TOK_UNARY_MINUS"
 };
 
-const char * get_string_token_type(token_t type)
+token_t keyword(const char * word)
 {
-    if (type >= TOK_EOF && type <= TOK_UNARY_MINUS)
-        return token_type_strings[type];
-    else
-        return "Unknown type";
+    if (strcmp(word, "while")  == 0)     return TOK_WHILE;
+    if (strcmp(word, "if")     == 0)     return TOK_IF;
+    if (strcmp(word, "else")   == 0)     return TOK_ELSE;
+    if (strcmp(word, "print")  == 0)     return TOK_PRINT;
+    if (strcmp(word, "out")    == 0)     return TOK_OUT;
+    if (strcmp(word, "read")   == 0)     return TOK_READ;
+    if (strcmp(word, "def")    == 0)     return TOK_DEF;
+    if (strcmp(word, "ID_def") == 0)     return TOK_ID_DEF;
+    if (strcmp(word, "Sin")    == 0)     return TOK_SIN;
+    if (strcmp(word, "Cos")    == 0)     return TOK_COS;
+    if (strcmp(word, "Tg")     == 0)     return TOK_TG;
+    if (strcmp(word, "Ln")     == 0)     return TOK_LN;
+    if (strcmp(word, "Sqrt")   == 0)     return TOK_SQRT;
+    if (strcmp(word, "Exp")    == 0)     return TOK_EXP;
+
+    return TOK_IDENTIFIER;
 }
 
-static void skip_spaces(const char ** s)
-{
-    while (**s == ' ' || **s == '\t' || **s == '\n' || **s == '\r')
-        (*s)++;
-}
 
 ErrorCode lexicalAnalysis(TokenList * token_list)
 {
@@ -260,29 +267,6 @@ int token_list_push(TokenList * token_list, Token cur_token)
 }
 
 
-token_t keyword(const char * word)
-{
-    if (strcmp(word, "while")  == 0)     return TOK_WHILE;
-    if (strcmp(word, "if")     == 0)     return TOK_IF;
-    if (strcmp(word, "else")   == 0)     return TOK_ELSE;
-    if (strcmp(word, "print")  == 0)     return TOK_PRINT;
-    if (strcmp(word, "out")    == 0)     return TOK_OUT;
-    if (strcmp(word, "read")   == 0)     return TOK_READ;
-    if (strcmp(word, "def")    == 0)     return TOK_DEF;
-    if (strcmp(word, "ID_def") == 0)     return TOK_ID_DEF;
-    if (strcmp(word, "Sin")    == 0)     return TOK_SIN;
-    if (strcmp(word, "Cos")    == 0)     return TOK_COS;
-    if (strcmp(word, "Tg")     == 0)     return TOK_TG;
-    if (strcmp(word, "Ln")     == 0)     return TOK_LN;
-    if (strcmp(word, "Sqrt")   == 0)     return TOK_SQRT;
-    if (strcmp(word, "Exp")    == 0)     return TOK_EXP;
-
-    return TOK_IDENTIFIER;
-}
-
-
-
-
 Token make_token(token_t type, const char * start, size_t len) 
 {
     Token t = {};
@@ -320,6 +304,21 @@ void destroy_tokens(TokenList * token_list)
     
     free(token_list->data);
     token_list->data = NULL;
+}
+
+
+const char * get_string_token_type(token_t type)
+{
+    if (type >= TOK_EOF && type <= TOK_UNARY_MINUS)
+        return token_type_strings[type];
+    else
+        return "Unknown type";
+}
+
+void skip_spaces(const char ** s)
+{
+    while (**s == ' ' || **s == '\t' || **s == '\n' || **s == '\r')
+        (*s)++;
 }
 
 

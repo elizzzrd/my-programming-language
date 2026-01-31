@@ -179,103 +179,6 @@ ErrorCode collect_definitions(Node_t * node, SymbolTable * st)
     return error;
 }
 
-/*
-ErrorCode check_semantics(Node_t * node, SymbolTable * st)
-{
-    assert(st);
-
-    if (!node)
-        return SUCCESS;
-    ErrorCode error = SUCCESS;
-
-    if (node->type == STATEMENT && node->value.stmt == OP_FUNC_DEF)
-    {
-        size_t old_var_count = st[ST_VAR].count;
-
-        Node_t * params = node->left;
-        if (params)
-        {
-            Node_t * p = params->left;
-            while (p)
-            {
-                const char * name = p->id.name;
-
-                if (symbol_table_find(name, st, ST_VAR) >= 0)
-                {
-                    DEBUG_PRINT("[ERROR] parameter shadows variable %s", name);
-                    ERROR_MESSAGE(SEMANTIC_ERROR, error);
-                    return error;
-                }
-
-                int index = symbol_table_add(name, st, ST_VAR);
-                p->id.id_index = index;
-
-                p = p->left;
-            }
-        }
-
-        error = check_semantics(node->right, st);
-        if (error != SUCCESS)
-            return error;
-
-        for (size_t i = old_var_count; i < st[ST_VAR].count; ++i)
-        {
-            free(st[ST_VAR].names[i]);
-            st[ST_VAR].names[i] = NULL;
-        }
-
-        st[ST_VAR].count = old_var_count;
-
-        return SUCCESS;
-    }
-
-    if (node->type == STATEMENT && node->value.stmt == OP_READ)
-    {
-        if (!node->left || node->left->type != IDENTIFIER)
-        {
-            DEBUG_PRINT("[ERROR] read statement must have a variable");
-            ERROR_MESSAGE(SEMANTIC_ERROR, error);
-            return error;
-        }
-
-        const char * name = node->left->id.name;
-        int index = symbol_table_find(name, st, ST_VAR);
-
-        if (index < 0)
-        {
-            DEBUG_PRINT("[ERROR] read variable '%s' not declared", name);
-            ERROR_MESSAGE(SEMANTIC_ERROR, error);
-            return error;
-        }
-
-        node->left->id.id_index = index;
-    }
-
-
-    if (node->type == IDENTIFIER)
-    {
-        const char * name = node->id.name;
-
-        int index = symbol_table_find(name, st, ST_VAR);
-        if (index < 0)
-        {
-            DEBUG_PRINT("[ERROR] undefined variable %s", name);
-            ERROR_MESSAGE(SEMANTIC_ERROR, error);
-            return error;
-        }
-
-        node->id.id_index = index;
-    }
-
-
-    error = check_semantics(node->left, st);
-    if (error != SUCCESS)
-        return error;
-    
-    error = check_semantics(node->right, st);
-    return error;
-}
-*/
 
 ErrorCode check_semantics(Node_t * node, SymbolTable * st)
 {
@@ -284,12 +187,11 @@ ErrorCode check_semantics(Node_t * node, SymbolTable * st)
 
     ErrorCode error = SUCCESS;
 
-    // --- Функция ---
     if (node->type == STATEMENT && node->value.stmt == OP_FUNC_DEF)
     {
         size_t old_var_count = st[ST_VAR].count;
 
-        // добавляем параметры функции в таблицу локальных переменных
+        // local variables
         Node_t * params = node->left;
         if (params)
         {
@@ -311,13 +213,12 @@ ErrorCode check_semantics(Node_t * node, SymbolTable * st)
                 p = p->right;
             }
         }
-
-        // проверяем тело функции
+        // function body
         error = check_semantics(node->right, st);
         if (error != SUCCESS)
             return error;
 
-        // очищаем локальные параметры после проверки
+        // kill local variables
         for (size_t i = old_var_count; i < st[ST_VAR].count; ++i)
         {
             free(st[ST_VAR].names[i]);
@@ -328,7 +229,7 @@ ErrorCode check_semantics(Node_t * node, SymbolTable * st)
         return SUCCESS;
     }
 
-    // --- Вызов функции (может быть в выражении) ---
+
     if (node->type == STATEMENT && node->value.stmt == OP_CALL)
     {
         const char * name = node->id.name;
@@ -341,7 +242,6 @@ ErrorCode check_semantics(Node_t * node, SymbolTable * st)
         }
         node->id.id_index = index;
 
-        // проверяем аргументы функции
         if (node->left)
         {
             error = check_semantics(node->left, st);
@@ -350,7 +250,7 @@ ErrorCode check_semantics(Node_t * node, SymbolTable * st)
         }
     }
 
-    // --- Выражение в out(...) ---
+
     if (node->type == STATEMENT && node->value.stmt == OP_RETURN)
     {
         if (node->left)
@@ -361,7 +261,7 @@ ErrorCode check_semantics(Node_t * node, SymbolTable * st)
         }
     }
 
-    // --- read (только если это чистый read) ---
+
     if (node->type == OPERATOR && node->value.op == OP_READ)
     {
         if (!node->left || node->left->type != IDENTIFIER)
@@ -382,7 +282,7 @@ ErrorCode check_semantics(Node_t * node, SymbolTable * st)
         node->left->id.id_index = index;
     }
 
-    // --- Идентификатор ---
+    
     if (node->type == IDENTIFIER)
     {
         const char * name = node->id.name;
@@ -396,7 +296,7 @@ ErrorCode check_semantics(Node_t * node, SymbolTable * st)
         node->id.id_index = index;
     }
 
-    // --- Рекурсивно проверяем левое и правое поддерево ---
+
     error = check_semantics(node->left, st);
     if (error != SUCCESS)
         return error;

@@ -4,7 +4,6 @@
 #include "errors.h"
 
 
-
 typedef enum
 {
     TOK_EOF,
@@ -92,4 +91,4 @@ Token make_token(token_t type, const char * start, size_t len);
 Token make_token_number(const char * start, size_t len);
 void lexer_dump(const TokenList * token_list);
 const char * get_string_token_type(token_t type);
-
+void skip_spaces(const char ** s);

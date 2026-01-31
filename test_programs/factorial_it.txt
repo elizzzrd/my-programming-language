@@ -1,0 +1,13 @@
+ID_def n = 0;
+read{n};
+
+ID_def res = 1;
+
+while {n != 1}
+{{
+    res = res * n;
+    n = n - 1;
+}};
+
+print {res};
+$

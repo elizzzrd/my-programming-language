@@ -12,77 +12,6 @@
 #include "errors.h"
 
 
-void savenode(Node_t *node, FILE *f)
-{
-    if (!node)
-    {
-        fprintf(f, "nil");
-        return;
-    }
-
-    fprintf(f, "(");
-
-    switch (node->type)
-    {
-        case NUMBER:
-            fprintf(f, "%g", node->value.number);
-            break;
-
-        case IDENTIFIER:
-            fprintf(f, "%s##%d", node->id.name, node->id.id_index);
-            break;
-
-        case OPERATOR:
-            fprintf(f, "%s", get_string_operator(node->value.op));
-            break;
-
-        case STATEMENT:
-            if (node->value.stmt == OP_FUNC_DEF || node->value.stmt == OP_CALL)
-                fprintf(f, "%s##%s", get_statement_name(node->value.stmt), node->id.name);
-            else
-                fprintf(f, "%s", get_statement_name(node->value.stmt));
-            break;
-
-        case STRING:
-            fprintf(f, "\"%s\"", node->value.string_value);
-            break;
-
-        default:
-            fprintf(f, "UNKNOWN");
-    }
-
-    if (!node -> left && !node -> right)
-        fprintf(f, " nil nil");
-
-    if (node -> left)
-        savenode(node->left, f);
-    if (node -> right)
-        savenode(node->right, f);
-
-    fprintf(f, ")");
-}
-
-
-
-ErrorCode save_tree(Tree_t * tree, const char * filename)
-{
-    assert(tree && filename);
-    ErrorCode error = SUCCESS;
-
-    FILE * file_ptr = fopen(filename, "w");
-    if (!file_ptr)
-    {
-        ERROR_MESSAGE(OPENING_FILE_ERROR, error);
-        return error;
-    }
-
-    savenode(tree->root->right, file_ptr);
-
-    fclose(file_ptr);
-    DEBUG_PRINT("[INFO] TREE SAVED IN %s", filename);
-    return error;
-}
-
 
 ErrorCode build_middleend_tree(Tree_t * tree, const char * expression_input)
 {
@@ -134,8 +63,8 @@ Node_t * read_node(char * buffer, size_t * pos, Tree_t * tree)
     if (buffer[*pos] == '(') 
     {
         (*pos)++;     
-                                                                    // пропускаем '('
-        while (isspace(buffer[*pos])) (*pos)++;                     // пропускаем пробелы после '('
+                                                                    
+        while (isspace(buffer[*pos])) (*pos)++;                     
                                         
         token_res token = define_token_type(buffer, pos);
         if (token.type == ROOT)
@@ -239,9 +168,7 @@ Node_t * read_node(char * buffer, size_t * pos, Tree_t * tree)
             current.node->right = read_node(buffer, pos, tree);
         }
 
-
-        
-        while (isspace(buffer[*pos]))                             // пробелы перед закрывающей скобкой
+        while (isspace(buffer[*pos]))                             
             (*pos)++;
         
         if (buffer[*pos] == ')') 
@@ -255,6 +182,78 @@ Node_t * read_node(char * buffer, size_t * pos, Tree_t * tree)
         return NULL;
     }
     return NULL;
+}
+
+
+void savenode(Node_t *node, FILE *f)
+{
+    if (!node)
+    {
+        fprintf(f, "nil");
+        return;
+    }
+
+    fprintf(f, "(");
+
+    switch (node->type)
+    {
+        case NUMBER:
+            fprintf(f, "%g", node->value.number);
+            break;
+
+        case IDENTIFIER:
+            fprintf(f, "%s##%d", node->id.name, node->id.id_index);
+            break;
+
+        case OPERATOR:
+            fprintf(f, "%s", get_string_operator(node->value.op));
+            break;
+
+        case STATEMENT:
+            if (node->value.stmt == OP_FUNC_DEF || node->value.stmt == OP_CALL)
+                fprintf(f, "%s##%s", get_statement_name(node->value.stmt), node->id.name);
+            else
+                fprintf(f, "%s", get_statement_name(node->value.stmt));
+            break;
+
+        case STRING:
+            fprintf(f, "\"%s\"", node->value.string_value);
+            break;
+
+        default:
+            fprintf(f, "UNKNOWN");
+    }
+
+    if (!node -> left && !node -> right)
+        fprintf(f, " nil nil");
+
+    if (node -> left)
+        savenode(node->left, f);
+    if (node -> right)
+        savenode(node->right, f);
+
+    fprintf(f, ")");
+}
+
+
+
+ErrorCode save_tree(Tree_t * tree, const char * filename)
+{
+    assert(tree && filename);
+    ErrorCode error = SUCCESS;
+
+    FILE * file_ptr = fopen(filename, "w");
+    if (!file_ptr)
+    {
+        ERROR_MESSAGE(OPENING_FILE_ERROR, error);
+        return error;
+    }
+
+    savenode(tree->root->right, file_ptr);
+
+    fclose(file_ptr);
+    DEBUG_PRINT("[INFO] TREE SAVED IN %s", filename);
+    return error;
 }
 
 
@@ -274,7 +273,6 @@ char * get_token(const char * buffer, size_t * pos)
 }
 
 
-
 token_res define_token_type(char * buffer, size_t * pos)
 {
     assert(buffer && pos);
@@ -285,7 +283,6 @@ token_res define_token_type(char * buffer, size_t * pos)
         (*pos)++;
 
     char * token = get_token(buffer, pos);
-    //DEBUG_PRINT("[DEBUG] %s", token);
 
     size_t len = strlen(token);
 
