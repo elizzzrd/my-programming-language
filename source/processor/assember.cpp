@@ -114,74 +114,6 @@ void destroy_labels(label_t * labels)
 }
 
 
-/*
-Spu_Err parse_argument(const char * arg, double * value, type_arg * type) 
-{
-    assert(value && type);
-    Spu_Err errors = SPU_OK;
-    *type = UNKNOWN_TYPE;
-    if (!arg || !*arg) return SPU_INVALID_COMMAND;
-
-    if (is_number(arg)) 
-    {
-        *value = atoll(arg);
-        *type = NUM;
-        return SPU_OK;
-    }
-    else if (arg[0] == 'r' && isalpha((unsigned char)arg[1])) 
-    {
-        int reg_num = (toupper(arg[1]) - 'A') + 1;
-        if (strlen(arg) != 3 || (reg_num < 1 || reg_num > 16)) 
-        {
-            DEBUG_PRINT("[ERROR] Invalid register name");
-            return SPU_INVALID_COMMAND;
-        }
-        *value = reg_num;
-        *type = REG;
-        return errors;
-    } 
-    else if (arg[0] == '[' && arg[strlen(arg) - 1] == ']')
-    {
-        char inside[5] = {};
-        size_t len = strlen(arg);
-
-        if (len <=2)
-        {
-            DEBUG_PRINT("[ERROR] Empty brackets in pushm/popm");
-            errors |= SPU_INVALID_COMMAND;
-            return errors;
-        }
-
-        strncpy(inside, arg + 1, len - 2);
-        inside[len - 2] = '\0';
-        if (is_number(inside))
-        {
-            int addr = atoi(inside);
-            if (addr < 0)
-            {
-                DEBUG_PRINT("[ERROR] Negative RAM address");
-                return SPU_INVALID_COMMAND;
-            }
-            *value = addr;
-            *type = RAM;
-            return errors;
-        }
-    }
-
-    int id = find_label(arg);
-    if (id != -1) 
-    {
-        *value = g_labels[id].instructor_ptr;
-        *type = LABEL;
-        return errors;
-    }
-
-    DEBUG_PRINT("[ERROR] Unrecognized argument type '%s'", get_string_type_arg(*type));
-    *type = UNKNOWN_TYPE;
-    return SPU_INVALID_COMMAND;
-}
-*/
-
 
 Spu_Err parse_argument(const char * arg, double * value, type_arg * type) 
 {
@@ -190,14 +122,13 @@ Spu_Err parse_argument(const char * arg, double * value, type_arg * type)
     *type = UNKNOWN_TYPE;
     if (!arg || !*arg) return SPU_INVALID_COMMAND;
 
-    // Пробуем распарсить как число (целое или вещественное)
+
     char *endptr = NULL;
     double num = strtod(arg, &endptr);
     
     if (endptr != arg && *endptr == '\0') 
     {
-        // Это число (целое или вещественное)
-        *value = num;  // Сохраняем как double с дробной частью
+        *value = num;  
         *type = NUM;
         return SPU_OK;
     }
@@ -209,7 +140,7 @@ Spu_Err parse_argument(const char * arg, double * value, type_arg * type)
             DEBUG_PRINT("[ERROR] Invalid register name");
             return SPU_INVALID_COMMAND;
         }
-        *value = (double)reg_num;  // Регистр тоже как double
+        *value = (double)reg_num; 
         *type = REG;
         return errors;
     } 
@@ -228,17 +159,15 @@ Spu_Err parse_argument(const char * arg, double * value, type_arg * type)
         strncpy(inside, arg + 1, len - 2);
         inside[len - 2] = '\0';
         
-        // Пробуем распарсить как число для адреса
         num = strtod(inside, &endptr);
         if (endptr != inside && *endptr == '\0')
         {
-            // Адрес тоже может быть double, но обычно целый
             if (num < 0)
             {
                 DEBUG_PRINT("[ERROR] Negative RAM address");
                 return SPU_INVALID_COMMAND;
             }
-            *value = num;  // Сохраняем как double
+            *value = num;  
             *type = RAM;
             return errors;
         }
@@ -247,7 +176,7 @@ Spu_Err parse_argument(const char * arg, double * value, type_arg * type)
     int id = find_label(arg);
     if (id != -1) 
     {
-        *value = (double)g_labels[id].instructor_ptr;  // Приведение к double
+        *value = (double)g_labels[id].instructor_ptr; 
         *type = LABEL;
         return errors;
     }
@@ -258,7 +187,6 @@ Spu_Err parse_argument(const char * arg, double * value, type_arg * type)
 }
 
 
-// узнать, где что находиться
 Spu_Err first_pass(const char * txt_filename) 
 {
     Spu_Err errors = SPU_OK;
@@ -282,7 +210,7 @@ Spu_Err first_pass(const char * txt_filename)
 
         char * comment = strchr(cmd_command, ';'); 
         if (comment) 
-            *comment = '\0'; // убираем комментарии
+            *comment = '\0'; 
         
         char * line_ptr = cmd_command;
         while (isspace((unsigned char)*line_ptr)) line_ptr++;
@@ -293,8 +221,7 @@ Spu_Err first_pass(const char * txt_filename)
         }
         *end = '\0';
         
-        //printf("[DEBUG] cmd_command = %s\n", line_ptr);
-        if (*line_ptr == '\0') continue; // пустая строка
+        if (*line_ptr == '\0') continue; 
 
         char option[NMAX] = {};
         if (sscanf(line_ptr, "%s", option) != 1) continue;
@@ -311,7 +238,6 @@ Spu_Err first_pass(const char * txt_filename)
         }
 
         int cmd = check_option_with_stack_commands(option);
-        //printf("assembler 181: option: %s - cmd: %d \n", option, cmd);
         if (cmd == -1) 
         {
             DEBUG_PRINT("[ERROR] Unknown command in text file, option -- %s\n", option);
@@ -326,7 +252,7 @@ Spu_Err first_pass(const char * txt_filename)
     return errors;
 }
 
-//записать, что именно выполнять
+
 Spu_Err second_pass(const char * txt_filename) 
 {
     assert(txt_filename);
@@ -345,11 +271,11 @@ Spu_Err second_pass(const char * txt_filename)
     while (fgets(cmd_command, NMAX, file)) 
     {
         char * comment = strchr(cmd_command, ';'); 
-        if (comment) (*comment) = '\0'; // убираем комментарии
+        if (comment) (*comment) = '\0'; 
 
         char * line_ptr = cmd_command;
         while (isspace((unsigned char)*line_ptr)) line_ptr++;
-        if (*line_ptr == '\0') continue; // пустая строка
+        if (*line_ptr == '\0') continue; 
 
         char option[NMAX] = {};
         if (sscanf(line_ptr, "%s", option) != 1) continue;
