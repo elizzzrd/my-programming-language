@@ -8,7 +8,7 @@
 #include "errors.h"
 #include "utils.h"
 
-
+#define DISABLE_DEBUG_PRINT
 
 const char * token_type_strings[] =
 {

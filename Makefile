@@ -1,5 +1,8 @@
 CXX := g++
 SANITIZERS := -fsanitize=address,alignment,bool,bounds,enum,float-cast-overflow,float-divide-by-zero,integer-divide-by-zero,leak,nonnull-attribute,null,object-size,return,returns-nonnull-attribute,shift,signed-integer-overflow,undefined,unreachable,vla-bound,vptr
+LD := gcc
+NASM := nasm
+
 
 CXXFLAGS := -g -DDEBUG -ggdb3 -std=c++17 -O0 -Wall -Wextra -Weffc++ -Waggressive-loop-optimizations \
  -Wc++14-compat -Wmissing-declarations -Wcast-align -Wcast-qual -Wchar-subscripts -Wconditionally-supported \
@@ -12,12 +15,16 @@ CXXFLAGS := -g -DDEBUG -ggdb3 -std=c++17 -O0 -Wall -Wextra -Weffc++ -Waggressive
  -fsized-deallocation -fstack-protector -fstrict-overflow -flto-odr-type-merging -fno-omit-frame-pointer -Wlarger-than=8192 \
  -Wstack-usage=8192 -pie -fPIE -Werror=vla 
 
-INC_DIRS := headers/backend_h headers/middleend_h headers/frontend_h headers/processor_h headers/common_h 
+NASMFLAGS := -f elf64 
+LDFLAGS := -lm -no-pie
+
+INC_DIRS := headers/backend_h headers/middleend_h headers/frontend_h headers/processor_h headers/common_h  headers/backend-x64_h
 INCLUDES = $(addprefix -I,$(INC_DIRS))
 
 SRC_DIR := source
 FRONTEND_DIR := $(SRC_DIR)/frontend
 BACKEND_DIR := $(SRC_DIR)/backend
+BACKEND_X64_DIR := $(SRC_DIR)/backend_x64
 MIDDLEEND_DIR := $(SRC_DIR)/middleend
 COMMON_DIR := $(SRC_DIR)/common
 PROCESSOR_DIR := $(SRC_DIR)/processor
@@ -29,11 +36,13 @@ BIN_DIR := $(BUILD_DIR)/bin
 FRONTEND_PROG := $(BIN_DIR)/frontend
 MIDDLEEND_PROG := $(BIN_DIR)/middleend  
 BACKEND_PROG := $(BIN_DIR)/backend
+BACKEND_X64_PROG := $(BIN_DIR)/backend_x64
 
 COMMON_SOURCES :=   $(wildcard $(FRONTEND_DIR)/*.cpp) \
                     $(wildcard $(COMMON_DIR)/*.cpp) \
 					$(wildcard $(MIDDLEEND_DIR)/*.cpp) \
 					$(wildcard $(BACKEND_DIR)/*.cpp) \
+					$(wildcard $(BACKEND_X64_DIR)/*.cpp) \
 
 FRONTEND_SOURCES := exe/frontend.cpp \
                     $(COMMON_SOURCES) \
@@ -45,12 +54,15 @@ BACKEND_SOURCES := exe/backend.cpp \
 					$(COMMON_SOURCES)\
 				    $(wildcard $(PROCESSOR_DIR)/*.cpp) \
 
+BACKEND_X64_SOURCES := exe/backend-x64.cpp \
+                    $(COMMON_SOURCES) \
 
 FRONTEND_OBJECTS := $(addprefix $(OBJ_DIR)/,$(notdir $(FRONTEND_SOURCES:.cpp=.o)))
 MIDDLEEND_OBJECTS := $(addprefix $(OBJ_DIR)/,$(notdir $(MIDDLEEND_SOURCES:.cpp=.o)))
 BACKEND_OBJECTS := $(addprefix $(OBJ_DIR)/,$(notdir $(BACKEND_SOURCES:.cpp=.o)))
+BACKEND_X64_OBJECTS := $(addprefix $(OBJ_DIR)/,$(notdir $(BACKEND_X64_SOURCES:.cpp=.o)))
 
-all: $(FRONTEND_PROG) $(MIDDLEEND_PROG) $(BACKEND_PROG)
+all: $(FRONTEND_PROG) $(MIDDLEEND_PROG) $(BACKEND_PROG) $(BACKEND_X64_PROG)
 
 $(FRONTEND_PROG): $(FRONTEND_OBJECTS) | $(BIN_DIR)
 	@$(CXX) $(FRONTEND_OBJECTS) $(SANITIZERS) -o $@
@@ -61,15 +73,18 @@ $(MIDDLEEND_PROG): $(MIDDLEEND_OBJECTS) | $(BIN_DIR)
 $(BACKEND_PROG): $(BACKEND_OBJECTS) | $(BIN_DIR)
 	@$(CXX) $(BACKEND_OBJECTS) $(SANITIZERS) -o $@
 
+$(BACKEND_X64_PROG): $(BACKEND_X64_OBJECTS) | $(BIN_DIR)
+	@$(CXX) $(BACKEND_X64_OBJECTS) $(SANITIZERS) -o $@
 
 frontend: $(FRONTEND_PROG)
 middleend: $(MIDDLEEND_PROG)
 backend: $(BACKEND_PROG)
+backend_x64: $(BACKEND_X64_PROG)
 
 run: all
 	@./$(FRONTEND_PROG)
 	@./$(MIDDLEEND_PROG)
-	@./$(BACKEND_PROG)
+	@./$(BACKEND_X64_PROG)
 
 run_frontend:
 	@./$(FRONTEND_PROG)
@@ -79,6 +94,10 @@ run_middleend:
 
 run_backend:
 	@./$(BACKEND_PROG)
+
+run_backend_x64:
+	@./$(BACKEND_X64_PROG)
+
 
 $(OBJ_DIR)/%.o: %.cpp | $(OBJ_DIR)
 	@mkdir -p $(OBJ_DIR)
@@ -98,13 +117,28 @@ $(BIN_DIR) $(OBJ_DIR):
 clean:
 	rm -rf $(BUILD_DIR)
 
+
+OUTPUT_DIR := output
+NASM_PROG := $(OUTPUT_DIR)/nasm_output
+
+nasm: 
+	@nasm -f elf64 $(OUTPUT_DIR)/nasm_output.asm -o $(OUTPUT_DIR)/nasm_output.o
+	@gcc $(OUTPUT_DIR)/nasm_output.o -o $(NASM_PROG) -lm -no-pie
+	@./$(NASM_PROG)
+
+
+
+nasm_clean:
+	@rm -f $(OUTPUT_DIR)/nasm_output.asm $(OUTPUT_DIR)/nasm_output.o $(OUTPUT_DIR)/nasm_output
+
+
 logger-clean:
 	rm -rf logger/
 	rm -rf output/
 	mkdir -p logger/pics logger/dots
 	mkdir -p output/
 
-rebuild: clean all
+rebuild: clean  logger-clean all
 
 .PHONY: all clean rebuild frontend middleend backend run logger-clean
 

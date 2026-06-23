@@ -10,6 +10,8 @@
 #include "errors.h"
 #include "utils.h"
 
+#define DISABLE_DEBUG_PRINT
+
 int graph_dump_count = 0;
 int graph_dump_count_node = 0;
 int graph_dump_diff = 0;

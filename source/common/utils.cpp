@@ -10,7 +10,7 @@
 #include "errors.h"
 #include "read_file.h"
 
-
+#define DISABLE_DEBUG_PRINT
 
 
 

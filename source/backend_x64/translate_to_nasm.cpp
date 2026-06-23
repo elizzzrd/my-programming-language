@@ -11,11 +11,13 @@
 #include "translate_to_nasm.h"
 
 //--------------------------------------------------------------
-static int label_counter = 0;
+int label_counter = 0;
+double constants[MAX_CONSTANTS];
+int const_count = 0;
 
-
-static int add_constant(double val)
+int add_constant(double val)
 {    
+    assert(val);
     for (int i = 0; i < const_count; i++)
         if (fabs(constants[i] - val) < 1e-12)
             return i;
@@ -27,193 +29,37 @@ static int add_constant(double val)
     return const_count - 1;
 }
 
-static int new_label(void)
+int new_label(void)
 {
     return label_counter++;
 }
 
 //--------------------------------------------------------------
-variables_t vars = {};
-
-static void init_variables(void)
-{
-    vars.var_count = 0;
-    vars.var_capacity = 16;
-    vars.current_func_id = -1;
-    vars.var_list = (var_info_t *) calloc(vars.var_capacity, sizeof(var_info_t));
-}
-
-
-static int find_variable(const char * name)
-{
-    for (int i = 0; i < vars.var_count; i++)
-    {
-        if (strcmp(vars.var_list[i].name, name) == 0)
-            return i;
-    }
-    return -1;
-}
-
-static int add_variable(const char * name, bool is_parameter)
-{
-    int idx = find_variable(name);
-    if (idx != -1)
-        return vars.var_list[idx].offset;
-
-    if (vars.var_count >= vars.var_capacity)
-    {
-        vars.var_capacity *= 2;
-        vars.var_list = (var_info_t *) realloc(vars.var_list, vars.var_capacity * sizeof(var_info_t));
-    }
-    
-    int cur_count = vars.var_count; 
-    
-    if (is_parameter)
-    {
-
-    }
-    int offset = -(vars.var_count + 1) * 8;
-
-    vars.var_list[cur_count].name = strdup(name);
-    vars.var_list[cur_count].offset = offset;
-    vars.var_list[cur_count].initialized = false;
-    vars.var_list[cur_count].is_parametr = is_parameter;
-    vars.var_list[cur_count].func_id = vars.current_func_id;
-
-    vars.var_count++;
-    return offset;
-}
-
-static var_info_t * get_variable_by_name(const char * name)
-{
-    int idx = find_variable(name);
-    return (idx == -1) ? NULL: &vars.var_list[idx];
-}
-
-
-static void clear_variables_for_func(int func_id)
-{
-    int i = 0;
-    while (i < vars.var_count)
-    {
-        if (vars.var_list[i].func_id == func_id)
-        {
-            free(vars.var_list[i].name);
-
-            for (int j = i; j < vars.var_count - 1; j++)
-                vars.var_list[j] = vars.var_list[j+1];
-            
-            vars.var_count--;
-        }
-        else {
-            i++;
-        }
-    }
-}
-
-
-static int get_frame_size_for_func(int func_id)
-{
-    int size = 0;
-    for (int i = 0; i < vars.var_count; i++)
-    {
-        if (vars.var_list[i].func_id == func_id)
-            size += 8;
-    }
-    return size;
-}
-
-static void clear_variables(void)
-{
-    for (int i = 0; i < vars.var_count; i++)
-        free(vars.var_list[i].name);
-
-    free(vars.var_list);
-    vars.var_list = NULL;
-    vars.var_count = 0;
-    vars.var_capacity = 0;
-}
-//--------------------------------------------------------------
-
-ErrorCode collect_variables(Node_t * node)
-{
-    assert(node);
-    ErrorCode error = SUCCESS;
-
-    if (node->type == STATEMENT)
-    {
-        switch (node->value.stmt)
-        {
-            case OP_ASSIGNMENT:
-            case OP_VAR_DEF:
-            {
-                if (node->left && node->left->type == IDENTIFIER)
-                {
-                    int offset = add_variable(node->left->id.name, false);
-                    if (offset == -1)
-                        return SEMANTIC_ERROR;
-                }
-                break;
-            }
-            case OP_FUNC_DEF:
-            {
-                int old_func = vars.current_func_id;
-                vars.current_func_id = ++vars.func_counter;
-                
-                Node_t * params = node -> left;
-                int param_count = 0;
-    
-                if (params && params->type == STATEMENT && params->value.stmt == OP_PARAMS)
-                {
-                    Node_t * param = params->left;
-                    while (param)
-                    {
-                        if (param->type == IDENTIFIER)      
-                            add_variable(param->id.name, true);
-                        param = param -> left;
-                    }
-                }
-    
-                error = collect_variables(node -> right);
-                if (error != SUCCESS)
-                    return error;
-    
-                vars.current_func_id = old_func;
-                return SUCCESS;
-            }
-            default: break;
-        }
-    }
-    error = collect_variables(node->left);
-    if (error != SUCCESS)   return error;
-
-    error = collect_variables(node->right);
-    if (error != SUCCESS)   return error;
-
-    return SUCCESS;
-}
-
-
-
-
+extern variables_t vars;
 
 ErrorCode translate_to_nasm(Tree_t * tree, const char * filename)
 {
     assert(tree && filename);
     ErrorCode error = SUCCESS; 
 
+
     init_variables();
     const_count = 0;
     label_counter = 0;
 
+    DEBUG_PRINT("[DEBUG] variables initialized");
+
     vars.current_func_id = 0;                       // global area
-    error = collect_variables(tree->root->right);
+    error = collect_variables(tree->root);
     if (error != SUCCESS)
         return error;
 
+    DEBUG_PRINT("[DEBUG] valiables collected");
+    assign_offset_for_function(0);
+    DEBUG_PRINT("[DEBUG] offsets done");
+
     int frame_size = get_frame_size_for_func(0) + 32;
     frame_size = (frame_size + 15) & ~15;
-    
     
     FILE * file_ptr = fopen(filename, "w");
     if (!file_ptr)
@@ -225,15 +71,18 @@ ErrorCode translate_to_nasm(Tree_t * tree, const char * filename)
 
     fprintf(file_ptr, "default rel\n");
     fprintf(file_ptr, "global main\n\n");
-    fprintf(file_ptr, "%%include \"mystdlib.asm\"\n"); 
+    fprintf(file_ptr, "%%include \"/home/gardina_elizaveta/projects/1sem/language/source/backend_x64/mystdlib.asm\"\n"); 
+
+    
 
     fprintf(file_ptr, "section .text\n\n");
     fprintf(file_ptr, "main:\n");
     fprintf(file_ptr, "    push rbp\n");
-    fprintf(file_ptr,"     mov rbp, rsp\n");
+    fprintf(file_ptr, "    mov rbp, rsp\n");
     
     if (frame_size > 0)
-        fprintf(file_ptr, "    sub rsp, %d\n", frame_size);
+        fprintf(file_ptr, "    sub rsp, %d\n\n", frame_size);
+
 
     vars.current_func_id = 0;
     if (tree->root && tree->root->right)
@@ -247,21 +96,21 @@ ErrorCode translate_to_nasm(Tree_t * tree, const char * filename)
         }
     }
 
-    fprintf(file_ptr, "    xor eax, eax\n");
+    fprintf(file_ptr, "\n\n    xor eax, eax\n");
     fprintf(file_ptr, "    mov rsp, rbp\n");
     fprintf(file_ptr, "    pop rbp\n");
     fprintf(file_ptr, "    ret\n\n");
 
 
-    fprintf(file_ptr, "section .data\n");
-    fprintf(file_ptr, "fmt_print: db \"%%.10g\\n\", 0\n");
+    fprintf(file_ptr, "\n\nsection .data\n");
+    fprintf(file_ptr, "fmt_print: db \"%%.3g\", 10, 0\n");
     fprintf(file_ptr, "fmt_scan: db \"%%lf\", 0\n");
     fprintf(file_ptr, "\n");
 
     if (const_count > 0)
     {
         for (int i = 0; i < const_count; i++)
-            fprintf(file_ptr, "const_%d dq %g\n", i, constants[i]);
+            fprintf(file_ptr, "const_%d dq %f\n", i, constants[i]);
         fprintf(file_ptr, "\n");
     }
 
@@ -299,6 +148,253 @@ ErrorCode emit_program(Node_t * node, FILE * file_ptr)
 
 
 
+
+ErrorCode emit_statement(Node_t * node, FILE * file_ptr)
+{
+    assert(node && file_ptr);
+    ErrorCode error = SUCCESS;
+
+    switch (node->value.stmt)
+    {
+        case OP_PROGRAM:
+        case OP_STATEMENT:
+        case OP_END:
+        {
+            error = emit_expression(node->left,  file_ptr);
+            IF_THERE_IS_TRANSLATE_ERROR(error);
+
+            error = emit_expression(node->right, file_ptr);
+            IF_THERE_IS_TRANSLATE_ERROR(error);
+            break;
+        }
+        case OP_PRINT:
+        {
+            Node_t * arg = NULL;
+            if (node->left)
+                arg = node->left;
+            else if (node->right)
+                arg = node->right;
+
+            error = emit_expression(arg, file_ptr);              
+            IF_THERE_IS_TRANSLATE_ERROR(error);
+            
+            // if (arg->type == STRING)
+            //     fprintf(file_ptr, "puts\n");
+            // else
+            //     fprintf(file_ptr, "out\n");
+            // break;
+
+            fprintf(file_ptr, "\n    mov rdi, fmt_print\n");
+            fprintf(file_ptr, "    mov al, 1\n");
+            fprintf(file_ptr, "    call printf\n\n");
+
+            break;
+        }
+        case OP_ASSIGNMENT:
+        case OP_VAR_DEF:
+        {
+            error = emit_expression(node->right, file_ptr);
+            IF_THERE_IS_TRANSLATE_ERROR(error);
+
+            var_info_t * var = get_variable_by_index(node->left->id.id_index);
+            if (var)
+            {
+                var->initialized = true;
+                fprintf(file_ptr, "\n    movsd [rbp%+d], xmm0\n\n", var->offset);
+            }
+            break;
+        }
+        case OP_IF:
+        {
+            int label_else = new_label();
+            int label_endif = new_label();
+
+            Node_t * condition = node->left;
+            Node_t * stmt = node->right;
+            assert(condition && stmt);
+
+            Node_t * if_body = stmt->left;
+            Node_t * else_body = stmt->right; 
+
+            error = emit_expression(condition, file_ptr); // condition
+            IF_THERE_IS_TRANSLATE_ERROR(error);
+
+            fprintf(file_ptr, "\n    xorpd xmm1, xmm1\n");
+            fprintf(file_ptr, "    comisd xmm0, xmm1\n");
+            fprintf(file_ptr, "    je .L_else_%d\n\n", label_else);
+
+            error = emit_statement(if_body, file_ptr); // if_body
+            IF_THERE_IS_TRANSLATE_ERROR(error);
+
+            if (else_body)
+            {
+                fprintf(file_ptr, "\n    jmp .L_end_%d\n", label_endif);
+                fprintf(file_ptr, "    .L_else_%d:\n\n", label_else);
+
+                error = emit_statement(else_body, file_ptr);
+                IF_THERE_IS_TRANSLATE_ERROR(error);
+            }
+
+            fprintf(file_ptr, "\n    .L_end_%d:\n\n", label_endif);
+            break;
+        }
+        case OP_WHILE:
+        {
+            int label_start = new_label();
+            int label_end = new_label();
+
+            fprintf(file_ptr, "\n    .L_while_start_%d:\n\n", label_start);
+
+            error = emit_expression(node->left, file_ptr);
+            IF_THERE_IS_TRANSLATE_ERROR(error);
+
+            fprintf(file_ptr, "\n    xorpd xmm1, xmm1\n");
+            fprintf(file_ptr, "    comisd xmm0, xmm1\n");
+            fprintf(file_ptr, "    je .L_while_end_%d\n\n", label_end);
+
+            error = emit_statement(node->right, file_ptr);
+            IF_THERE_IS_TRANSLATE_ERROR(error);
+
+            fprintf(file_ptr, "\n    jmp .L_while_start_%d\n", label_start);
+            fprintf(file_ptr, ".L_while_end_%d:\n\n", label_end);
+            break;
+        }
+        case OP_BLOCK:
+        {
+            if (node->left)
+            {
+                error = emit_statement(node->left, file_ptr);
+                IF_THERE_IS_TRANSLATE_ERROR(error);
+            }
+            if (node->right)
+            {
+                error = emit_statement(node->right, file_ptr);
+                IF_THERE_IS_TRANSLATE_ERROR(error);
+            }
+            break;
+        }
+        case OP_FUNC_DEF:
+        {
+            fprintf(file_ptr, "\n%s:\n", node->id.name);
+            fprintf(file_ptr, "    push rbp\n");
+            fprintf(file_ptr, "    mov rbp, rsp\n\n");
+
+            int func_frame = get_frame_size_for_func(vars.current_func_id) + 32;
+            func_frame = (func_frame + 15) & ~15;
+            fprintf(file_ptr, "    sub rsp, %d\n", func_frame);
+
+            Node_t * params = node -> left;
+            int param_count = 0;
+
+            if (params && params->type == STATEMENT && params->value.stmt == OP_PARAMS)
+            {
+                Node_t * param = params->left;
+                while (param && param_count < 16)
+                {
+                    if (param->type == IDENTIFIER)      
+                        if (param_count < 4)
+                        {
+                            var_info_t * var = get_variable_by_index(param->id.id_index);
+                            if (var)
+                                fprintf(file_ptr, "\n    movsd [rbp%+d], xmm%d\n\n", var->offset, param_count);
+                        }
+                        else
+                        {
+                             // TODO: processing parameters on the stack
+                        }
+                    param = param -> left;
+                    param_count++;
+                }
+            }
+
+            Node_t * body = node->right;
+            if (body)
+            {
+                error = emit_statement(body, file_ptr);
+                IF_THERE_IS_TRANSLATE_ERROR(error);
+            }
+
+
+            fprintf(file_ptr, "\n    mov rsp, rbp\n");
+            fprintf(file_ptr, "    pop rbp\n");
+            fprintf(file_ptr, "    ret\n\n");
+
+            break;
+        }
+        case OP_CALL:
+        {
+            Node_t * args = node->left;
+            int arg_count = 0;
+            Node_t * arg_list[16];
+
+            if (args && args->type == STATEMENT && args->value.stmt == OP_ARGS)
+            {
+                Node_t * arg = args -> left;
+                while (arg && arg_count < 16)
+                {
+                    arg_list[arg_count++] = arg;
+                    arg = arg->left;
+                }
+            }
+
+            int stack_args_count = (arg_count > 4) ? (arg_count - 4) : 0;
+            if (stack_args_count > 0)
+            {
+                int stack_size = ((stack_args_count * 8 + 15) & ~ 15);
+                fprintf(file_ptr, "    sub rsp, %d\n\n", stack_size);
+            }
+
+            for (int i = arg_count - 1; i >= 4; i--)
+            {
+                error = emit_expression(arg_list[i], file_ptr);
+                IF_THERE_IS_TRANSLATE_ERROR(error);
+
+                int offset = (i - 4) * 8;
+                fprintf(file_ptr, "    movsd [rsp+%d], xmm0\n\n", offset);
+            }
+
+            for (int i = 3; i >= 0 && i < arg_count; i--)
+            {
+                error = emit_expression(arg_list[i], file_ptr);
+                IF_THERE_IS_TRANSLATE_ERROR(error);
+
+                fprintf(file_ptr, "    movapd xmm%d, xmm0\n\n", i);
+            }
+
+            fprintf(file_ptr, "    call %s\n\n", node->id.name);
+
+            if (stack_args_count > 0)
+            {
+                int stack_size = ((stack_args_count * 8 + 15) & ~ 15);
+                fprintf(file_ptr, "    add rsp, %d\n\n", stack_size);
+            }
+            break;
+        }
+        case OP_RETURN:
+        {
+            Node_t * expr = node -> left;
+            if (expr)
+            {
+                error = emit_expression(expr, file_ptr);
+                IF_THERE_IS_TRANSLATE_ERROR(error);
+            }
+            else
+            {
+                // no return value
+                fprintf(file_ptr, "\n    xorpd xmm0, xmm0\n\n");
+            }
+            
+            fprintf(file_ptr, "\n    mov rsp, rbp\n");
+            fprintf(file_ptr, "    pop rbp\n");
+            fprintf(file_ptr, "    ret\n\n");
+            break;
+        }
+        default: break;
+    }
+    return SUCCESS;
+}
+
+
 ErrorCode emit_expression(Node_t * node, FILE * file_ptr)
 {
     assert(file_ptr);
@@ -333,12 +429,12 @@ ErrorCode emit_expression(Node_t * node, FILE * file_ptr)
         case IDENTIFIER:
         {
             DEBUG_PRINT("%s -- %d\n", node->id.name, node->id.id_index);
-            var_info_t * var = get_variable_by_name(node->id.name);
+            var_info_t * var = get_variable_by_index(node->id.id_index);
             if (!var)      
                 error = SEMANTIC_ERROR;    
             IF_THERE_IS_TRANSLATE_ERROR(error);
 
-            fprintf(file_ptr, "    movsd xmm0, [rbp%+d]\n", var->offset);
+            fprintf(file_ptr, "    movsd xmm0, [rbp%+d]\n\n", var->offset);
             break;
         }
         case NUMBER:
@@ -346,7 +442,7 @@ ErrorCode emit_expression(Node_t * node, FILE * file_ptr)
             int idx = add_constant(node->value.number);
             if (idx < 0)
                 return TREE_MEMORY_ALLOCATION_ERROR;
-            fprintf(file_ptr, "    movsd xmm0, [rel const_%d]\n", idx);
+            fprintf(file_ptr, "    movsd xmm0, [rel const_%d]\n\n", idx);
             break;
         }
         case STATEMENT:     
@@ -386,14 +482,14 @@ ErrorCode emit_operator(Node_t * node, FILE * file_ptr)
         IF_THERE_IS_TRANSLATE_ERROR(error);
 
         fprintf(file_ptr, "    sub rsp, 8\n");
-        fprintf(file_ptr, "    movsd [rsp], xmm0\n");
+        fprintf(file_ptr, "    movsd [rsp], xmm0\n\n");
 
         if (node->right)
             error = emit_expression(node->right, file_ptr);    // xmm0
         IF_THERE_IS_TRANSLATE_ERROR(error);
 
         fprintf(file_ptr, "    movsd xmm1, [rsp]\n");
-        fprintf(file_ptr, "    add rsp, 8\n");
+        fprintf(file_ptr, "    add rsp, 8\n\n");
 
         switch (op)
         {
@@ -401,22 +497,29 @@ ErrorCode emit_operator(Node_t * node, FILE * file_ptr)
             case OP_SUB:            fprintf(file_ptr, "    subsd xmm1, xmm0\n"); break;
             case OP_MUL:            fprintf(file_ptr, "    mulsd xmm1, xmm0\n"); break;
             case OP_DIV:            fprintf(file_ptr, "    divsd xmm1, xmm0\n"); break;
-            case OP_POW:            fprintf(file_ptr, "    movapd xmm0, xmm1\n");
-                                    fprintf(file_ptr, "    call pow\n"); break;
-
+            case OP_POW:
+                                    fprintf(file_ptr, "    movapd xmm2, xmm0\n");
+                                    fprintf(file_ptr, "    movapd xmm0, xmm1\n");
+                                    fprintf(file_ptr, "    movapd xmm1, xmm2\n");
+                                    fprintf(file_ptr, "    call pow\n");
+                                    fprintf(file_ptr, "    movapd xmm1, xmm0\n");
+                                    break;
+                                
             case OP_EQUAL:          
             case OP_NON_EQUAL:      
             case OP_BELOW:          
             case OP_BELOW_EQUAL:    
             case OP_ABOVE:          
-            case OP_ABOVE_EQUAL:    emit_cmp_x64(node, file_ptr, op); break;
-
+            case OP_ABOVE_EQUAL:    emit_cmp_x64(node, file_ptr, op); 
+                                    fprintf(file_ptr, "    movapd xmm1, xmm0\n");
+                                    break;
             default:
             {
                 ERROR_MESSAGE(TRANSLATING_TO_ASM_ERROR, error);
                 return error;
             }
         }
+        fprintf(file_ptr, "    movapd xmm0, xmm1\n");
         return SUCCESS;
     }
 
@@ -433,7 +536,7 @@ ErrorCode emit_operator(Node_t * node, FILE * file_ptr)
             fprintf(file_ptr, "    call read_double\n");
             if (node->left && node->left->type == IDENTIFIER)
             {
-                var_info_t * var = get_variable_by_name(node->left->id.name);
+                var_info_t * var = get_variable_by_index(node->left->id.id_index);
                 if (var)
                     fprintf(file_ptr, "    movsd [rbp%+d], xmm0\n", var->offset);
             }
@@ -499,252 +602,6 @@ ErrorCode emit_cmp_x64(Node_t * node, FILE * file_ptr, operator_t op)
         fprintf(file_ptr, "    cvtsi2sd xmm0, rax\n");
     }
 
-    return SUCCESS;
-}
-
-
-ErrorCode emit_statement(Node_t * node, FILE * file_ptr)
-{
-    assert(node && file_ptr);
-    ErrorCode error = SUCCESS;
-
-    switch (node->value.stmt)
-    {
-        case OP_PROGRAM:
-        case OP_STATEMENT:
-        case OP_END:
-        {
-            error = emit_expression(node->left,  file_ptr);
-            IF_THERE_IS_TRANSLATE_ERROR(error);
-
-            error = emit_expression(node->right, file_ptr);
-            IF_THERE_IS_TRANSLATE_ERROR(error);
-            break;
-        }
-        case OP_PRINT:
-        {
-            Node_t * arg = NULL;
-            if (node->left)
-                arg = node->left;
-            else if (node->right)
-                arg = node->right;
-
-            error = emit_expression(arg, file_ptr);              
-            IF_THERE_IS_TRANSLATE_ERROR(error);
-            
-            // if (arg->type == STRING)
-            //     fprintf(file_ptr, "puts\n");
-            // else
-            //     fprintf(file_ptr, "out\n");
-            // break;
-
-            fprintf(file_ptr, "    mov rdi, fmt_print\n");
-            fprintf(file_ptr, "    mov al, 1\n");
-            fprintf(file_ptr, "    call printf\n");
-
-            break;
-        }
-        case OP_ASSIGNMENT:
-        case OP_VAR_DEF:
-        {
-            error = emit_expression(node->right, file_ptr);
-            IF_THERE_IS_TRANSLATE_ERROR(error);
-
-            var_info_t * var = get_variable_by_name(node->left->id.name);
-            if (var)
-            {
-                var->initialized = true;
-                fprintf(file_ptr, "    movsd [rbp%+d], xmm0\n", var->offset);
-            }
-            break;
-        }
-        case OP_IF:
-        {
-            int label_else = new_label();
-            int label_endif = new_label();
-
-            Node_t * condition = node->left;
-            Node_t * stmt = node->right;
-            assert(condition && stmt);
-
-            Node_t * if_body = stmt->left;
-            Node_t * else_body = stmt->right; 
-
-            error = emit_expression(condition, file_ptr); // condition
-            IF_THERE_IS_TRANSLATE_ERROR(error);
-
-            fprintf(file_ptr, "    xorpd xmm1, xmm1\n");
-            fprintf(file_ptr, "    comisd xmm0, xmm1\n");
-            fprintf(file_ptr, "    je .L_else_%d\n", label_else);
-
-            error = emit_statement(if_body, file_ptr); // if_body
-            IF_THERE_IS_TRANSLATE_ERROR(error);
-
-            if (else_body)
-            {
-                fprintf(file_ptr, "    jmp .L_end_%d\n", label_endif);
-                fprintf(file_ptr, "    .L_else_%d:\n", label_else);
-
-                error = emit_statement(else_body, file_ptr);
-                IF_THERE_IS_TRANSLATE_ERROR(error);
-            }
-
-            fprintf(file_ptr, "    .L_end_%d:\n", label_endif);
-            break;
-        }
-        case OP_WHILE:
-        {
-            int label_start = new_label();
-            int label_end = new_label();
-
-            fprintf(file_ptr, "    .L_while_start_%d:\n", label_start);
-
-            error = emit_expression(node->left, file_ptr);
-            IF_THERE_IS_TRANSLATE_ERROR(error);
-
-            fprintf(file_ptr, "    xorpd xmm1, xmm1\n");
-            fprintf(file_ptr, "    comisd xmm0, xmm1\n");
-            fprintf(file_ptr, "    je .L_while_end_%d\n", label_end);
-
-            error = emit_statement(node->right, file_ptr);
-            IF_THERE_IS_TRANSLATE_ERROR(error);
-
-            fprintf(file_ptr, "    jmp .L_while_start_%d\n", label_start);
-            fprintf(file_ptr, ".L_while_end_%d:\n", label_end);
-            break;
-        }
-        case OP_BLOCK:
-        {
-            if (node->left)
-            {
-                error = emit_statement(node->left, file_ptr);
-                IF_THERE_IS_TRANSLATE_ERROR(error);
-            }
-            if (node->right)
-            {
-                error = emit_statement(node->right, file_ptr);
-                IF_THERE_IS_TRANSLATE_ERROR(error);
-            }
-            break;
-        }
-        case OP_FUNC_DEF:
-        {
-            fprintf(file_ptr, "%s:\n", node->id.name);
-            fprintf(file_ptr, "    push rbp\n");
-            fprintf(file_ptr, "    mov rbp, rsp\n");
-
-            int func_frame = get_frame_size_for_func(vars.current_func_id) + 32;
-            func_frame = (func_frame + 15) & ~15;
-            fprintf(file_ptr, "    sub rsp, %d\n", func_frame);
-
-            Node_t * params = node -> left;
-            int param_count = 0;
-
-            if (params && params->type == STATEMENT && params->value.stmt == OP_PARAMS)
-            {
-                Node_t * param = params->left;
-                while (param && param_count < 16)
-                {
-                    if (param->type == IDENTIFIER)      
-                        if (param_count < 4)
-                        {
-                            var_info_t * var = get_variable_by_name(param->id.name);
-                            if (var)
-                                fprintf(file_ptr, "    movsd [rbp%+d], xmm%d\n", var->offset, param_count);
-                        }
-                        else
-                        {
-                             // TODO: processing parameters on the stack
-                        }
-                    param = param -> left;
-                    param_count++;
-                }
-            }
-
-            Node_t * body = node->right;
-            if (body)
-            {
-                error = emit_statement(body, file_ptr);
-                IF_THERE_IS_TRANSLATE_ERROR(error);
-            }
-
-
-            fprintf(file_ptr, "    mov rsp, rbp\n");
-            fprintf(file_ptr, "    pop rbp\n");
-            fprintf(file_ptr, "    ret\n");
-
-            break;
-        }
-        case OP_CALL:
-        {
-            Node_t * args = node->left;
-            int arg_count = 0;
-            Node_t * arg_list[16];
-
-            if (args && args->type == STATEMENT && args->value.stmt == OP_ARGS)
-            {
-                Node_t * arg = args -> left;
-                while (arg && arg_count < 16)
-                {
-                    arg_list[arg_count++] = arg;
-                    arg = arg->left;
-                }
-            }
-
-            int stack_args_count = (arg_count > 4) ? (arg_count - 4) : 0;
-            if (stack_args_count > 0)
-            {
-                int stack_size = ((stack_args_count * 8 + 15) & ~ 15);
-                fprintf(file_ptr, "    sub rsp, %d\n", stack_size);
-            }
-
-            for (int i = arg_count - 1; i >= 4; i--)
-            {
-                error = emit_expression(arg_list[i], file_ptr);
-                IF_THERE_IS_TRANSLATE_ERROR(error);
-
-                int offset = (i - 4) * 8;
-                fprintf(file_ptr, "    movsd [rsp+%d], xmm0\n", offset);
-            }
-
-            for (int i = 3; i >= 0 && i < arg_count; i--)
-            {
-                error = emit_expression(arg_list[i], file_ptr);
-                IF_THERE_IS_TRANSLATE_ERROR(error);
-
-                fprintf(file_ptr, "    movapd xmm%d, xmm0\n", i);
-            }
-
-            fprintf(file_ptr, "    call %s\n", node->id.name);
-
-            if (stack_args_count > 0)
-            {
-                int stack_size = ((stack_args_count * 8 + 15) & ~ 15);
-                fprintf(file_ptr, "    add rsp, %d\n", stack_size);
-            }
-            break;
-        }
-        case OP_RETURN:
-        {
-            Node_t * expr = node -> left;
-            if (expr)
-            {
-                error = emit_expression(expr, file_ptr);
-                IF_THERE_IS_TRANSLATE_ERROR(error);
-            }
-            else
-            {
-                // no return value
-                fprintf(file_ptr, "    xorpd xmm0, xmm0\n");
-            }
-            
-            fprintf(file_ptr, "    mov rsp, rbp\n");
-            fprintf(file_ptr, "    pop rbp\n");
-            fprintf(file_ptr, "    ret\n");
-            break;
-        }
-        default: break;
-    }
     return SUCCESS;
 }
 

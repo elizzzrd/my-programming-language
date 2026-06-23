@@ -12,6 +12,8 @@
     } while(0)
 
 #define ASM_OUTPUT "output/asm_output.txt"
+#define NASM_OUTPUT "output/nasm_output.asm"
+
 
 #define OUTPUT_FILE "output/output.txt"    
 #define OUTPUT(fmt, ...)                                               \
@@ -25,8 +27,7 @@
 
 
 #define MAX_CONSTANTS 1024
-static double constants[MAX_CONSTANTS];
-static int const_count = 0;
+
 
 
 typedef struct 
@@ -36,6 +37,7 @@ typedef struct
     bool initialized;
     bool is_parametr;
     int func_id;
+    int param_index;
 } var_info_t;
 
 typedef struct 
@@ -49,6 +51,17 @@ typedef struct
 } variables_t;
 
 
+void init_variables(void);
+int find_variable_in_current_func(const char * name);
+int add_variable(const char * name, bool is_parameter);
+var_info_t * get_variable_by_index(int index);
+void clear_variables_for_func(int func_id);
+int get_frame_size_for_func(int func_id);
+void clear_variables(void);
+void assign_offset_for_function(int func_id);
+ErrorCode collect_variables(Node_t * node);
+int new_label(void);
+int add_constant(double val);
 
 
 ErrorCode translate_to_nasm(Tree_t * tree, const char * filename);

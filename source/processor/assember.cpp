@@ -14,7 +14,7 @@
 #include "errors.h"
 #include "utils.h"
 
-
+#define DISABLE_DEBUG_PRINT
 
 static label_t g_labels[MAX_LABELS];
 static size_t labels_count = 0;

@@ -10,7 +10,7 @@
 #include "translate_to_asm.h"
 #include "utils.h"
 
-
+#define DISABLE_DEBUG_PRINT
 
 #define IF_THERE_IS_STACK_ERROR(stack_errors, fmt) \
     do { \

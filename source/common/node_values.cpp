@@ -9,6 +9,7 @@
 #include "utils.h"
 #include "lexer.h"
 
+#define DISABLE_DEBUG_PRINT
 
 const char * type_strings[] =
 {

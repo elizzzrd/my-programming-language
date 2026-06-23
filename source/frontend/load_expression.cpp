@@ -11,7 +11,7 @@
 #include "lexer.h"
 #include "errors.h"
 
-
+#define DISABLE_DEBUG_PRINT
 
 ErrorCode build_middleend_tree(Tree_t * tree, const char * expression_input)
 {

@@ -32,11 +32,8 @@ int main(void)
     DEBUG_PRINT("[DEBUG] backend tree was build successfully");
     
     error = SUCCESS;
-    error = translate_to_nasm(&tree_backend, ASM_OUTPUT);
+    error = translate_to_nasm(&tree_backend, NASM_OUTPUT);
     if (error == SUCCESS)
-    {
-        
-    }
     
     destroy_tree(&tree_backend, "destroy_backend");
     DEBUG_PRINT("[INFO] BACKEND END\n");

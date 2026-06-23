@@ -5,6 +5,7 @@
 #include "errors_spu.h"
 #include "utils.h"
 
+#define DISABLE_DEBUG_PRINT
 
 Stack_Err stack_verify(const stack_t * stack) 
 {

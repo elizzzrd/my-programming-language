@@ -9,6 +9,7 @@
 #include "utils.h"
 #include "errors_spu.h"
 
+#define DISABLE_DEBUG_PRINT
 
 const char * stack_commands[] = 
 {

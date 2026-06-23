@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include "stack.h"
 
+#define DISABLE_DEBUG_PRINT
+
 #define CANARY_LEFT_VALUE  0x7ABCDEFA
 #define CANARY_RIGHT_VALUE 0x12345678
 

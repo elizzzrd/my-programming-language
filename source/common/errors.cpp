@@ -11,7 +11,7 @@
 #include "math_functions.h"
 
 #define HTML_FILE "logger/page.html"
-
+#define DISABLE_DEBUG_PRINT
 
 const char * tree_error_string(ErrorCode error) 
 {

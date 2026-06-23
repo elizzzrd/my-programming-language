@@ -9,6 +9,7 @@
 #include "node_values.h"
 #include "latex_dump.h"
 
+#define DISABLE_DEBUG_PRINT
 
 ErrorCode evaluate_const_node(const Node_t * node, double * result)
 {

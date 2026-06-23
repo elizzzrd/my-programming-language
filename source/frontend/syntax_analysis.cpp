@@ -7,6 +7,7 @@
 #include "lexer.h"
 #include "syntax_analysis.h"
 
+#define DISABLE_DEBUG_PRINT
 
 /*-----------------------------------GRAMMAR------------------------------------
 Program     ::= Statement* '$'

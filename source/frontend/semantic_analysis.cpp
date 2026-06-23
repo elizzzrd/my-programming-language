@@ -6,7 +6,7 @@
 #include "semantic_analysis.h"
 #include "tree_structure.h"
 
-
+#define DISABLE_DEBUG_PRINT
 
 int symbol_table_find(const char * name, SymbolTable * st, st_mode_t mode)
 {
