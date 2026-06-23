@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
+#include <stdbool.h>
+#include <stdlib.h>
 
 #include "errors.h"
 #include "tree_structure.h"
@@ -9,27 +11,11 @@
 #include "translate_to_nasm.h"
 
 //--------------------------------------------------------------
-#define MAX_CONSTANTS 1024
-static double constants[MAX_CONSTANTS];
-static int const_count = 0;
-
-#define MAX_VARS 256
-typedef struct 
-{
-    char * name;
-    int offset;
-    bool initialized;
-} var_info_t;
-
-static var_info_t variables[MAX_VARS];
-static int var_count = 0;
-
 static int label_counter = 0;
-static int total_frame_size = 0; 
 
-//--------------------------------------------------------------
+
 static int add_constant(double val)
-{
+{    
     for (int i = 0; i < const_count; i++)
         if (fabs(constants[i] - val) < 1e-12)
             return i;
@@ -47,51 +33,168 @@ static int new_label(void)
 }
 
 //--------------------------------------------------------------
+variables_t vars = {};
+
+static void init_variables(void)
+{
+    vars.var_count = 0;
+    vars.var_capacity = 16;
+    vars.current_func_id = -1;
+    vars.var_list = (var_info_t *) calloc(vars.var_capacity, sizeof(var_info_t));
+}
+
+
 static int find_variable(const char * name)
 {
-    for (int i = 0; i < var_count; i++)
+    for (int i = 0; i < vars.var_count; i++)
     {
-        if (strcmp(variables[i].name, name) == 0)
+        if (strcmp(vars.var_list[i].name, name) == 0)
             return i;
     }
     return -1;
 }
 
-static int add_variable(const char * name)
+static int add_variable(const char * name, bool is_parameter)
 {
     int idx = find_variable(name);
     if (idx != -1)
-        return variables[idx].offset;
+        return vars.var_list[idx].offset;
 
-    if (var_count >= MAX_VARS)
-        return -1;
+    if (vars.var_count >= vars.var_capacity)
+    {
+        vars.var_capacity *= 2;
+        vars.var_list = (var_info_t *) realloc(vars.var_list, vars.var_capacity * sizeof(var_info_t));
+    }
     
-    int offset = -(var_count + 1)*8;
-    variables[var_count].name = strdup(name);
-    variables[var_count].offset = offset;
-    variables[var_count].initialized = false;
+    int cur_count = vars.var_count; 
+    
+    if (is_parameter)
+    {
 
-    var_count++;
-    total_frame_size += 8;
+    }
+    int offset = -(vars.var_count + 1) * 8;
 
+    vars.var_list[cur_count].name = strdup(name);
+    vars.var_list[cur_count].offset = offset;
+    vars.var_list[cur_count].initialized = false;
+    vars.var_list[cur_count].is_parametr = is_parameter;
+    vars.var_list[cur_count].func_id = vars.current_func_id;
+
+    vars.var_count++;
     return offset;
 }
 
 static var_info_t * get_variable_by_name(const char * name)
 {
     int idx = find_variable(name);
-    return (idx == -1) ? NULL: &variables[idx];
+    return (idx == -1) ? NULL: &vars.var_list[idx];
+}
+
+
+static void clear_variables_for_func(int func_id)
+{
+    int i = 0;
+    while (i < vars.var_count)
+    {
+        if (vars.var_list[i].func_id == func_id)
+        {
+            free(vars.var_list[i].name);
+
+            for (int j = i; j < vars.var_count - 1; j++)
+                vars.var_list[j] = vars.var_list[j+1];
+            
+            vars.var_count--;
+        }
+        else {
+            i++;
+        }
+    }
+}
+
+
+static int get_frame_size_for_func(int func_id)
+{
+    int size = 0;
+    for (int i = 0; i < vars.var_count; i++)
+    {
+        if (vars.var_list[i].func_id == func_id)
+            size += 8;
+    }
+    return size;
 }
 
 static void clear_variables(void)
 {
-    for (int i = 0; i < var_count; i++)
-        free(variables[i].name);
-    
-    var_count = 0;
-    total_frame_size = 0;
+    for (int i = 0; i < vars.var_count; i++)
+        free(vars.var_list[i].name);
+
+    free(vars.var_list);
+    vars.var_list = NULL;
+    vars.var_count = 0;
+    vars.var_capacity = 0;
 }
 //--------------------------------------------------------------
+
+ErrorCode collect_variables(Node_t * node)
+{
+    assert(node);
+    ErrorCode error = SUCCESS;
+
+    if (node->type == STATEMENT)
+    {
+        switch (node->value.stmt)
+        {
+            case OP_ASSIGNMENT:
+            case OP_VAR_DEF:
+            {
+                if (node->left && node->left->type == IDENTIFIER)
+                {
+                    int offset = add_variable(node->left->id.name, false);
+                    if (offset == -1)
+                        return SEMANTIC_ERROR;
+                }
+                break;
+            }
+            case OP_FUNC_DEF:
+            {
+                int old_func = vars.current_func_id;
+                vars.current_func_id = ++vars.func_counter;
+                
+                Node_t * params = node -> left;
+                int param_count = 0;
+    
+                if (params && params->type == STATEMENT && params->value.stmt == OP_PARAMS)
+                {
+                    Node_t * param = params->left;
+                    while (param)
+                    {
+                        if (param->type == IDENTIFIER)      
+                            add_variable(param->id.name, true);
+                        param = param -> left;
+                    }
+                }
+    
+                error = collect_variables(node -> right);
+                if (error != SUCCESS)
+                    return error;
+    
+                vars.current_func_id = old_func;
+                return SUCCESS;
+            }
+            default: break;
+        }
+    }
+    error = collect_variables(node->left);
+    if (error != SUCCESS)   return error;
+
+    error = collect_variables(node->right);
+    if (error != SUCCESS)   return error;
+
+    return SUCCESS;
+}
+
+
+
 
 
 ErrorCode translate_to_nasm(Tree_t * tree, const char * filename)
@@ -99,9 +202,18 @@ ErrorCode translate_to_nasm(Tree_t * tree, const char * filename)
     assert(tree && filename);
     ErrorCode error = SUCCESS; 
 
+    init_variables();
     const_count = 0;
-    clear_variables();
     label_counter = 0;
+
+    vars.current_func_id = 0;                       // global area
+    error = collect_variables(tree->root->right);
+    if (error != SUCCESS)
+        return error;
+
+    int frame_size = get_frame_size_for_func(0) + 32;
+    frame_size = (frame_size + 15) & ~15;
+    
     
     FILE * file_ptr = fopen(filename, "w");
     if (!file_ptr)
@@ -120,18 +232,18 @@ ErrorCode translate_to_nasm(Tree_t * tree, const char * filename)
     fprintf(file_ptr, "    push rbp\n");
     fprintf(file_ptr,"     mov rbp, rsp\n");
     
-    int frame_size = total_frame_size + 32;
     if (frame_size > 0)
         fprintf(file_ptr, "    sub rsp, %d\n", frame_size);
 
+    vars.current_func_id = 0;
     if (tree->root && tree->root->right)
     {
         error = emit_program(tree->root->right, file_ptr);
         if (error != SUCCESS)
         {
             fclose(file_ptr);
-        DEBUG_PRINT("[DEBUG] ERROR DURING TRANSLATION");
-        return TRANSLATING_TO_ASM_ERROR;
+            DEBUG_PRINT("[DEBUG] ERROR DURING TRANSLATION");
+            return TRANSLATING_TO_ASM_ERROR;
         }
     }
 
@@ -153,6 +265,8 @@ ErrorCode translate_to_nasm(Tree_t * tree, const char * filename)
         fprintf(file_ptr, "\n");
     }
 
+    clear_variables_for_func(0);
+    free(vars.var_list);
 
     DEBUG_PRINT("[DEBUG] TRANSLATION COMPLETED");
     return SUCCESS;
@@ -436,10 +550,6 @@ ErrorCode emit_statement(Node_t * node, FILE * file_ptr)
             error = emit_expression(node->right, file_ptr);
             IF_THERE_IS_TRANSLATE_ERROR(error);
 
-            int offset = add_variable(node->left->id.name);
-            if (offset == -1)
-                return SEMANTIC_ERROR;
-
             var_info_t * var = get_variable_by_name(node->left->id.name);
             if (var)
             {
@@ -455,6 +565,7 @@ ErrorCode emit_statement(Node_t * node, FILE * file_ptr)
 
             Node_t * condition = node->left;
             Node_t * stmt = node->right;
+            assert(condition && stmt);
 
             Node_t * if_body = stmt->left;
             Node_t * else_body = stmt->right; 
@@ -466,7 +577,7 @@ ErrorCode emit_statement(Node_t * node, FILE * file_ptr)
             fprintf(file_ptr, "    comisd xmm0, xmm1\n");
             fprintf(file_ptr, "    je .L_else_%d\n", label_else);
 
-            error = emit_expression(if_body, file_ptr); // if_body
+            error = emit_statement(if_body, file_ptr); // if_body
             IF_THERE_IS_TRANSLATE_ERROR(error);
 
             if (else_body)
@@ -474,7 +585,7 @@ ErrorCode emit_statement(Node_t * node, FILE * file_ptr)
                 fprintf(file_ptr, "    jmp .L_end_%d\n", label_endif);
                 fprintf(file_ptr, "    .L_else_%d:\n", label_else);
 
-                error = emit_expression(else_body, file_ptr);
+                error = emit_statement(else_body, file_ptr);
                 IF_THERE_IS_TRANSLATE_ERROR(error);
             }
 
@@ -495,7 +606,7 @@ ErrorCode emit_statement(Node_t * node, FILE * file_ptr)
             fprintf(file_ptr, "    comisd xmm0, xmm1\n");
             fprintf(file_ptr, "    je .L_while_end_%d\n", label_end);
 
-            error = emit_expression(node->right, file_ptr);
+            error = emit_statement(node->right, file_ptr);
             IF_THERE_IS_TRANSLATE_ERROR(error);
 
             fprintf(file_ptr, "    jmp .L_while_start_%d\n", label_start);
@@ -506,12 +617,12 @@ ErrorCode emit_statement(Node_t * node, FILE * file_ptr)
         {
             if (node->left)
             {
-                error = emit_expression(node->left, file_ptr);
+                error = emit_statement(node->left, file_ptr);
                 IF_THERE_IS_TRANSLATE_ERROR(error);
             }
             if (node->right)
             {
-                error = emit_expression(node->right, file_ptr);
+                error = emit_statement(node->right, file_ptr);
                 IF_THERE_IS_TRANSLATE_ERROR(error);
             }
             break;
@@ -521,11 +632,13 @@ ErrorCode emit_statement(Node_t * node, FILE * file_ptr)
             fprintf(file_ptr, "%s:\n", node->id.name);
             fprintf(file_ptr, "    push rbp\n");
             fprintf(file_ptr, "    mov rbp, rsp\n");
-            fprintf(file_ptr, "    sub rsp, 32\n");
+
+            int func_frame = get_frame_size_for_func(vars.current_func_id) + 32;
+            func_frame = (func_frame + 15) & ~15;
+            fprintf(file_ptr, "    sub rsp, %d\n", func_frame);
 
             Node_t * params = node -> left;
             int param_count = 0;
-            Node_t * param_list[16];
 
             if (params && params->type == STATEMENT && params->value.stmt == OP_PARAMS)
             {
@@ -533,34 +646,26 @@ ErrorCode emit_statement(Node_t * node, FILE * file_ptr)
                 while (param && param_count < 16)
                 {
                     if (param->type == IDENTIFIER)      
-                        param_list[param_count++] = param;
+                        if (param_count < 4)
+                        {
+                            var_info_t * var = get_variable_by_name(param->id.name);
+                            if (var)
+                                fprintf(file_ptr, "    movsd [rbp%+d], xmm%d\n", var->offset, param_count);
+                        }
+                        else
+                        {
+                             // TODO: processing parameters on the stack
+                        }
                     param = param -> left;
+                    param_count++;
                 }
-            }
-
-            // the parameters are passed through xmm0, xmm1, xmm2, xmm3
-            for (int i = 0; i < param_count && i < 4; i++)
-            {
-                int offset = -(i + 1) * 8;
-                param_list[i]->id.id_index = offset;
-                fprintf(file_ptr, "    movsd [rbp%+d], xmm%d\n", offset, i);
-            }
-
-            if (param_count > 4)
-            {
-                // TODO: processing parameters on the stack
             }
 
             Node_t * body = node->right;
             if (body)
             {
-                int saved_var_count = var_count;
-                var_count = param_count;
-    
                 error = emit_statement(body, file_ptr);
                 IF_THERE_IS_TRANSLATE_ERROR(error);
-
-                var_count = saved_var_count;
             }
 
 
@@ -586,29 +691,37 @@ ErrorCode emit_statement(Node_t * node, FILE * file_ptr)
                 }
             }
 
-            // evalute args for pushing in xmm% and stack
-            double temp_values[16];
-            for (int i = 0; i < arg_count; i++)
+            int stack_args_count = (arg_count > 4) ? (arg_count - 4) : 0;
+            if (stack_args_count > 0)
+            {
+                int stack_size = ((stack_args_count * 8 + 15) & ~ 15);
+                fprintf(file_ptr, "    sub rsp, %d\n", stack_size);
+            }
+
+            for (int i = arg_count - 1; i >= 4; i--)
             {
                 error = emit_expression(arg_list[i], file_ptr);
                 IF_THERE_IS_TRANSLATE_ERROR(error);
 
-                if (i < 4)
-                {
-                    fprintf(file_ptr, "    movapd xmm%d, xmm0\n", i);
-                }
-                else
-                {
-                    fprintf(file_ptr, "    sub rsp, 8\n");
-                    fprintf(file_ptr, "    movsd [rsp], xmm0\n");
-                }
+                int offset = (i - 4) * 8;
+                fprintf(file_ptr, "    movsd [rsp+%d], xmm0\n", offset);
             }
-            
+
+            for (int i = 3; i >= 0 && i < arg_count; i--)
+            {
+                error = emit_expression(arg_list[i], file_ptr);
+                IF_THERE_IS_TRANSLATE_ERROR(error);
+
+                fprintf(file_ptr, "    movapd xmm%d, xmm0\n", i);
+            }
+
             fprintf(file_ptr, "    call %s\n", node->id.name);
 
-            if (arg_count > 4)
-                fprintf(file_ptr, "    add rsp, %d\n", (arg_count - 4) * 8);
-
+            if (stack_args_count > 0)
+            {
+                int stack_size = ((stack_args_count * 8 + 15) & ~ 15);
+                fprintf(file_ptr, "    add rsp, %d\n", stack_size);
+            }
             break;
         }
         case OP_RETURN:
