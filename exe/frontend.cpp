@@ -29,8 +29,8 @@ int main(void)
     }
     
     size_t pos = 0;
-    Node_t * tree_root = GetProgram_tokens(&token_list, &pos, &tree);
-    SYNTAX_ANALISYS_ERROR(tree_root);
+    Node_t * tree_root = GetProgram_tokens(&token_list, &pos, &tree, &error);
+    SYNTAX_ANALISYS_ERROR(error);
     tree.root->right = tree_root;
     error = build_parent_links(&tree);
     BUILDING_FRONTEND_TREE_ERROR(error);

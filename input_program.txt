@@ -1,9 +1,12 @@
-ID_def a = 10;
-ID_def b = 3;
+def square{A}
+{{
+    ID_def A2 = A*A;
+    print {A2};
+}};
 
-ID_def g = a ^ b;
 
-
-print{g};
+ID_def a = 5;
+square{a};
 
 $
+

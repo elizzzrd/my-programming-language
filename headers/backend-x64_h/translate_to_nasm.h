@@ -62,6 +62,8 @@ void assign_offset_for_function(int func_id);
 ErrorCode collect_variables(Node_t * node);
 int new_label(void);
 int add_constant(double val);
+void clear_all_variables(void);
+void destroy_variables(void);
 
 
 ErrorCode translate_to_nasm(Tree_t * tree, const char * filename);

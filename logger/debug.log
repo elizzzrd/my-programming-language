@@ -1,48 +1,61 @@
 source/frontend/lexer.cpp:84: lexicalAnalysis: [INFO] LEXICAL_ANALYSIS START
 source/frontend/lexer.cpp:90: lexicalAnalysis: buffer:
-ID_def a = 10;
-ID_def b = 3;
+def square{A}
+{{
+    ID_def A2 = A*A;
+    print {A2};
+}};
 
-ID_def g = a ^ b;
 
-
-print{g};
+ID_def a = 5;
+square{a};
 
 $
+
+
 exe/frontend.cpp:19: main: [INFO] LEXICAL_ANALYSIS END
 source/frontend/lexer.cpp:329: lexer_dump: [LEXER DUMP]
-source/frontend/lexer.cpp:330: lexer_dump: token_list.count = 24, token_list->capacity = 32
+source/frontend/lexer.cpp:330: lexer_dump: token_list.count = 34, token_list->capacity = 64
 
-source/frontend/lexer.cpp:333: lexer_dump: token_0, TOK_ID_DEF, 0, ID_def
-source/frontend/lexer.cpp:333: lexer_dump: token_1, TOK_IDENTIFIER, 0, a
-source/frontend/lexer.cpp:333: lexer_dump: token_2, TOK_ASSIGN, 0, =
-source/frontend/lexer.cpp:333: lexer_dump: token_3, TOK_NUMBER, 10, 10
-source/frontend/lexer.cpp:333: lexer_dump: token_4, TOK_SEMICOLON, 0, ;
-source/frontend/lexer.cpp:333: lexer_dump: token_5, TOK_ID_DEF, 0, ID_def
-source/frontend/lexer.cpp:333: lexer_dump: token_6, TOK_IDENTIFIER, 0, b
-source/frontend/lexer.cpp:333: lexer_dump: token_7, TOK_ASSIGN, 0, =
-source/frontend/lexer.cpp:333: lexer_dump: token_8, TOK_NUMBER, 3, 3
-source/frontend/lexer.cpp:333: lexer_dump: token_9, TOK_SEMICOLON, 0, ;
-source/frontend/lexer.cpp:333: lexer_dump: token_10, TOK_ID_DEF, 0, ID_def
-source/frontend/lexer.cpp:333: lexer_dump: token_11, TOK_IDENTIFIER, 0, g
-source/frontend/lexer.cpp:333: lexer_dump: token_12, TOK_ASSIGN, 0, =
-source/frontend/lexer.cpp:333: lexer_dump: token_13, TOK_IDENTIFIER, 0, a
-source/frontend/lexer.cpp:333: lexer_dump: token_14, TOK_POW, 0, ^
-source/frontend/lexer.cpp:333: lexer_dump: token_15, TOK_IDENTIFIER, 0, b
-source/frontend/lexer.cpp:333: lexer_dump: token_16, TOK_SEMICOLON, 0, ;
-source/frontend/lexer.cpp:333: lexer_dump: token_17, TOK_PRINT, 0, print
-source/frontend/lexer.cpp:333: lexer_dump: token_18, TOK_LBRACE, 0, {
-source/frontend/lexer.cpp:333: lexer_dump: token_19, TOK_IDENTIFIER, 0, g
+source/frontend/lexer.cpp:333: lexer_dump: token_0, TOK_DEF, 0, def
+source/frontend/lexer.cpp:333: lexer_dump: token_1, TOK_IDENTIFIER, 0, square
+source/frontend/lexer.cpp:333: lexer_dump: token_2, TOK_LBRACE, 0, {
+source/frontend/lexer.cpp:333: lexer_dump: token_3, TOK_IDENTIFIER, 0, A
+source/frontend/lexer.cpp:333: lexer_dump: token_4, TOK_RBRACE, 0, }
+source/frontend/lexer.cpp:333: lexer_dump: token_5, TOK_LBRACE, 0, {
+source/frontend/lexer.cpp:333: lexer_dump: token_6, TOK_LBRACE, 0, {
+source/frontend/lexer.cpp:333: lexer_dump: token_7, TOK_ID_DEF, 0, ID_def
+source/frontend/lexer.cpp:333: lexer_dump: token_8, TOK_IDENTIFIER, 0, A2
+source/frontend/lexer.cpp:333: lexer_dump: token_9, TOK_ASSIGN, 0, =
+source/frontend/lexer.cpp:333: lexer_dump: token_10, TOK_IDENTIFIER, 0, A
+source/frontend/lexer.cpp:333: lexer_dump: token_11, TOK_MULTIPLY, 0, *
+source/frontend/lexer.cpp:333: lexer_dump: token_12, TOK_IDENTIFIER, 0, A
+source/frontend/lexer.cpp:333: lexer_dump: token_13, TOK_SEMICOLON, 0, ;
+source/frontend/lexer.cpp:333: lexer_dump: token_14, TOK_PRINT, 0, print
+source/frontend/lexer.cpp:333: lexer_dump: token_15, TOK_LBRACE, 0, {
+source/frontend/lexer.cpp:333: lexer_dump: token_16, TOK_IDENTIFIER, 0, A2
+source/frontend/lexer.cpp:333: lexer_dump: token_17, TOK_RBRACE, 0, }
+source/frontend/lexer.cpp:333: lexer_dump: token_18, TOK_SEMICOLON, 0, ;
+source/frontend/lexer.cpp:333: lexer_dump: token_19, TOK_RBRACE, 0, }
 source/frontend/lexer.cpp:333: lexer_dump: token_20, TOK_RBRACE, 0, }
 source/frontend/lexer.cpp:333: lexer_dump: token_21, TOK_SEMICOLON, 0, ;
-source/frontend/lexer.cpp:333: lexer_dump: token_22, TOK_END, 0, $
-source/frontend/lexer.cpp:333: lexer_dump: token_23, TOK_EOF, 0, 
-source/frontend/syntax_analysis.cpp:115: GetProgram_tokens: 
+source/frontend/lexer.cpp:333: lexer_dump: token_22, TOK_ID_DEF, 0, ID_def
+source/frontend/lexer.cpp:333: lexer_dump: token_23, TOK_IDENTIFIER, 0, a
+source/frontend/lexer.cpp:333: lexer_dump: token_24, TOK_ASSIGN, 0, =
+source/frontend/lexer.cpp:333: lexer_dump: token_25, TOK_NUMBER, 5, 5
+source/frontend/lexer.cpp:333: lexer_dump: token_26, TOK_SEMICOLON, 0, ;
+source/frontend/lexer.cpp:333: lexer_dump: token_27, TOK_IDENTIFIER, 0, square
+source/frontend/lexer.cpp:333: lexer_dump: token_28, TOK_LBRACE, 0, {
+source/frontend/lexer.cpp:333: lexer_dump: token_29, TOK_IDENTIFIER, 0, a
+source/frontend/lexer.cpp:333: lexer_dump: token_30, TOK_RBRACE, 0, }
+source/frontend/lexer.cpp:333: lexer_dump: token_31, TOK_SEMICOLON, 0, ;
+source/frontend/lexer.cpp:333: lexer_dump: token_32, TOK_END, 0, $
+source/frontend/lexer.cpp:333: lexer_dump: token_33, TOK_EOF, 0, 
+source/frontend/syntax_analysis.cpp:116: GetProgram_tokens: 
 [INFO] SYNTAX_ANALYSIS START
-source/frontend/syntax_analysis.cpp:588: GetVarDef_tokens: var_def node created
-source/frontend/syntax_analysis.cpp:588: GetVarDef_tokens: var_def node created
-source/frontend/syntax_analysis.cpp:588: GetVarDef_tokens: var_def node created
-source/frontend/syntax_analysis.cpp:172: GetProgram_tokens: all expression was parsed in tree
+source/frontend/syntax_analysis.cpp:618: GetVarDef_tokens: var_def node created
+source/frontend/syntax_analysis.cpp:618: GetVarDef_tokens: var_def node created
+source/frontend/syntax_analysis.cpp:179: GetProgram_tokens: all expression was parsed in tree
 source/common/tree_operations.cpp:180: build_parent_links: [INFO] start build parent links
 
 source/common/tree_operations.cpp:189: build_parent_links: [INFO] end build parent links
@@ -62,21 +75,25 @@ source/common/errors.cpp:131: tree_graph_dump: [INFO] Starting graph dump to log
 source/common/errors.cpp:175: tree_graph_dump: Graph dump completed: logger/dots/tree2.dot and logger/pics/graph_tree_destroy_frontend_2.png have been created
 
 source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x507000000100, type=IDENTIFIER
-source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x507000000170, type=NUMBER
-source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x5070000001e0, type=STATEMENT
+source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x507000000170, type=STATEMENT
+source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x5070000001e0, type=IDENTIFIER
 source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x507000000250, type=IDENTIFIER
-source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x5070000002c0, type=NUMBER
-source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x507000000330, type=STATEMENT
+source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x5070000002c0, type=IDENTIFIER
+source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x507000000330, type=OPERATOR
 source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x5070000003a0, type=STATEMENT
 source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x507000000410, type=IDENTIFIER
-source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x507000000480, type=IDENTIFIER
-source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x5070000004f0, type=IDENTIFIER
-source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x507000000560, type=OPERATOR
+source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x507000000480, type=STATEMENT
+source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x5070000004f0, type=STATEMENT
+source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x507000000560, type=STATEMENT
 source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x5070000005d0, type=STATEMENT
-source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x507000000640, type=STATEMENT
-source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x5070000006b0, type=IDENTIFIER
+source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x507000000640, type=IDENTIFIER
+source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x5070000006b0, type=NUMBER
 source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x507000000720, type=STATEMENT
 source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x507000000790, type=STATEMENT
+source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x507000000800, type=IDENTIFIER
+source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x507000000870, type=STATEMENT
+source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x5070000008e0, type=STATEMENT
+source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x507000000950, type=STATEMENT
 source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x507000000090, type=ROOT
 exe/middleend.cpp:14: main: [INFO] MIDDLEEND START
 
@@ -84,22 +101,26 @@ source/frontend/load_expression.cpp:26: build_middleend_tree: [DEBUG]: expressio
 
 source/frontend/load_expression.cpp:27: build_middleend_tree: [DEBUG] buffer:
 
-source/frontend/load_expression.cpp:28: build_middleend_tree: (op_end(op_end(op_end(var_def(a##0 nil nil)(10 nil nil))(var_def(b##1 nil nil)(3 nil nil)))(var_def(g##2 nil nil)(^(a##0 nil nil)(b##1 nil nil))))(print(g##2 nil nil)))
+source/frontend/load_expression.cpp:28: build_middleend_tree: (op_end(op_end(func_def##square(params(A##2 nil nil))(block(op_end(var_def(A2##0 nil nil)(*(A##2 nil nil)(A##2 nil nil)))(print(A2##0 nil nil)))))(var_def(a##1 nil nil)(5 nil nil)))(func_call##square(args(a##1 nil nil))))
 
 source/frontend/load_expression.cpp:151: read_node: [DEBUG] node has been succesfully created: STATEMENT
 source/frontend/load_expression.cpp:151: read_node: [DEBUG] node has been succesfully created: STATEMENT
 source/frontend/load_expression.cpp:151: read_node: [DEBUG] node has been succesfully created: STATEMENT
 source/frontend/load_expression.cpp:151: read_node: [DEBUG] node has been succesfully created: STATEMENT
 source/frontend/load_expression.cpp:151: read_node: [DEBUG] node has been succesfully created: IDENTIFIER
-source/frontend/load_expression.cpp:151: read_node: [DEBUG] node has been succesfully created: NUMBER
 source/frontend/load_expression.cpp:151: read_node: [DEBUG] node has been succesfully created: STATEMENT
-source/frontend/load_expression.cpp:151: read_node: [DEBUG] node has been succesfully created: IDENTIFIER
-source/frontend/load_expression.cpp:151: read_node: [DEBUG] node has been succesfully created: NUMBER
+source/frontend/load_expression.cpp:151: read_node: [DEBUG] node has been succesfully created: STATEMENT
 source/frontend/load_expression.cpp:151: read_node: [DEBUG] node has been succesfully created: STATEMENT
 source/frontend/load_expression.cpp:151: read_node: [DEBUG] node has been succesfully created: IDENTIFIER
 source/frontend/load_expression.cpp:151: read_node: [DEBUG] node has been succesfully created: OPERATOR
 source/frontend/load_expression.cpp:151: read_node: [DEBUG] node has been succesfully created: IDENTIFIER
 source/frontend/load_expression.cpp:151: read_node: [DEBUG] node has been succesfully created: IDENTIFIER
+source/frontend/load_expression.cpp:151: read_node: [DEBUG] node has been succesfully created: STATEMENT
+source/frontend/load_expression.cpp:151: read_node: [DEBUG] node has been succesfully created: IDENTIFIER
+source/frontend/load_expression.cpp:151: read_node: [DEBUG] node has been succesfully created: STATEMENT
+source/frontend/load_expression.cpp:151: read_node: [DEBUG] node has been succesfully created: IDENTIFIER
+source/frontend/load_expression.cpp:151: read_node: [DEBUG] node has been succesfully created: NUMBER
+source/frontend/load_expression.cpp:151: read_node: [DEBUG] node has been succesfully created: STATEMENT
 source/frontend/load_expression.cpp:151: read_node: [DEBUG] node has been succesfully created: STATEMENT
 source/frontend/load_expression.cpp:151: read_node: [DEBUG] node has been succesfully created: IDENTIFIER
 source/frontend/load_expression.cpp:38: build_middleend_tree: [DEBUG] all nodes was read
@@ -109,8 +130,7 @@ source/common/tree_operations.cpp:189: build_parent_links: [INFO] end build pare
 
 source/common/errors.cpp:185: tree_graph_middleend: [INFO] Starting graph dump in middleend to logger/dots/middleend_tree1.dot and logger/pics/graph_middleend_tree1.png
 
-source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x507000000330, type=NUMBER
-source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x507000000480, type=NUMBER
+source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x507000000800, type=NUMBER
 source/common/tree_operations.cpp:180: build_parent_links: [INFO] start build parent links
 
 source/common/tree_operations.cpp:189: build_parent_links: [INFO] end build parent links
@@ -123,20 +143,24 @@ source/common/errors.cpp:131: tree_graph_dump: [INFO] Starting graph dump to log
 source/common/errors.cpp:175: tree_graph_dump: Graph dump completed: logger/dots/tree1.dot and logger/pics/graph_tree_destroy_middleend_1.png have been created
 
 source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x5070000002c0, type=IDENTIFIER
-source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x507000000800, type=NUMBER
 source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x507000000250, type=STATEMENT
-source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x507000000410, type=IDENTIFIER
-source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x507000000870, type=NUMBER
-source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x5070000003a0, type=STATEMENT
-source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x5070000001e0, type=STATEMENT
+source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x507000000480, type=IDENTIFIER
 source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x507000000560, type=IDENTIFIER
-source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x507000000640, type=IDENTIFIER
+source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x5070000005d0, type=IDENTIFIER
+source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x5070000004f0, type=OPERATOR
+source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x507000000410, type=STATEMENT
 source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x5070000006b0, type=IDENTIFIER
-source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x5070000005d0, type=OPERATOR
-source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x5070000004f0, type=STATEMENT
-source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x507000000170, type=STATEMENT
+source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x507000000640, type=STATEMENT
+source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x5070000003a0, type=STATEMENT
+source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x507000000330, type=STATEMENT
+source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x5070000001e0, type=STATEMENT
 source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x507000000790, type=IDENTIFIER
+source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x5070000009c0, type=NUMBER
 source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x507000000720, type=STATEMENT
+source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x507000000170, type=STATEMENT
+source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x507000000950, type=IDENTIFIER
+source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x5070000008e0, type=STATEMENT
+source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x507000000870, type=STATEMENT
 source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x507000000100, type=STATEMENT
 source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x507000000090, type=ROOT
 exe/middleend.cpp:35: main: [INFO] MIDDLEEND END
@@ -146,22 +170,26 @@ source/frontend/load_expression.cpp:26: build_middleend_tree: [DEBUG]: expressio
 
 source/frontend/load_expression.cpp:27: build_middleend_tree: [DEBUG] buffer:
 
-source/frontend/load_expression.cpp:28: build_middleend_tree: (op_end(op_end(op_end(var_def(a##0 nil nil)(10 nil nil))(var_def(b##1 nil nil)(3 nil nil)))(var_def(g##2 nil nil)(^(a##0 nil nil)(b##1 nil nil))))(print(g##2 nil nil)))
+source/frontend/load_expression.cpp:28: build_middleend_tree: (op_end(op_end(func_def##square(params(A##2 nil nil))(block(op_end(var_def(A2##0 nil nil)(*(A##2 nil nil)(A##2 nil nil)))(print(A2##0 nil nil)))))(var_def(a##1 nil nil)(5 nil nil)))(func_call##square(args(a##1 nil nil))))
 
 source/frontend/load_expression.cpp:151: read_node: [DEBUG] node has been succesfully created: STATEMENT
 source/frontend/load_expression.cpp:151: read_node: [DEBUG] node has been succesfully created: STATEMENT
 source/frontend/load_expression.cpp:151: read_node: [DEBUG] node has been succesfully created: STATEMENT
 source/frontend/load_expression.cpp:151: read_node: [DEBUG] node has been succesfully created: STATEMENT
 source/frontend/load_expression.cpp:151: read_node: [DEBUG] node has been succesfully created: IDENTIFIER
-source/frontend/load_expression.cpp:151: read_node: [DEBUG] node has been succesfully created: NUMBER
 source/frontend/load_expression.cpp:151: read_node: [DEBUG] node has been succesfully created: STATEMENT
-source/frontend/load_expression.cpp:151: read_node: [DEBUG] node has been succesfully created: IDENTIFIER
-source/frontend/load_expression.cpp:151: read_node: [DEBUG] node has been succesfully created: NUMBER
+source/frontend/load_expression.cpp:151: read_node: [DEBUG] node has been succesfully created: STATEMENT
 source/frontend/load_expression.cpp:151: read_node: [DEBUG] node has been succesfully created: STATEMENT
 source/frontend/load_expression.cpp:151: read_node: [DEBUG] node has been succesfully created: IDENTIFIER
 source/frontend/load_expression.cpp:151: read_node: [DEBUG] node has been succesfully created: OPERATOR
 source/frontend/load_expression.cpp:151: read_node: [DEBUG] node has been succesfully created: IDENTIFIER
 source/frontend/load_expression.cpp:151: read_node: [DEBUG] node has been succesfully created: IDENTIFIER
+source/frontend/load_expression.cpp:151: read_node: [DEBUG] node has been succesfully created: STATEMENT
+source/frontend/load_expression.cpp:151: read_node: [DEBUG] node has been succesfully created: IDENTIFIER
+source/frontend/load_expression.cpp:151: read_node: [DEBUG] node has been succesfully created: STATEMENT
+source/frontend/load_expression.cpp:151: read_node: [DEBUG] node has been succesfully created: IDENTIFIER
+source/frontend/load_expression.cpp:151: read_node: [DEBUG] node has been succesfully created: NUMBER
+source/frontend/load_expression.cpp:151: read_node: [DEBUG] node has been succesfully created: STATEMENT
 source/frontend/load_expression.cpp:151: read_node: [DEBUG] node has been succesfully created: STATEMENT
 source/frontend/load_expression.cpp:151: read_node: [DEBUG] node has been succesfully created: IDENTIFIER
 source/frontend/load_expression.cpp:38: build_middleend_tree: [DEBUG] all nodes was read
@@ -174,49 +202,52 @@ source/common/errors.cpp:131: tree_graph_dump: [INFO] Starting graph dump to log
 source/common/errors.cpp:175: tree_graph_dump: Graph dump completed: logger/dots/tree1.dot and logger/pics/graph_tree_backend_1.png have been created
 
 exe/backend-x64.cpp:32: main: [DEBUG] backend tree was build successfully
-source/backend_x64/translate_to_nasm.cpp:50: translate_to_nasm: [DEBUG] variables initialized
-source/backend_x64/translate_to_nasm.cpp:57: translate_to_nasm: [DEBUG] valiables collected
-source/backend_x64/translate_to_nasm.cpp:59: translate_to_nasm: [DEBUG] offsets done
-source/backend_x64/translate_to_nasm.cpp:70: translate_to_nasm: [INFO] TRANSLATION START
+source/backend_x64/translate_to_nasm.cpp:49: translate_to_nasm: [DEBUG] variables initialized
+source/backend_x64/translate_to_nasm.cpp:56: translate_to_nasm: [DEBUG] valiables collected
+source/backend_x64/translate_to_nasm.cpp:58: translate_to_nasm: [DEBUG] offsets done
+source/backend_x64/translate_to_nasm.cpp:69: translate_to_nasm: [INFO] TRANSLATION START
 
 source/backend_x64/translate_to_nasm.cpp:406: emit_expression: [DEBUG] emit_expression: type = STATEMENT
 source/backend_x64/translate_to_nasm.cpp:406: emit_expression: [DEBUG] emit_expression: type = STATEMENT
-source/backend_x64/translate_to_nasm.cpp:406: emit_expression: [DEBUG] emit_expression: type = STATEMENT
-source/backend_x64/translate_to_nasm.cpp:406: emit_expression: [DEBUG] emit_expression: type = NUMBER
-source/backend_x64/translate_to_nasm.cpp:406: emit_expression: [DEBUG] emit_expression: type = STATEMENT
-source/backend_x64/translate_to_nasm.cpp:406: emit_expression: [DEBUG] emit_expression: type = NUMBER
 source/backend_x64/translate_to_nasm.cpp:406: emit_expression: [DEBUG] emit_expression: type = STATEMENT
 source/backend_x64/translate_to_nasm.cpp:406: emit_expression: [DEBUG] emit_expression: type = OPERATOR
 source/backend_x64/translate_to_nasm.cpp:406: emit_expression: [DEBUG] emit_expression: type = IDENTIFIER
-source/backend_x64/translate_to_nasm.cpp:431: emit_expression: a -- 0
+source/backend_x64/translate_to_nasm.cpp:431: emit_expression: A -- 2
 
 source/backend_x64/translate_to_nasm.cpp:406: emit_expression: [DEBUG] emit_expression: type = IDENTIFIER
-source/backend_x64/translate_to_nasm.cpp:431: emit_expression: b -- 1
+source/backend_x64/translate_to_nasm.cpp:431: emit_expression: A -- 2
 
 source/backend_x64/translate_to_nasm.cpp:406: emit_expression: [DEBUG] emit_expression: type = STATEMENT
 source/backend_x64/translate_to_nasm.cpp:406: emit_expression: [DEBUG] emit_expression: type = IDENTIFIER
-source/backend_x64/translate_to_nasm.cpp:431: emit_expression: g -- 2
+source/backend_x64/translate_to_nasm.cpp:431: emit_expression: A2 -- 0
 
-source/backend_x64/translate_to_nasm.cpp:120: translate_to_nasm: [DEBUG] TRANSLATION COMPLETED
+source/backend_x64/translate_to_nasm.cpp:406: emit_expression: [DEBUG] emit_expression: type = STATEMENT
+source/backend_x64/translate_to_nasm.cpp:406: emit_expression: [DEBUG] emit_expression: type = NUMBER
+source/backend_x64/translate_to_nasm.cpp:406: emit_expression: [DEBUG] emit_expression: type = STATEMENT
+source/backend_x64/translate_to_nasm.cpp:118: translate_to_nasm: [DEBUG] TRANSLATION COMPLETED
 source/common/errors.cpp:131: tree_graph_dump: [INFO] Starting graph dump to logger/dots/tree2.dot and logger/pics/graph_tree_destroy_backend_2.png
 
 source/common/errors.cpp:175: tree_graph_dump: Graph dump completed: logger/dots/tree2.dot and logger/pics/graph_tree_destroy_backend_2.png have been created
 
 source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x5070000002c0, type=IDENTIFIER
-source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x507000000330, type=NUMBER
 source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x507000000250, type=STATEMENT
-source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x507000000410, type=IDENTIFIER
-source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x507000000480, type=NUMBER
-source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x5070000003a0, type=STATEMENT
-source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x5070000001e0, type=STATEMENT
+source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x507000000480, type=IDENTIFIER
 source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x507000000560, type=IDENTIFIER
-source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x507000000640, type=IDENTIFIER
+source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x5070000005d0, type=IDENTIFIER
+source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x5070000004f0, type=OPERATOR
+source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x507000000410, type=STATEMENT
 source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x5070000006b0, type=IDENTIFIER
-source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x5070000005d0, type=OPERATOR
-source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x5070000004f0, type=STATEMENT
-source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x507000000170, type=STATEMENT
+source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x507000000640, type=STATEMENT
+source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x5070000003a0, type=STATEMENT
+source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x507000000330, type=STATEMENT
+source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x5070000001e0, type=STATEMENT
 source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x507000000790, type=IDENTIFIER
+source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x507000000800, type=NUMBER
 source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x507000000720, type=STATEMENT
+source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x507000000170, type=STATEMENT
+source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x507000000950, type=IDENTIFIER
+source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x5070000008e0, type=STATEMENT
+source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x507000000870, type=STATEMENT
 source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x507000000100, type=STATEMENT
 source/common/tree_operations.cpp:159: destroy_node: Destroying node 0x507000000090, type=ROOT
 exe/backend-x64.cpp:39: main: [INFO] BACKEND END

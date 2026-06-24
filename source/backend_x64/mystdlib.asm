@@ -11,7 +11,7 @@ extern sqrt
 extern exp
 
 section .data
-fmt_double      db "g", 10, 0
+fmt_double      db "%g", 10, 0
 fmt_double_in   db "%lg", 0
 
 section .text
@@ -35,6 +35,7 @@ _my_printf:
     sub rsp, 32
 
     lea rdi, [fmt_double]
+    mov rax, 1
     call printf
 
     mov rsp, rbp
@@ -49,7 +50,7 @@ global _my_read:
 _my_read:
     push rbp
     mov rbp, rsp
-    sub rsp, 32
+    sub rsp, 40
 
     sub rsp, 8
     lea rsi, [rsp]
@@ -64,23 +65,4 @@ _my_read:
     pop rbp
     ret    
 
-
-;--------------------------------------------------------------
-;   _read_double
-;--------------------------------------------------------------
-global _read_double
-_read_double:
-    push rbp
-    mov rbp, rsp
-    sub rsp, 16
-
-    lea rsi, [rsp]
-    mov rdi, fmt_scan
-    xor eax, eax
-    call scanf
-    movsd xmm0, [rsp]
-
-    mov rsp, rbp
-    pop rbp
-    ret
 

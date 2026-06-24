@@ -81,6 +81,28 @@ void clear_variables_for_func(int func_id)
     }
 }
 
+void clear_all_variables(void)
+{
+    for (int i = 0; i < vars.var_count; i++) {
+        if (vars.var_list[i].name) {
+            free(vars.var_list[i].name);
+            vars.var_list[i].name = NULL;
+        }
+    }
+    vars.var_count = 0;
+}
+
+
+void destroy_variables(void)
+{
+    clear_all_variables();
+    if (vars.var_list) {
+        free(vars.var_list);
+        vars.var_list = NULL;
+    }
+    vars.var_capacity = 0;
+}
+
 
 int get_frame_size_for_func(int func_id)
 {
