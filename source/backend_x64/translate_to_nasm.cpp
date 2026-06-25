@@ -36,11 +36,11 @@ int new_label(void)
 //--------------------------------------------------------------
 extern variables_t vars;
 
+
 ErrorCode translate_to_nasm(Tree_t * tree, const char * filename)
 {
     assert(tree && filename);
     ErrorCode error = SUCCESS; 
-
 
     init_variables();
     const_count = 0;
@@ -56,9 +56,6 @@ ErrorCode translate_to_nasm(Tree_t * tree, const char * filename)
     DEBUG_PRINT("[DEBUG] valiables collected");
     assign_offset_for_function(0);
     DEBUG_PRINT("[DEBUG] offsets done");
-
-    int frame_size = get_frame_size_for_func(0) + 32;
-    frame_size = (frame_size + 15) & ~15;
     
     FILE * file_ptr = fopen(filename, "w");
     if (!file_ptr)
@@ -69,32 +66,33 @@ ErrorCode translate_to_nasm(Tree_t * tree, const char * filename)
     DEBUG_PRINT("[INFO] TRANSLATION START\n");
 
     fprintf(file_ptr, "default rel\n");
-    fprintf(file_ptr, "global main\n\n");
     fprintf(file_ptr, "%%include \"/home/gardina_elizaveta/projects/1sem/language/source/backend_x64/mystdlib.asm\"\n"); 
 
-    
-
     fprintf(file_ptr, "section .text\n\n");
+    vars.current_func_id = 1;
+    error = emit_functions(tree->root->right, file_ptr);
+    IF_THERE_IS_TRANSLATE_ERROR(error);
+
+    vars.current_func_id = 0;
+    int frame_size = get_frame_size_for_func(0) + 32;
+    frame_size = (frame_size + 15) & ~15;
+
+    fprintf(file_ptr, "global main\n\n");
     fprintf(file_ptr, "main:\n");
     fprintf(file_ptr, "    push rbp\n");
     fprintf(file_ptr, "    mov rbp, rsp\n");
     
     if (frame_size > 0)
         fprintf(file_ptr, "    sub rsp, %d\n\n", frame_size);
-
-
-    vars.current_func_id = 0;
-    if (tree->root && tree->root->right)
+    
+    error = emit_main(tree->root->right, file_ptr);
+    if (error != SUCCESS)
     {
-        error = emit_program(tree->root->right, file_ptr);
-        if (error != SUCCESS)
-        {
-            fclose(file_ptr);
-            DEBUG_PRINT("[DEBUG] ERROR DURING TRANSLATION");
-            return TRANSLATING_TO_ASM_ERROR;
-        }
+        fclose(file_ptr);
+        DEBUG_PRINT("[DEBUG] ERROR DURING TRANSLATION");
+        return TRANSLATING_TO_ASM_ERROR;
     }
-
+    
     fprintf(file_ptr, "\n    xor eax, eax\n");
     fprintf(file_ptr, "    mov rsp, rbp\n");
     fprintf(file_ptr, "    pop rbp\n");
@@ -120,30 +118,87 @@ ErrorCode translate_to_nasm(Tree_t * tree, const char * filename)
 }
 
 
-ErrorCode emit_program(Node_t * node, FILE * file_ptr)
+ErrorCode emit_functions(Node_t * node, FILE * file_ptr)
 {
-    if (!node)
-        return SUCCESS;
+    assert(file_ptr);
+    if (!node)      return SUCCESS;
     ErrorCode error = SUCCESS;
+
+    if (node->type == STATEMENT && node->value.stmt == OP_FUNC_DEF)
+    {
+        error = emit_statement(node, file_ptr);
+        IF_THERE_IS_TRANSLATE_ERROR(error);
+        return SUCCESS;
+    }
+
+    error = emit_functions(node->left, file_ptr);
+    IF_THERE_IS_TRANSLATE_ERROR(error);
+
+    error = emit_functions(node->right, file_ptr);
+    IF_THERE_IS_TRANSLATE_ERROR(error);
+
+    return SUCCESS;
+
+}
+
+
+ErrorCode emit_main(Node_t * node, FILE * file_ptr)
+{
+    if (!node)      return SUCCESS;
+    ErrorCode error = SUCCESS;
+
+    // if (node->type == STATEMENT && node->value.stmt == OP_FUNC_DEF)
+    //     return SUCCESS;
+
+    // if (node->type == ROOT)
+    // {
+    //     if (node->left)
+    //     {
+    //         error = emit_main(node->left, file_ptr);
+    //         IF_THERE_IS_TRANSLATE_ERROR(error);
+    //     }
+    //     if (node->right)
+    //     {
+    //         error = emit_main(node->right, file_ptr);
+    //         IF_THERE_IS_TRANSLATE_ERROR(error);
+    //     }
+    //     return SUCCESS;
+    // }
+
 
     if (node->type == ROOT)
     {
-        if (node->left)
-        {
-            error = emit_program(node->left, file_ptr);
-            if (error != SUCCESS)
-                return error;
-        }
-        if (node->right)
-        {
-            error = emit_program(node->right, file_ptr);
-            if (error != SUCCESS)
-                return error;
-        }
-    }
-    return emit_statement(node, file_ptr);
-}
+        error = emit_main(node->left, file_ptr);
+        IF_THERE_IS_TRANSLATE_ERROR(error);
 
+        error = emit_main(node->right, file_ptr);
+        IF_THERE_IS_TRANSLATE_ERROR(error);
+
+        return SUCCESS;
+    }
+
+    if (node->type == STATEMENT && node->value.stmt == OP_FUNC_DEF)
+        return SUCCESS;
+    
+    if (node->type == STATEMENT && (node->value.stmt == OP_END ||
+                                    node->value.stmt == OP_STATEMENT))
+    {
+        error = emit_main(node->left, file_ptr);
+        IF_THERE_IS_TRANSLATE_ERROR(error);
+
+        error = emit_main(node->right, file_ptr);
+        IF_THERE_IS_TRANSLATE_ERROR(error);
+
+        return SUCCESS;
+    }
+
+
+    error = emit_statement(node, file_ptr);
+    IF_THERE_IS_TRANSLATE_ERROR(error);
+
+    return SUCCESS;
+}
+    
 
 
 
@@ -167,20 +222,18 @@ ErrorCode emit_statement(Node_t * node, FILE * file_ptr)
         }
         case OP_PRINT:
         {
-            Node_t * arg = NULL;
-            if (node->left)
-                arg = node->left;
-            else if (node->right)
-                arg = node->right;
+            Node_t * arg = (node->left) ? (node->left) : (node->right);
 
             error = emit_expression(arg, file_ptr);              
             IF_THERE_IS_TRANSLATE_ERROR(error);
+
             
             // if (arg->type == STRING)
             //     fprintf(file_ptr, "puts\n");
             // else
             //     fprintf(file_ptr, "out\n");
             // break;
+
 
             fprintf(file_ptr, "\n    mov rdi, fmt_print\n");
             fprintf(file_ptr, "    mov eax, 1\n");
@@ -430,10 +483,15 @@ ErrorCode emit_expression(Node_t * node, FILE * file_ptr)
         {
             DEBUG_PRINT("%s -- %d\n", node->id.name, node->id.id_index);
             var_info_t * var = get_variable_by_index(node->id.id_index);
-            if (!var)      
-                error = SEMANTIC_ERROR;    
-            IF_THERE_IS_TRANSLATE_ERROR(error);
-
+            if (!var)    
+            {
+                var = get_variable_by_name(node->id.name);
+                if (!var)
+                {
+                    error = SEMANTIC_ERROR;    
+                    IF_THERE_IS_TRANSLATE_ERROR(error);
+                }
+            }      
             fprintf(file_ptr, "    movsd xmm0, [rbp%+d]\n", var->offset);
             break;
         }

@@ -1,0 +1,10 @@
+ID_def x = 0;
+ID_def y = 0;
+
+read {x};
+read {y};
+
+ID_def z = x + y;
+print{z};
+
+$

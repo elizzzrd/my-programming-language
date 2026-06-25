@@ -55,6 +55,7 @@ void init_variables(void);
 int find_variable_in_current_func(const char * name);
 int add_variable(const char * name, bool is_parameter);
 var_info_t * get_variable_by_index(int index);
+var_info_t * get_variable_by_name(char * name);
 void clear_variables_for_func(int func_id);
 int get_frame_size_for_func(int func_id);
 void clear_variables(void);
@@ -67,7 +68,8 @@ void destroy_variables(void);
 
 
 ErrorCode translate_to_nasm(Tree_t * tree, const char * filename);
-ErrorCode emit_program(Node_t * node, FILE * file_ptr);
+ErrorCode emit_main(Node_t * node, FILE * file_ptr);
+ErrorCode emit_functions(Node_t * node, FILE * file_ptr);
 ErrorCode emit_expression(Node_t * node, FILE * file_ptr);
 ErrorCode emit_operator(Node_t * node, FILE * file_ptr);
 ErrorCode emit_cmp_x64(Node_t * node, FILE * file_ptr, operator_t op);

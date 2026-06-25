@@ -1,4 +1,5 @@
 /build
 /logger/dots
-/tests
+/tests/test_program.cpp
+
 

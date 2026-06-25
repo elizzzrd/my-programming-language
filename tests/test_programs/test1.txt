@@ -1,0 +1,16 @@
+ID_def a = 10;
+ID_def b = 3;
+
+ID_def c = a + b;
+ID_def d = a - b;
+ID_def e = a * b;
+ID_def f = a / b;
+ID_def g = a ^ b;
+
+print{c};
+print{d};
+print{e};
+print{f};
+print{g};
+
+$

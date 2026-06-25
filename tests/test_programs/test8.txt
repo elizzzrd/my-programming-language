@@ -1,0 +1,20 @@
+def add{a, b} 
+{{
+    out a + b;
+}}
+
+def mul{a, b} 
+{{
+    out {a * b};
+}}
+
+def calc{x, y} 
+{{
+    ID_def sum = add{x, y};
+    ID_def prod = mul{x, y};
+    out {sum + prod};
+}}
+
+ID_def result = calc{3, 4};
+print{result};
+$

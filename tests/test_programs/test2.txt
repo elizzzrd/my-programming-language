@@ -1,0 +1,24 @@
+ID_def x = 5;
+ID_def y = 10;
+
+if {x < y} 
+{{
+    print{1};
+}} 
+else 
+{{
+    print{0};
+}};
+
+
+if {x >= 5} 
+{{
+    print{150};
+}};
+
+if {y != 5}
+{{
+    print{200};
+}};
+
+$

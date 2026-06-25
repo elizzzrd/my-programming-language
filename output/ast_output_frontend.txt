@@ -1,1 +1,1 @@
-(op_end(op_end(func_def##square(params(A##2 nil nil))(block(op_end(var_def(A2##0 nil nil)(*(A##2 nil nil)(A##2 nil nil)))(print(A2##0 nil nil)))))(var_def(a##1 nil nil)(5 nil nil)))(func_call##square(args(a##1 nil nil))))
+(op_end(op_end(op_end(func_def##square(params(A##3 nil nil))(block(op_end(var_def(A2##0 nil nil)(*(A##3 nil nil)(A##3 nil nil)))(return(A2##0 nil nil)))))(var_def(a##1 nil nil)(5 nil nil)))(var_def(b##2 nil nil)(func_call##square(args(a##1 nil nil)))))(print(b##2 nil nil)))

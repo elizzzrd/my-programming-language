@@ -60,6 +60,14 @@ var_info_t * get_variable_by_index(int index)
     return &vars.var_list[index];
 }
 
+var_info_t * get_variable_by_name(char * name)
+{
+    assert(name);
+    int index = find_variable_in_current_func(name);
+    if (index == -1)
+        return NULL;
+    return &vars.var_list[index];
+}
 
 void clear_variables_for_func(int func_id)
 {
@@ -166,6 +174,15 @@ ErrorCode collect_variables(Node_t * node)
     if (!node)      return SUCCESS;
     ErrorCode error = SUCCESS;
 
+    if (node->type == IDENTIFIER)
+    {
+        int idx = find_variable_in_current_func(node->id.name);
+        if (idx == -1)
+            return SEMANTIC_ERROR;
+
+        node->id.id_index = idx;
+    }
+
     if (node->type == STATEMENT)
     {
         switch (node->value.stmt)
@@ -186,7 +203,8 @@ ErrorCode collect_variables(Node_t * node)
             case OP_FUNC_DEF:
             {
                 int old_func = vars.current_func_id;
-                vars.current_func_id = ++vars.func_counter;
+                int new_func_id = ++vars.func_counter;
+                vars.current_func_id = new_func_id;
                 
                 Node_t * params = node -> left;
                 int param_count = 0;
@@ -209,7 +227,7 @@ ErrorCode collect_variables(Node_t * node)
                 if (error != SUCCESS)
                     return error;
 
-                assign_offset_for_function(vars.current_func_id);
+                assign_offset_for_function(new_func_id);
     
                 vars.current_func_id = old_func;
                 return SUCCESS;

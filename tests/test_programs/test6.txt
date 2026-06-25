@@ -1,0 +1,27 @@
+ID_def a = 5;
+ID_def b = 5;
+ID_def c = 3;
+ID_def d = 7;
+
+print{a == b};   
+print{a != c};   
+print{a < d};    
+print{a <= b};   
+print{a > c};    
+print{a >= b};   
+print{a == c};   
+print{a != b};   
+print{a < c};    
+print{a > d};    
+
+$
+1
+1
+1
+1
+1
+1
+0
+0
+0
+0
