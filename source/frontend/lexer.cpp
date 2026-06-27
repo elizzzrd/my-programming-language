@@ -54,6 +54,7 @@ token_t is_token_keyword(const char * word)
 }
 
 
+
 // -------------------------------------------------------------------------------------------------------
 
 frontend_err lexical_analysis(TokenList * token_list)
@@ -63,8 +64,8 @@ frontend_err lexical_analysis(TokenList * token_list)
     frontend_err error = FRONTEND_SUCCESS;
     token_list_ctor(token_list);
 
-    char * buffer = NULL;
-    buffer_err b_err = buffer_ctor(buffer, EXPRESSION_INPUT);
+    buffer_err b_err = BUFFER_SUCCESS;
+    char * buffer = buffer_ctor(&b_err, EXPRESSION_INPUT);
     if (b_err != BUFFER_SUCCESS)   
         return LOADING_EXPRESSION_ERROR;
     DEBUG_PRINT("buffer:\n%s", buffer);
@@ -93,7 +94,11 @@ frontend_err lexical_analysis(TokenList * token_list)
 
             char * word = strndup(start, len);
             if (!word)
+            {
+                buffer_dtor(buffer);
+                token_list_dtor(token_list); 
                 return MEMORY_ALLOCATION_ERROR;
+            }
 
             token_t type = is_token_keyword(word);
             free(word);
@@ -134,6 +139,7 @@ frontend_err lexical_analysis(TokenList * token_list)
             else
             {
                 buffer_dtor(buffer);
+                token_list_dtor(token_list);
                 return FORGOTTEN_QUATATION_MARK;
             }
             continue;
@@ -204,6 +210,7 @@ frontend_err lexical_analysis(TokenList * token_list)
                 else
                 {    
                     buffer_dtor(buffer);
+                    token_list_dtor(token_list);
                     DEBUG_PRINT("Unknown char: %d\n", *p); 
                     return UNKNOWN_CHAR;
                 }
@@ -221,15 +228,7 @@ frontend_err lexical_analysis(TokenList * token_list)
         p++;
     }
 
-    // EOF token
-    if (*p == '$')
-        TOKEN_PUSH(make_token(TOK_EOF, "", 0));
-    else
-    {
-        buffer_dtor(buffer);
-        return FORGOTTEN_EOF;
-    }
-
+    TOKEN_PUSH(make_token(TOK_EOF, "", 0));
     buffer_dtor(buffer);
     return FRONTEND_SUCCESS;
 }
@@ -283,7 +282,7 @@ int token_list_push(TokenList * token_list, Token cur_token)
 
     if (token_list->count == token_list->capasity)
     {
-        if (!token_list_resize(token_list))
+        if (token_list_resize(token_list) != FRONTEND_SUCCESS)
             return -1;
     }
 

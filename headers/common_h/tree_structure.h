@@ -2,32 +2,7 @@
 
 #include <stdbool.h>
 #include "node_values.h"
-
-typedef enum 
-{
-    SUCCESS = 0,
-
-    TREE_NULL_POINTER,
-    TREE_MEMORY_ALLOCATION_ERROR,
-    TREE_EMPTY_TREE,
-    TREE_DELETION_ERROR,
-    TREE_INVALID_NODE_TYPE,
-    TREE_INVALID_OPERATOR,
-    TREE_CREATING_NODE_ERROR,
-    
-    OPENING_FILE_ERROR,
-    LOADING_EXPRESSION_ERROR,
-    SAVING_LATEX_ERROR,
-    GRAPH_DUMP_ERROR,
-    DIFFERENTIATION_ERROR,
-
-    LEXER_ERROR,
-    PARSER_ERROR,
-    TRANSLATING_TO_ASM_ERROR,
-    SYNTAX_ERROR,
-    SEMANTIC_ERROR
-} ErrorCode;
-
+#include "errors.h"
 
 
 typedef struct treenode
@@ -54,10 +29,21 @@ typedef struct
 } Tree_t;
 
 
+
+typedef enum
+{
+    TREE_SUCCESS,
+    TREE_NULL_POINTER,
+    TREE_DELETION_ERROR,
+    TREE_CREATING_NODE_ERROR,
+    TREE_ALLOCATION_ERROR,
+    EMPTY_TREE,
+    TREE_INVALID_NODE
+} tree_err;
+
 typedef struct 
 {
-    Node_t * node;
-    ErrorCode error;
+        Node_t * node;
+        tree_err error;    
 } Node_result_t; 
-
-
+    

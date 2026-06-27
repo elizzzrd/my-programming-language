@@ -97,7 +97,7 @@ static Token * current_token(TokenList * tokens, size_t pos)
 }
 
 // ----------------------------------------------------------------------------------------------------------------------
-extern const error_struct frontend_error_list[];
+
 
 
 //  Program     ::= Statement* '$'

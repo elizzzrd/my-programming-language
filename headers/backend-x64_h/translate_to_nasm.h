@@ -2,14 +2,6 @@
 #include "tree_structure.h"
 #include <stdio.h>
 
-#define IF_THERE_IS_TRANSLATE_ERROR(errors) \
-    do { \
-        if (error != SUCCESS) \
-            { \
-                ERROR_MESSAGE(TRANSLATING_TO_ASM_ERROR, error); \
-                return error; \
-            } \
-    } while(0)
 
 #define ASM_OUTPUT "output/asm_output.txt"
 #define NASM_OUTPUT "output/nasm_output.asm"
@@ -60,17 +52,17 @@ void clear_variables_for_func(int func_id);
 int get_frame_size_for_func(int func_id);
 void clear_variables(void);
 void assign_offset_for_function(int func_id);
-ErrorCode collect_variables(Node_t * node);
+backend_err collect_variables(Node_t * node);
 int new_label(void);
 int add_constant(double val);
 void clear_all_variables(void);
 void destroy_variables(void);
 
 
-ErrorCode translate_to_nasm(Tree_t * tree, const char * filename);
-ErrorCode emit_main(Node_t * node, FILE * file_ptr);
-ErrorCode emit_functions(Node_t * node, FILE * file_ptr);
-ErrorCode emit_expression(Node_t * node, FILE * file_ptr);
-ErrorCode emit_operator(Node_t * node, FILE * file_ptr);
-ErrorCode emit_cmp_x64(Node_t * node, FILE * file_ptr, operator_t op);
-ErrorCode emit_statement(Node_t * node, FILE * file_ptr);
+backend_err translate_to_nasm(Tree_t * tree, const char * filename);
+backend_err emit_main(Node_t * node, FILE * file_ptr);
+backend_err emit_functions(Node_t * node, FILE * file_ptr);
+backend_err emit_expression(Node_t * node, FILE * file_ptr);
+backend_err emit_operator(Node_t * node, FILE * file_ptr);
+backend_err emit_cmp_x64(Node_t * node, FILE * file_ptr, operator_t op);
+backend_err emit_statement(Node_t * node, FILE * file_ptr);

@@ -5,7 +5,7 @@
 #include "semantic_analysis.h"
 #include "tree_structure.h"
 
-extern const error_struct frontend_error_list[];
+
 
 int symbol_table_find(const char * name, SymbolTable * st, st_mode_t mode)
 {

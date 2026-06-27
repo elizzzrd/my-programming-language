@@ -3,7 +3,8 @@
 #include "spu.h"
 #include "assembler.h"
 #include "errors_spu.h"
-#include "utils.h"
+#include "errors.h"
+
 
 #define DISABLE_DEBUG_PRINT
 

@@ -1,34 +1,49 @@
 #include <assert.h>
 #include <math.h>
+#include <stdbool.h>
 
 #include "tree_structure.h"
 #include "errors.h"
 #include "tree_operations.h"
-#include "math_functions.h"
-#include "utils.h"
+#include "optimize_tree.h"
 #include "node_values.h"
-#include "latex_dump.h"
 
-#define DISABLE_DEBUG_PRINT
+extern const error_struct optimizer_error_list[];
 
-ErrorCode evaluate_const_node(const Node_t * node, double * result)
+// ----------------------------------------------------------------------------------------
+static bool IS_ONE(Node_t * node) 
+{
+    if (!node) return false;
+
+    return (node->type == NUMBER && fabs(node->value.number - 1) < 1e-9);
+}
+
+static bool IS_ZERO(Node_t * node) 
+{
+    if (!node) return false;
+
+    return (node->type == NUMBER && fabs(node->value.number) < 1e-9);
+}
+// ----------------------------------------------------------------------------------------
+
+optimize_err evaluate_const_node(const Node_t * node, double * result)
 {
     assert(result);
     if (!node)
-        return SUCCESS;
+        return OPTIMIZER_SUCCESS;
 
     switch (node->type)
     {
         case NUMBER:
         {
             *result = node->value.number;
-            return SUCCESS;
+            return OPTIMIZER_SUCCESS;
         }
         case OPERATOR:
         {
             double left_val = 0.0;
             double right_val = 0.0;
-            ErrorCode error_l = SUCCESS, error_r = SUCCESS;
+            optimize_err error_l = OPTIMIZER_SUCCESS, error_r = OPTIMIZER_SUCCESS;
 
             operator_t op = node->value.op;
             if (op >= OP_READ && op <= OP_ABOVE_EQUAL)
@@ -37,7 +52,7 @@ ErrorCode evaluate_const_node(const Node_t * node, double * result)
             if (is_unary_operator(op))
             {
                 error_l = evaluate_const_node(node->left, &left_val);
-                if (error_l != SUCCESS)
+                if (error_l != FRONTEND_SUCCESS)
                     return error_l;
 
                 switch(node->value.op)
@@ -45,34 +60,22 @@ ErrorCode evaluate_const_node(const Node_t * node, double * result)
                     case OP_SIN:        * result = sin(left_val); break;
                     case OP_COS:        * result = cos(left_val); break;
                     case OP_TAN:        * result = tan(left_val); break;
-                    // case OP_CTG:        * result = 1.0 / tan(left_val); break;
-                    // case OP_ARCSIN:     * result = asin(left_val); break;
-                    // case OP_ARCCOS:     * result = acos(left_val); break;
-                    // case OP_ARCTAN:     * result = atan(left_val); break;
-                    // case OP_ARCCTG:     * result = atan(1.0 / left_val); break;
-                    // case OP_SINH:       * result = sinh(left_val); break;
-                    // case OP_COSH:       * result = cosh(left_val); break;
-                    // case OP_TANH:       * result = tanh(left_val); break;
-                    // case OP_CTGH:       * result = 1.0 / tanh(left_val); break;
                     case OP_EXP:        * result = exp(left_val); break;
                     case OP_LN:         * result = log(left_val); break;
                     case OP_SQRT:       * result = sqrt(left_val); break;
                     //case OP_ABS:        * result = fabs(left_val); break;
                     case OP_UNARY_MINUS:* result = -left_val; break;
                     default:
-                    {
-                        ERROR_MESSAGE(TREE_INVALID_OPERATOR, error_l); 
-                        return error_l;
-                    }
+                        return OPTIMIZER_INVALID_OPERATOR;
                 }
             }
             else if (is_binary_operator(op))
             {
                 error_l = evaluate_const_node(node->left, &left_val);
-                if (error_l != SUCCESS)
+                if (error_l != OPTIMIZER_SUCCESS)
                     return error_l;
                 error_r = evaluate_const_node(node->right, &right_val);
-                if (error_r != SUCCESS)
+                if (error_r != OPTIMIZER_SUCCESS)
                     return error_r;
                 
                 switch(op)
@@ -80,41 +83,41 @@ ErrorCode evaluate_const_node(const Node_t * node, double * result)
                     case OP_ADD:    * result = left_val + right_val; break;
                     case OP_SUB:    * result = left_val - right_val; break;
                     case OP_MUL:    * result = left_val * right_val; break;
-                    case OP_DIV:    * result = left_val / right_val; break;
+                    case OP_DIV:    
+                    {
+                                    if (right_val != 0)
+                                    {
+                                        * result = left_val / right_val; 
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        return OPTIMIZER_DIVISION_BY_ZERO;
+                                    }
+                    }
+                    
                     case OP_POW:    * result = pow(left_val, right_val); break;
                     default:
-                    {
-                        ERROR_MESSAGE(TREE_INVALID_OPERATOR, error_l);
-                        return error_l;
-                    }
+                        return OPTIMIZER_INVALID_OPERATOR;
                 }
             }
             else
-            {
-                ErrorCode error = SUCCESS;
-                ERROR_MESSAGE(TREE_INVALID_OPERATOR, error);
-                return error;
-            }
-            return SUCCESS;
-
+                return OPTIMIZER_INVALID_OPERATOR;
+        
         }
         case IDENTIFIER:
-            return DIFFERENTIATION_ERROR;
+            return OPTIMIZER_INVALID_NODE;
         case STATEMENT:
-            return DIFFERENTIATION_ERROR;
+            return OPTIMIZER_INVALID_NODE;
         case STRING:
-            return DIFFERENTIATION_ERROR;
+            return OPTIMIZER_INVALID_NODE;
         default: 
         {
-            if (!(node->type == IDENTIFIER || node->type == ROOT))
-            {
-                ErrorCode error = SUCCESS;
-                ERROR_MESSAGE(TREE_INVALID_NODE_TYPE, error); 
-                return error;
-            }
+            if (!(node->type == IDENTIFIER || node->type == ROOT)) 
+                return OPTIMIZER_INVALID_NODE;   
         }
     }
-    return TREE_INVALID_NODE_TYPE;
+    return OPTIMIZER_INVALID_NODE;
 }
  
 
@@ -133,12 +136,18 @@ Node_t * optimize_const_node_recursive(Node_t * node, Tree_t * tree)
         node->right = optimize_const_node_recursive(node->right, tree);
 
     double result = 0.0;
-    if (evaluate_const_node(node, &result) == SUCCESS)
+    optimize_err error = evaluate_const_node(node, &result);
+    
+    if (error == OPTIMIZER_SUCCESS)
     {
         // replace subtree with number node
         Node_result_t new_node =  replace_node_by_number(tree, node, result);
-        if (new_node.error == SUCCESS)
+        if (new_node.error == TREE_SUCCESS)
             return new_node.node;
+    }
+    else
+    {
+        //ERROR_MESSAGE_OPTIMIZER(error);
     }
     return node;
 }
@@ -148,10 +157,10 @@ Node_result_t replace_node_by_number(Tree_t * tree, Node_t * old_node, double ne
 {
     assert(tree && old_node);
 
-    Node_result_t new_node = create_number_node(tree, new_value);
-    if (new_node.error != SUCCESS)
+    Node_result_t new_node = NUMBER_NODE(new_value);
+    if (new_node.error != TREE_SUCCESS)
     {
-        ERROR_MESSAGE(TREE_CREATING_NODE_ERROR, new_node.error);
+        ERROR_MESSAGE_OPTIMIZER(OPTIMIZER_CREATING_NODE_ERROR);
         return new_node;
     }
     
@@ -168,10 +177,19 @@ Node_result_t replace_node_by_number(Tree_t * tree, Node_t * old_node, double ne
         tree->root = new_node.node;
     }
 
-    destroy_node(old_node);
+    node_dtor(old_node);
     return new_node;
 }
 
+
+#define REPLACE_WITH(SUBTREE)                                \
+    do {                                                     \
+        Node_t * new_sub = copy_subtree((SUBTREE), tree);    \
+        if (!new_sub) return node;                           \
+        new_sub -> prev = node->prev;                        \
+        node_dtor(node);                                  \
+        return new_sub;                                      \
+    } while(0)
 
 Node_t * simplify_node(Node_t * node, Tree_t * tree)
 {
@@ -184,16 +202,6 @@ Node_t * simplify_node(Node_t * node, Tree_t * tree)
     Node_t * u = node -> left;
     Node_t * v = node -> right;
     operator_t op = node -> value.op;
-
-
-    #define REPLACE_WITH(SUBTREE)                         \
-    do {                                                  \
-        Node_t * new_sub = copy_subtree((SUBTREE), tree);  \
-        if (!new_sub) return node;                        \
-        new_sub -> prev = node->prev;                       \
-        destroy_node(node);                               \
-        return new_sub;                                   \
-    } while(0)
 
     // x * 0 or 0 * x → 0
     if (op == OP_MUL && (IS_ZERO(u) || IS_ZERO(v)))
@@ -222,15 +230,16 @@ Node_t * simplify_node(Node_t * node, Tree_t * tree)
     // 0 - x → -x
     if (op == OP_SUB && IS_ZERO(u))
     {
-        Node_result_t res = create_operator_node(tree, OP_UNARY_MINUS);
-        if (res.error != SUCCESS) return node;
+        Node_result_t res = OPERATOR_NODE(OP_UNARY_MINUS);
+        if (res.error != TREE_SUCCESS) 
+            return node;
         res.node -> right  = copy_subtree(v, tree);
         res.node -> left = NULL;
         if (!res.node -> right)
             return node;
 
         res.node -> prev = node -> prev;
-        destroy_node(node);
+        node_dtor(node);
         return res.node;
     }
 
@@ -272,17 +281,16 @@ Node_t * optimize_simple_arithmetic_recursive(Node_t * node, Tree_t * tree)
 }
 
 
-ErrorCode optimize_tree_recursive(Tree_t * tree)
+optimize_err optimize_tree_recursive(Tree_t * tree)
 {
     assert(tree);
 
     if (!tree -> root)
-        return TREE_EMPTY_TREE;
+        return OPTIMIZER_INVALID_NODE;
 
     tree -> root = optimize_const_node_recursive(tree -> root, tree);
     tree -> root = optimize_simple_arithmetic_recursive(tree -> root, tree);
     build_parent_links(tree);
     
-    return SUCCESS;
+    return OPTIMIZER_SUCCESS;
 }
-

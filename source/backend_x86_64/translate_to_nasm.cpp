@@ -7,7 +7,6 @@
 
 #include "errors.h"
 #include "tree_structure.h"
-#include "utils.h"
 #include "translate_to_nasm.h"
 
 //--------------------------------------------------------------
@@ -37,10 +36,10 @@ int new_label(void)
 extern variables_t vars;
 
 
-ErrorCode translate_to_nasm(Tree_t * tree, const char * filename)
+backend_err translate_to_nasm(Tree_t * tree, const char * filename)
 {
     assert(tree && filename);
-    ErrorCode error = SUCCESS; 
+    backend_err error = BACKEND_SUCCESS; 
 
     init_variables();
     const_count = 0;
@@ -50,7 +49,7 @@ ErrorCode translate_to_nasm(Tree_t * tree, const char * filename)
 
     vars.current_func_id = 0;                       // global area
     error = collect_variables(tree->root);
-    if (error != SUCCESS)
+    if (error != BACKEND_SUCCESS)
         return error;
 
     DEBUG_PRINT("[DEBUG] valiables collected");
@@ -60,13 +59,13 @@ ErrorCode translate_to_nasm(Tree_t * tree, const char * filename)
     FILE * file_ptr = fopen(filename, "w");
     if (!file_ptr)
     {
-        ERROR_MESSAGE(OPENING_FILE_ERROR, error);
-        return error;
+        ERROR_MESSAGE_BACKEND(BACKEND_OPENING_FILE_ERROR);
+        return BACKEND_OPENING_FILE_ERROR;
     }
     DEBUG_PRINT("[INFO] TRANSLATION START\n");
 
     fprintf(file_ptr, "default rel\n");
-    fprintf(file_ptr, "%%include \"/home/gardina_elizaveta/projects/1sem/language/source/backend_x64/mystdlib.asm\"\n"); 
+    fprintf(file_ptr, "%%include \"/home/gardina_elizaveta/projects/1sem/language/source/backend_x86_64/mystdlib.asm\"\n"); 
 
     fprintf(file_ptr, "section .text\n\n");
     vars.current_func_id = 1;
@@ -86,7 +85,7 @@ ErrorCode translate_to_nasm(Tree_t * tree, const char * filename)
         fprintf(file_ptr, "    sub rsp, %d\n\n", frame_size);
     
     error = emit_main(tree->root->right, file_ptr);
-    if (error != SUCCESS)
+    if (error != BACKEND_SUCCESS)
     {
         fclose(file_ptr);
         DEBUG_PRINT("[DEBUG] ERROR DURING TRANSLATION");
@@ -114,21 +113,22 @@ ErrorCode translate_to_nasm(Tree_t * tree, const char * filename)
 
     destroy_variables();
     DEBUG_PRINT("[DEBUG] TRANSLATION COMPLETED");
-    return SUCCESS;
+    return BACKEND_SUCCESS;
 }
 
 
-ErrorCode emit_functions(Node_t * node, FILE * file_ptr)
+backend_err emit_functions(Node_t * node, FILE * file_ptr)
 {
     assert(file_ptr);
-    if (!node)      return SUCCESS;
-    ErrorCode error = SUCCESS;
+    if (!node)      
+        return BACKEND_SUCCESS;
+    backend_err error = BACKEND_SUCCESS;
 
     if (node->type == STATEMENT && node->value.stmt == OP_FUNC_DEF)
     {
         error = emit_statement(node, file_ptr);
         IF_THERE_IS_TRANSLATE_ERROR(error);
-        return SUCCESS;
+        return error;
     }
 
     error = emit_functions(node->left, file_ptr);
@@ -137,15 +137,15 @@ ErrorCode emit_functions(Node_t * node, FILE * file_ptr)
     error = emit_functions(node->right, file_ptr);
     IF_THERE_IS_TRANSLATE_ERROR(error);
 
-    return SUCCESS;
-
+    return BACKEND_SUCCESS;
 }
 
 
-ErrorCode emit_main(Node_t * node, FILE * file_ptr)
+backend_err emit_main(Node_t * node, FILE * file_ptr)
 {
-    if (!node)      return SUCCESS;
-    ErrorCode error = SUCCESS;
+    if (!node)      
+        return BACKEND_SUCCESS;
+    backend_err error = BACKEND_SUCCESS;
 
     // if (node->type == STATEMENT && node->value.stmt == OP_FUNC_DEF)
     //     return SUCCESS;
@@ -174,11 +174,11 @@ ErrorCode emit_main(Node_t * node, FILE * file_ptr)
         error = emit_main(node->right, file_ptr);
         IF_THERE_IS_TRANSLATE_ERROR(error);
 
-        return SUCCESS;
+        return BACKEND_SUCCESS;
     }
 
     if (node->type == STATEMENT && node->value.stmt == OP_FUNC_DEF)
-        return SUCCESS;
+        return BACKEND_SUCCESS;
     
     if (node->type == STATEMENT && (node->value.stmt == OP_END ||
                                     node->value.stmt == OP_STATEMENT))
@@ -189,23 +189,21 @@ ErrorCode emit_main(Node_t * node, FILE * file_ptr)
         error = emit_main(node->right, file_ptr);
         IF_THERE_IS_TRANSLATE_ERROR(error);
 
-        return SUCCESS;
+        return BACKEND_SUCCESS;
     }
 
 
     error = emit_statement(node, file_ptr);
     IF_THERE_IS_TRANSLATE_ERROR(error);
 
-    return SUCCESS;
+    return BACKEND_SUCCESS;
 }
     
 
-
-
-ErrorCode emit_statement(Node_t * node, FILE * file_ptr)
+backend_err emit_statement(Node_t * node, FILE * file_ptr)
 {
     assert(node && file_ptr);
-    ErrorCode error = SUCCESS;
+    backend_err error = BACKEND_SUCCESS;
 
     switch (node->value.stmt)
     {
@@ -444,16 +442,16 @@ ErrorCode emit_statement(Node_t * node, FILE * file_ptr)
         }
         default: break;
     }
-    return SUCCESS;
+    return BACKEND_SUCCESS;
 }
 
 
-ErrorCode emit_expression(Node_t * node, FILE * file_ptr)
+backend_err emit_expression(Node_t * node, FILE * file_ptr)
 {
     assert(file_ptr);
     if (!node)
-        return TREE_NULL_POINTER;
-    ErrorCode error = SUCCESS;
+        return BACKEND_SUCCESS;
+    backend_err error = BACKEND_SUCCESS;
 
 
     DEBUG_PRINT("[DEBUG] emit_expression: type = %s", get_string_type(node->type));
@@ -488,7 +486,7 @@ ErrorCode emit_expression(Node_t * node, FILE * file_ptr)
                 var = get_variable_by_name(node->id.name);
                 if (!var)
                 {
-                    error = SEMANTIC_ERROR;    
+                    error = BACKEND_SEMANTIC_ERROR;    
                     IF_THERE_IS_TRANSLATE_ERROR(error);
                 }
             }      
@@ -499,7 +497,7 @@ ErrorCode emit_expression(Node_t * node, FILE * file_ptr)
         {
             int idx = add_constant(node->value.number);
             if (idx < 0)
-                return TREE_MEMORY_ALLOCATION_ERROR;
+                return BACKEND_ALLOCATION_ERROR;
             fprintf(file_ptr, "    movsd xmm0, [rel const_%d]\n", idx);
             break;
         }
@@ -517,19 +515,19 @@ ErrorCode emit_expression(Node_t * node, FILE * file_ptr)
         // }
         default: 
         {
-            ERROR_MESSAGE(TREE_INVALID_NODE_TYPE, error);
+            ERROR_MESSAGE_BACKEND(BACKEND_INVALID_NODE);
             return error;
         }
     }
 
-    return SUCCESS;
+    return BACKEND_SUCCESS;
 }
 
 
-ErrorCode emit_operator(Node_t * node, FILE * file_ptr)
+backend_err emit_operator(Node_t * node, FILE * file_ptr)
 {
     assert(node && file_ptr);
-    ErrorCode error = SUCCESS;
+    backend_err error = BACKEND_SUCCESS;
 
     operator_t op = node->value.op;
     
@@ -573,12 +571,12 @@ ErrorCode emit_operator(Node_t * node, FILE * file_ptr)
                                     break;
             default:
             {
-                ERROR_MESSAGE(TRANSLATING_TO_ASM_ERROR, error);
-                return error;
+                ERROR_MESSAGE_BACKEND(TRANSLATING_TO_ASM_ERROR);
+                return TRANSLATING_TO_ASM_ERROR;
             }
         }
         fprintf(file_ptr, "    movapd xmm0, xmm1\n");
-        return SUCCESS;
+        return BACKEND_SUCCESS;
     }
 
     if (is_unary_operator(op))
@@ -614,21 +612,21 @@ ErrorCode emit_operator(Node_t * node, FILE * file_ptr)
             case OP_EXP:    fprintf(file_ptr, "    call exp\n");  break;
             case OP_LN:     fprintf(file_ptr, "    call log\n");   break;
             default:
-                ERROR_MESSAGE(TREE_INVALID_OPERATOR, error);
+                ERROR_MESSAGE_BACKEND(BACKEND_INVALID_OPERATOR);
                 return error;
         }
-        return SUCCESS;
+        return BACKEND_SUCCESS;
     }
 
-    ERROR_MESSAGE(TREE_INVALID_OPERATOR, error);
+    ERROR_MESSAGE_BACKEND(BACKEND_INVALID_OPERATOR);
     return error;
 }
 
 
-ErrorCode emit_cmp_x64(Node_t * node, FILE * file_ptr, operator_t op)
+backend_err emit_cmp_x64(Node_t * node, FILE * file_ptr, operator_t op)
 {
     assert(node && file_ptr);
-    ErrorCode error = emit_expression(node->left, file_ptr);
+    backend_err error = emit_expression(node->left, file_ptr);
     IF_THERE_IS_TRANSLATE_ERROR(error);
 
     fprintf(file_ptr, "    sub rsp, 8\n");
@@ -660,8 +658,5 @@ ErrorCode emit_cmp_x64(Node_t * node, FILE * file_ptr, operator_t op)
         fprintf(file_ptr, "    cvtsi2sd xmm0, rax\n");
     }
 
-    return SUCCESS;
+    return BACKEND_SUCCESS;
 }
-
-
-

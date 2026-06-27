@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include "errors.h"
+#include "tree_structure.h"
 
 typedef enum
 {
@@ -15,8 +17,6 @@ typedef struct
 } SymbolTable;
 
 
-
-
 int symbol_table_find(const char * name, SymbolTable * st, st_mode_t mode);
 int symbol_table_add(const char * name, SymbolTable * st, st_mode_t mode);
 int symbol_table_resize(SymbolTable *st);
@@ -25,6 +25,6 @@ const char * get_id_name(size_t id_index, SymbolTable * st, st_mode_t mode);
 SymbolTable * st_init(void);
 void symbol_table_init(SymbolTable *st);
 
-ErrorCode collect_definitions(Node_t * node, SymbolTable * st);
-ErrorCode check_semantics(Node_t * node, SymbolTable * st);
-ErrorCode semantic_analysis(Tree_t * tree);
+frontend_err collect_definitions(Node_t * node, SymbolTable * st);
+frontend_err check_semantics(Node_t * node, SymbolTable * st);
+frontend_err semantic_analysis(Tree_t * tree);

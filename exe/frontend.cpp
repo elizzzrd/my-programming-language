@@ -2,28 +2,31 @@
 
 #include "tree_structure.h"
 #include "lexer.h"
-#include "utils.h"
 #include "tree_operations.h"
 #include "syntax_analysis.h"
+#include "errors.h"
 #include "load_expression.h"
+#include "tree_dump.h"
 #include "semantic_analysis.h"
+
+extern const error_struct frontend_error_list[];
 
 
 int main(void)
 {
     fprintf(stderr, "[INFO] FRONTEND START\n");
-    ErrorCode error = SUCCESS;
+    frontend_err error = FRONTEND_SUCCESS;
 
     TokenList token_list = {};
-    error = lexicalAnalysis(&token_list);
+    error = lexical_analysis(&token_list);
     LEXICAL_ANALYSIS_ERROR(error);
 
     Tree_t tree = {};
-    error = init_tree(&tree);
-    if (error != SUCCESS)
+    tree_err t_error = tree_ctor(&tree);
+    if (t_error != TREE_SUCCESS)
     {
-        destroy_tokens(&token_list);
-        destroy_tree(&tree, "destroy_frontend_error");
+        token_list_dtor(&token_list);
+        tree_dtor(&tree, "destroy_frontend_error");
         fprintf(stderr, "[ERROR] ERROR DURING FRONTEND\n");
         return -1;
     }
@@ -32,14 +35,14 @@ int main(void)
     Node_t * tree_root = GetProgram_tokens(&token_list, &pos, &tree, &error);
     SYNTAX_ANALISYS_ERROR(error);
     tree.root->right = tree_root;
-    error = build_parent_links(&tree);
-    BUILDING_FRONTEND_TREE_ERROR(error);
+    t_error = build_parent_links(&tree);
+    BUILDING_FRONTEND_TREE_ERROR(t_error);
 
     error = semantic_analysis(&tree);
-    if (error != SUCCESS)
+    if (error != FRONTEND_SUCCESS)
     {
-        ERROR_MESSAGE(SEMANTIC_ERROR, error);
-        destroy_tree(&tree, "destroy_frontend_error");
+        ERROR_MESSAGE_FRONTEND(SEMANTIC_ERROR);
+        tree_dtor(&tree, "destroy_frontend_error");
         fprintf(stderr, "[ERROR] ERROR DURING FRONTEND\n");
         return -1;
     }
@@ -47,7 +50,7 @@ int main(void)
     GRAPH_DUMP(&tree, "frontend"); 
 
     save_tree(&tree, AST_OUTPUT_FRONTEND);
-    destroy_tree(&tree, "destroy_frontend");
+    tree_dtor(&tree, "destroy_frontend");
     fprintf(stderr, "[INFO] FRONTEND COMPLETED\n\n");
 
     return 0;

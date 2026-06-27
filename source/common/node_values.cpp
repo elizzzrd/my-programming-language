@@ -6,10 +6,8 @@
 #include <ctype.h>
 
 #include "node_values.h"
-#include "utils.h"
 #include "lexer.h"
 
-#define DISABLE_DEBUG_PRINT
 
 const char * type_strings[] =
 {
@@ -28,7 +26,7 @@ const char * get_string_type(type_t type)
     if (type >= ROOT && type <= STRING)
         return type_strings[type];
     else
-        return "Unknown type";
+        return "UNKNOWN TYPE";
 }
 
 
@@ -52,16 +50,6 @@ const char * operator_strings[] =
     "sin",          // OP_SIN
     "cos",          // OP_COS
     "tan",          // OP_TAN
-    // "ctg",          // OP_CTG
-    // "arcsin",       // OP_ARCSIN
-    // "arccos",       // OP_ARCCOS
-    // "arctan",       // OP_ARCTAN
-    // "arcctg",       // OP_ARCCTG
-
-    // "sinh",         // OP_SINH
-    // "cosh",         // OP_COSH
-    // "tanh",         // OP_TANH
-    // "ctgh",         // OP_CTGH
 
     "exp",          // OP_EXP
     "ln",           // OP_LN
@@ -70,7 +58,8 @@ const char * operator_strings[] =
     //"abs",          // OP_ABS
     "u-"             // OP_UNARY_MINUS
 };
-   
+  
+
 const char * statement_strings[] =
 {
     "program",      // OP_PROGRAMM
@@ -96,9 +85,9 @@ const char * statement_strings[] =
 const char * get_statement_name(statement_t op)
 {
     if (op >= OP_PROGRAM && op <= OP_ARGS)
-    return statement_strings[op];
+        return statement_strings[op];
     else
-    return "Unknown statement";
+        return "UNKNOWN STATEMENT";
 }
 
 
@@ -203,10 +192,7 @@ token_res check_for_statement(const char * token)
     return res;
 }
 
-
-    
-
-
+ 
 token_res check_for_string(const char * token)
 {
     assert(token);
@@ -222,7 +208,6 @@ token_res check_for_string(const char * token)
     }
     return res;
 }
-
 
 
 token_res check_for_identifier(const char * token)
@@ -268,7 +253,7 @@ const char* get_string_operator(operator_t op)
     if (op >= OP_ADD && op <= OP_UNARY_MINUS) {
         return operator_strings[op];
     }
-    return "Unknown operator";
+    return "UNKNOWN OPERATOR";
 }
 
 

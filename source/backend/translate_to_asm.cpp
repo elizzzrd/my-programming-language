@@ -11,22 +11,23 @@
 #include "read_file.h"
 #include "lexer.h"
 #include "translate_to_asm.h"
-#include "utils.h"
+
 
 static int string_top = 256; // где в RAM начинаются строки
 function_info_t functions[128];
 int function_count = 0;
 
 
-ErrorCode translate_to_asm(Tree_t * tree, const char * filename)
+backend_err translate_to_asm(Tree_t * tree, const char * filename)
 {
     assert(tree && filename);
-    ErrorCode error = SUCCESS; 
+    backend_err error = BACKEND_SUCCESS; 
     
     FILE * file_ptr = fopen(filename, "w");
     if (!file_ptr)
     {
-        ERROR_MESSAGE(OPENING_FILE_ERROR, error);
+        error = BACKEND_OPENING_FILE_ERROR;
+        ERROR_MESSAGE_BACKEND(BACKEND_OPENING_FILE_ERROR);
         return error;
     }
 
@@ -46,7 +47,7 @@ ErrorCode translate_to_asm(Tree_t * tree, const char * filename)
 
         fclose(file_ptr);
         DEBUG_PRINT("[DEBUG] TRANSLATION COMPLETED");
-        return SUCCESS;
+        return BACKEND_SUCCESS;
     }
     else
     {
@@ -56,19 +57,19 @@ ErrorCode translate_to_asm(Tree_t * tree, const char * filename)
     }
 }
 
-ErrorCode translate_functions(Node_t * node, FILE * file_ptr)
+backend_err translate_functions(Node_t * node, FILE * file_ptr)
 {
     assert(file_ptr);
     if (!node)
-        return SUCCESS;
+        return BACKEND_SUCCESS;
 
-    ErrorCode error = SUCCESS;
+    backend_err error = BACKEND_SUCCESS;
 
     if (node->type == STATEMENT && node->value.stmt == OP_FUNC_DEF)
     {
         error = translate_statement(node, file_ptr);
         IF_THERE_IS_TRANSLATE_ERROR(error);
-        return SUCCESS;
+        return BACKEND_SUCCESS;
     }
 
     error = translate_functions(node->left, file_ptr);
@@ -77,16 +78,16 @@ ErrorCode translate_functions(Node_t * node, FILE * file_ptr)
     error = translate_functions(node->right, file_ptr);
     IF_THERE_IS_TRANSLATE_ERROR(error);
 
-    return SUCCESS;
+    return BACKEND_SUCCESS;
 }
 
-ErrorCode translate_main(Node_t * node, FILE * file_ptr)
+backend_err translate_main(Node_t * node, FILE * file_ptr)
 {
     assert(file_ptr);
     if (!node)
-        return SUCCESS;
+        return BACKEND_SUCCESS;
 
-    ErrorCode error = SUCCESS;
+    backend_err error = BACKEND_SUCCESS;
 
     if (node->type == ROOT)
     {
@@ -96,11 +97,11 @@ ErrorCode translate_main(Node_t * node, FILE * file_ptr)
         error = translate_main(node->right, file_ptr);
         IF_THERE_IS_TRANSLATE_ERROR(error);
 
-        return SUCCESS;
+        return BACKEND_SUCCESS;
     }
 
     if (node->type == STATEMENT && node->value.stmt == OP_FUNC_DEF)
-        return SUCCESS;
+        return BACKEND_SUCCESS;
     
     if (node->type == STATEMENT && (node->value.stmt == OP_END ||
                                     node->value.stmt == OP_STATEMENT))
@@ -111,22 +112,22 @@ ErrorCode translate_main(Node_t * node, FILE * file_ptr)
         error = translate_main(node->right, file_ptr);
         IF_THERE_IS_TRANSLATE_ERROR(error);
 
-        return SUCCESS;
+        return BACKEND_SUCCESS;
     }
 
     error = translate_node(node, file_ptr);
     IF_THERE_IS_TRANSLATE_ERROR(error);
 
-    return SUCCESS;
+    return BACKEND_SUCCESS;
 }
 
 
-ErrorCode translate_node(Node_t * node, FILE * file_ptr)
+backend_err translate_node(Node_t * node, FILE * file_ptr)
 {
     assert(file_ptr);
     if (!node)
-        return TREE_NULL_POINTER;
-    ErrorCode error = SUCCESS;
+        return BACKEND_SUCCESS;
+    backend_err error = BACKEND_SUCCESS;
 
 
     DEBUG_PRINT("[DEBUG] translate_node: type = %s", get_string_type(node->type));
@@ -181,20 +182,20 @@ ErrorCode translate_node(Node_t * node, FILE * file_ptr)
         }
         default: 
         {
-            ERROR_MESSAGE(TREE_INVALID_NODE_TYPE, error);
+            ERROR_MESSAGE_TREE(TREE_INVALID_NODE);
             return error;
         }
     }
 
-    return SUCCESS;
+    return BACKEND_SUCCESS;
 }
 
 
 
-ErrorCode translate_operator(Node_t * node, FILE * file_ptr)
+backend_err translate_operator(Node_t * node, FILE * file_ptr)
 {
     assert(node && file_ptr);
-    ErrorCode error = SUCCESS;
+    backend_err error = BACKEND_SUCCESS;
 
     operator_t op = node->value.op;
     
@@ -225,11 +226,11 @@ ErrorCode translate_operator(Node_t * node, FILE * file_ptr)
 
             default:
             {
-                ERROR_MESSAGE(TRANSLATING_TO_ASM_ERROR, error);
-                return error;
+                ERROR_MESSAGE_BACKEND(TRANSLATING_TO_ASM_ERROR);
+                return TRANSLATING_TO_ASM_ERROR;
             }
         }
-        return SUCCESS;
+        return BACKEND_SUCCESS;
     }
 
     if (is_unary_operator(op))
@@ -287,33 +288,33 @@ ErrorCode translate_operator(Node_t * node, FILE * file_ptr)
             case OP_EXP:    fprintf(file_ptr, "exp\n");  break;
             case OP_LN:     fprintf(file_ptr, "ln\n");   break;
             default:
-                ERROR_MESSAGE(TREE_INVALID_OPERATOR, error);
-                return error;
+                ERROR_MESSAGE_BACKEND(BACKEND_INVALID_OPERATOR);
+                return BACKEND_INVALID_OPERATOR;
         }
-        return SUCCESS;
+        return BACKEND_SUCCESS;
     }
 
-    ERROR_MESSAGE(TREE_INVALID_OPERATOR, error);
-    return error;
+    ERROR_MESSAGE_BACKEND(BACKEND_INVALID_OPERATOR);
+    return BACKEND_INVALID_OPERATOR;
 }
 
 
-ErrorCode translate_string(Node_t * node, FILE * file_ptr)
+backend_err translate_string(Node_t * node, FILE * file_ptr)
 {
     assert(node && file_ptr);
 
     int addr = emit_strings(file_ptr, node->value.string_value);
 
     fprintf(file_ptr, "push %d\n", addr);
-    return SUCCESS;
+    return BACKEND_SUCCESS;
 }
 
 
 
-ErrorCode translate_statement(Node_t * node, FILE * file_ptr)
+backend_err translate_statement(Node_t * node, FILE * file_ptr)
 {
     assert(node && file_ptr);
-    ErrorCode error = SUCCESS;
+    backend_err error = BACKEND_SUCCESS;
 
     switch (node->value.stmt)
     {
@@ -452,8 +453,8 @@ ErrorCode translate_statement(Node_t * node, FILE * file_ptr)
                 int param_index = param_list[i]->id.id_index;
                 if (param_index < 0)
                 {
-                    ERROR_MESSAGE(TRANSLATING_TO_ASM_ERROR, error);
-                    return error;
+                    ERROR_MESSAGE_BACKEND(TRANSLATING_TO_ASM_ERROR);
+                    return TRANSLATING_TO_ASM_ERROR;
                 }
                 fprintf(file_ptr, "popm [%d]\n", param_index);
             }
@@ -512,11 +513,9 @@ ErrorCode translate_statement(Node_t * node, FILE * file_ptr)
         }
         default: break;
     }
-    return SUCCESS;
+    return BACKEND_SUCCESS;
 }
 
-
-  
 
 int emit_strings(FILE * file_ptr, const char * s)
 {
@@ -536,6 +535,7 @@ int emit_strings(FILE * file_ptr, const char * s)
     return addr;
 }
 
+
 void emit_cmp(FILE * file_ptr, const char * jmp)
 {
     assert(file_ptr && jmp);
@@ -552,6 +552,7 @@ void emit_cmp(FILE * file_ptr, const char * jmp)
     fprintf(file_ptr, "push 1\n");
     fprintf(file_ptr, "END_CONDITION_%d:\n", id);
 }
+
 
 void emit_op_pow(FILE * file_ptr)
 {

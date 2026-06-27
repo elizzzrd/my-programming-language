@@ -169,16 +169,20 @@ void assign_offset_for_function(int func_id)
 
 //--------------------------------------------------------------
 
-ErrorCode collect_variables(Node_t * node)
+backend_err collect_variables(Node_t * node)
 {
-    if (!node)      return SUCCESS;
-    ErrorCode error = SUCCESS;
+    if (!node)
+        return BACKEND_SUCCESS;
+    backend_err error = BACKEND_SUCCESS;
 
     if (node->type == IDENTIFIER)
     {
         int idx = find_variable_in_current_func(node->id.name);
         if (idx == -1)
-            return SEMANTIC_ERROR;
+        {
+            ERROR_MESSAGE_BACKEND(BACKEND_SEMANTIC_ERROR);
+            return BACKEND_SEMANTIC_ERROR;
+        }
 
         node->id.id_index = idx;
     }
@@ -194,7 +198,10 @@ ErrorCode collect_variables(Node_t * node)
                 {
                     int idx = add_variable(node->left->id.name, false);
                     if (idx == -1)
-                        return SEMANTIC_ERROR;
+                    {
+                        ERROR_MESSAGE_BACKEND(BACKEND_SEMANTIC_ERROR);
+                        return BACKEND_SEMANTIC_ERROR;
+                    }
                     
                     node->left->id.id_index = idx;
                 }
@@ -224,24 +231,24 @@ ErrorCode collect_variables(Node_t * node)
                 }
     
                 error = collect_variables(node->right);
-                if (error != SUCCESS)
+                if (error != BACKEND_SUCCESS)
                     return error;
 
                 assign_offset_for_function(new_func_id);
     
                 vars.current_func_id = old_func;
-                return SUCCESS;
+                return BACKEND_SUCCESS;
             }
             default: break;
         }
     }
 
     error = collect_variables(node->left);
-    if (error != SUCCESS)   return error;
+    if (error != BACKEND_SUCCESS)   return error;
 
     error = collect_variables(node->right);
-    if (error != SUCCESS)   return error;
+    if (error != BACKEND_SUCCESS)   return error;
 
-    return SUCCESS;
+    return BACKEND_SUCCESS;
 }
 

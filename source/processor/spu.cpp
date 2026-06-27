@@ -8,7 +8,6 @@
 #include "assembler.h"
 #include "spu.h"
 #include "translate_to_asm.h"
-#include "utils.h"
 
 #define DISABLE_DEBUG_PRINT
 

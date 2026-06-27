@@ -1,12 +1,12 @@
 #include <stdio.h>
 #include <sys/stat.h>
 #include <assert.h>
+#include <math.h>
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
 #include "read_file.h"
 #include "assembler.h"
-#include "utils.h"
 #include "errors_spu.h"
 
 #define DISABLE_DEBUG_PRINT

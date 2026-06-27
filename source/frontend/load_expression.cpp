@@ -12,22 +12,19 @@
 #include "lexer.h"
 #include "errors.h"
 
-extern const error_struct optimizer_error_list[];
-extern const error_struct tree_error_list[];
-extern const error_struct frontend_error_list[];
 
-optimize_err optimizer_dtor(optimizer_t * optimizer);
 
-optimize_err optimize_AST(optimizer_t optimizer);
+//optimize_err optimizer_dtor(optimizer_t * optimizer);
+
+//optimize_err optimize_AST(optimizer_t optimizer);
 
 
 optimize_err optimizer_ctor(char * expression_input, optimizer_t * optimizer)
 {
     assert(optimizer && expression_input);
 
-    char * buffer = NULL;
     buffer_err b_error = BUFFER_SUCCESS;
-    b_error = buffer_ctor(buffer, expression_input);
+    char * buffer = buffer_ctor(&b_error, expression_input);
     if (b_error != BUFFER_SUCCESS)
     {
         ERROR_MESSAGE_OPTIMIZER(OPTIMIZER_BUFFER_ERROR);
@@ -64,7 +61,9 @@ optimize_err optimizer_ctor(char * expression_input, optimizer_t * optimizer)
 
 Node_t * read_node(char * buffer, size_t * pos, Tree_t * tree) 
 {
-    assert(buffer && pos && tree);
+    assert(buffer);
+    assert(tree);
+    assert(pos);
     
     while (isspace(buffer[*pos])) 
         (*pos)++;
