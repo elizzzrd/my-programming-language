@@ -1,13 +1,12 @@
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>
-#include "utils.h"
 #include "tree_structure.h"
 #include "tree_operations.h"
 #include "lexer.h"
 #include "syntax_analysis.h"
 
-#define DISABLE_DEBUG_PRINT
+
 
 /*-----------------------------------GRAMMAR------------------------------------
 Program     ::= Statement* '$'
@@ -80,8 +79,6 @@ Number      ::= ['0'-'9']+
 
 ------------------------------------------------------------------------------*/
 
-
-
 #define REQUIRE_TOKEN(expected_type, token) \
     do { \
         if (!token) return NULL; \
@@ -89,16 +86,8 @@ Number      ::= ['0'-'9']+
             return NULL; \
     } while(0)
 
-#define IF_THERE_IS_ERROR_WITH_FUNC_OPERATOR(res) \
-    do { \
-        if (res.error != error) {\
-            ERROR_MESSAGE(TREE_INVALID_OPERATOR, error);\
-            return NULL;}\
-    } while(0)
 
             
-
-
 static Token * current_token(TokenList * tokens, size_t pos)
 {
     if (!tokens || !tokens->data)                return NULL;
@@ -107,12 +96,15 @@ static Token * current_token(TokenList * tokens, size_t pos)
     return &tokens->data[pos];
 }
 
+// ----------------------------------------------------------------------------------------------------------------------
+extern const error_struct frontend_error_list[];
+
 
 //  Program     ::= Statement* '$'
-Node_t * GetProgram_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, ErrorCode * error)
+Node_t * GetProgram_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, frontend_err * error)
 {
     assert(tokens && tree && pos);
-    *error = SUCCESS;
+    *error = FRONTEND_SUCCESS;
     DEBUG_PRINT("\n[INFO] SYNTAX_ANALYSIS START");
 
     Node_t * first_stmt = NULL;
@@ -126,9 +118,9 @@ Node_t * GetProgram_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, Erro
 
         if (cur_stmt == NULL)
         {
-            DEBUG_PRINT("[ERROR] Error during parsing statement");
-            destroy_tree(tree, "destroy_frontend_error");
+            tree_dtor(tree, "destroy_frontend_error");
             *error = PARSER_ERROR;
+            ERROR_MESSAGE_FRONTEND(PARSER_ERROR);
             return NULL;
         }
         
@@ -139,10 +131,11 @@ Node_t * GetProgram_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, Erro
         }
         else                                                                // связываем через узел разделитель
         {
-            Node_result_t sep_res = create_statement_node(tree, OP_END);
-            if (sep_res.error != SUCCESS)   
+            Node_result_t sep_res = STATEMENT_NODE(OP_END);
+            if (sep_res.error != TREE_SUCCESS)   
             {
-                *error = TREE_CREATING_NODE_ERROR;
+                ERROR_MESSAGE_FRONTEND(CREATING_NODE_ERROR);
+                *error = CREATING_NODE_ERROR;
                 return NULL;
             }
             Node_t * sep = sep_res.node;
@@ -165,8 +158,7 @@ Node_t * GetProgram_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, Erro
         }
         else
         {
-            DEBUG_PRINT("[SYNTAX ERROR] expected ';'\n");
-            DEBUG_PRINT("got token %s at %lu", get_string_token_type(t->type), *pos);
+            ERROR_MESSAGE_FRONTEND(FORGOTTEN_SEMICOLON);
             *error = SYNTAX_ERROR;
             return NULL;
         }
@@ -184,15 +176,16 @@ Node_t * GetProgram_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, Erro
 
 //    Statement   ::=  PrintStmt | Assignment | IfStmt | WhileStmt |
 //                     VarDef | FuncCall | FuncDef | Return';'
-Node_t * GetStatement_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, ErrorCode * error)
+Node_t * GetStatement_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, frontend_err * error)
 {
     assert(tokens && pos && tree);
-    * error = SUCCESS;
+    * error = FRONTEND_SUCCESS;
     
     Token * t = current_token(tokens, *pos);
     if (!t)     
     {
-        * error = PARSER_ERROR;
+        *error = PARSER_ERROR;
+        ERROR_MESSAGE_FRONTEND(PARSER_ERROR);
         return NULL;
     }
 
@@ -211,7 +204,7 @@ Node_t * GetStatement_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, Er
         else if (next && next->type == TOK_LBRACE)
             return GetFuncCall_tokens(tokens, pos, tree, error);
 
-        DEBUG_PRINT("Unexpexted identifier at statement\n");
+        ERROR_MESSAGE_FRONTEND(UNEXPECTED_SYNTAX);
     }
     else if (t -> type == TOK_DEF)
         return GetFuncDef(tokens, pos, tree, error);
@@ -226,10 +219,10 @@ Node_t * GetStatement_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, Er
 
 
 // FuncDef     ::= 'def' Identifier '{' ParamList?'}' Block
-Node_t * GetFuncDef(TokenList * tokens, size_t * pos, Tree_t * tree, ErrorCode * error)
+Node_t * GetFuncDef(TokenList * tokens, size_t * pos, Tree_t * tree, frontend_err * error)
 {
     assert (tokens && pos && tree);
-    *error = SUCCESS;
+    *error = FRONTEND_SUCCESS;
 
     REQUIRE_TOKEN(TOK_DEF, current_token(tokens, (*pos)));
     (*pos)++;
@@ -247,7 +240,8 @@ Node_t * GetFuncDef(TokenList * tokens, size_t * pos, Tree_t * tree, ErrorCode *
         params = GetParams_tokens(tokens, pos, tree, error);
         if (!params)
         {
-            ERROR_MESSAGE(PARSER_ERROR, *error);
+            *error = PARSER_ERROR;
+            ERROR_MESSAGE_FRONTEND(PARSER_ERROR);
             return NULL;
         }
     }
@@ -258,14 +252,16 @@ Node_t * GetFuncDef(TokenList * tokens, size_t * pos, Tree_t * tree, ErrorCode *
     Node_t * body = GetBlock_tokens(tokens, pos, tree, error);
     if (!body)
     {
-        ERROR_MESSAGE(PARSER_ERROR, *error);
+        *error = PARSER_ERROR;
+        ERROR_MESSAGE_FRONTEND(PARSER_ERROR);
         return NULL;
     }
 
-    Node_result_t res = create_statement_node(tree, OP_FUNC_DEF);
-    if (res.error != SUCCESS)
+    Node_result_t res = STATEMENT_NODE(OP_FUNC_DEF);
+    if (res.error != TREE_SUCCESS)
     {
-        ERROR_MESSAGE(PARSER_ERROR,* error);
+        *error = PARSER_ERROR;
+        ERROR_MESSAGE_FRONTEND(PARSER_ERROR);
         return NULL;
     }
     res.node->id.name = strdup(name->string_value);
@@ -278,27 +274,29 @@ Node_t * GetFuncDef(TokenList * tokens, size_t * pos, Tree_t * tree, ErrorCode *
 
 
 //ParamList   ::= Var ( ',' Var)*
-Node_t * GetParams_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, ErrorCode * error)
+Node_t * GetParams_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, frontend_err * error)
 {
     assert (tokens && pos && tree);
-    *error = SUCCESS;
+    *error = FRONTEND_SUCCESS;
 
     Token * t = current_token(tokens, *pos);
     REQUIRE_TOKEN(TOK_IDENTIFIER, t);
 
-    Node_result_t first_var = create_identifier_node(tree, t->string_value);
-    if (first_var.error != SUCCESS)
+    Node_result_t first_var = ID_NODE(t->string_value);
+    if (first_var.error != TREE_SUCCESS)
     {
-        ERROR_MESSAGE(SYNTAX_ERROR, *error);
+        *error = SYNTAX_ERROR;
+        ERROR_MESSAGE_FRONTEND(SYNTAX_ERROR);
         return NULL;
     }
     (*pos)++;
 
-    Node_t * list = create_statement_node(tree, OP_PARAMS).node;
+    Node_t * list = STATEMENT_NODE(OP_PARAMS).node;
     list->param_count = 1;
     if (!list)
     {
-        ERROR_MESSAGE(SYNTAX_ERROR, *error);
+        *error = SYNTAX_ERROR;
+        ERROR_MESSAGE_FRONTEND(SYNTAX_ERROR);
         return NULL;
     }
     list -> right = first_var.node;
@@ -312,10 +310,11 @@ Node_t * GetParams_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, Error
         t = current_token(tokens, (*pos));
         REQUIRE_TOKEN(TOK_IDENTIFIER, t);
 
-        Node_result_t var = create_identifier_node(tree, t->string_value);
-        if (var.error != SUCCESS)
+        Node_result_t var = ID_NODE(t->string_value);
+        if (var.error != TREE_SUCCESS)
         {
-            ERROR_MESSAGE(SYNTAX_ERROR, *error);
+            *error = SYNTAX_ERROR;
+            ERROR_MESSAGE_FRONTEND(SYNTAX_ERROR);
             return NULL;
         }
         (*pos)++;
@@ -331,22 +330,24 @@ Node_t * GetParams_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, Error
 
 
 // ArgList   ::= Expression ( ',' Expression)*
-Node_t * GetArgs_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, ErrorCode * error)
+Node_t * GetArgs_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, frontend_err * error)
 {
     assert (tokens && pos && tree);
-    *error = SUCCESS;
+    *error = FRONTEND_SUCCESS;
 
     Node_t * first_expr = GetExpression_tokens(tokens, pos, tree, error);
     if (!first_expr)
     {
-        ERROR_MESSAGE(SYNTAX_ERROR, *error);
+        *error = SYNTAX_ERROR;
+        ERROR_MESSAGE_FRONTEND(SYNTAX_ERROR);
         return NULL;
     }
 
-    Node_t * list = create_statement_node(tree, OP_ARGS).node;
+    Node_t * list = STATEMENT_NODE(OP_ARGS).node;
     if (!list)
     {
-        ERROR_MESSAGE(SYNTAX_ERROR, *error);
+        *error = SYNTAX_ERROR;
+        ERROR_MESSAGE_FRONTEND(SYNTAX_ERROR);
         return NULL;
     }
     list->param_count = 1;
@@ -361,8 +362,9 @@ Node_t * GetArgs_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, ErrorCo
         Node_t * next_expr = GetExpression_tokens(tokens, pos, tree, error);
         if (!next_expr)
         {
-            ERROR_MESSAGE(SYNTAX_ERROR, *error);
-            destroy_node(list);
+            *error = SYNTAX_ERROR;
+            ERROR_MESSAGE_FRONTEND(SYNTAX_ERROR);
+            node_dtor(list);
             return NULL;
         }
 
@@ -376,10 +378,10 @@ Node_t * GetArgs_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, ErrorCo
 
 
 // Return ::= 'out' Expression
-Node_t * GetReturn_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, ErrorCode * error)
+Node_t * GetReturn_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, frontend_err * error)
 {
     assert (tokens && pos && tree);
-    *error = SUCCESS;
+    *error = FRONTEND_SUCCESS;
 
     REQUIRE_TOKEN(TOK_OUT, current_token(tokens, (*pos)));
     (*pos)++;
@@ -387,14 +389,16 @@ Node_t * GetReturn_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, Error
     Node_t * expr = GetExpression_tokens(tokens, pos, tree, error);
     if (!expr)
     {
-        ERROR_MESSAGE(PARSER_ERROR, *error);
+        *error = PARSER_ERROR;
+        ERROR_MESSAGE_FRONTEND(PARSER_ERROR);
         return NULL;
     }
 
-    Node_result_t res = create_statement_node(tree, OP_RETURN);
-    if (res.error != SUCCESS)
+    Node_result_t res = STATEMENT_NODE(OP_RETURN);
+    if (res.error != TREE_SUCCESS)
     {
-        ERROR_MESSAGE(PARSER_ERROR, *error);
+        *error = PARSER_ERROR;
+        ERROR_MESSAGE_FRONTEND(PARSER_ERROR);
         return NULL;
     }
 
@@ -406,10 +410,10 @@ Node_t * GetReturn_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, Error
 
 
 // FuncCall    ::= Identifier '{' ArgList? '}'
-Node_t * GetFuncCall_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, ErrorCode * error)
+Node_t * GetFuncCall_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, frontend_err * error)
 {
     assert (tokens && pos && tree);
-    *error = SUCCESS;
+    *error = FRONTEND_SUCCESS;
 
     Token * name = current_token(tokens, *pos);
     REQUIRE_TOKEN(TOK_IDENTIFIER, name);
@@ -424,7 +428,8 @@ Node_t * GetFuncCall_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, Err
         args = GetArgs_tokens(tokens, pos, tree, error);
         if (!args)
         {
-            ERROR_MESSAGE(PARSER_ERROR, *error);
+            *error = PARSER_ERROR;
+            ERROR_MESSAGE_FRONTEND(PARSER_ERROR);
             return NULL;
         }
     }
@@ -432,10 +437,11 @@ Node_t * GetFuncCall_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, Err
     REQUIRE_TOKEN(TOK_RBRACE, current_token(tokens, (*pos)));
     (*pos)++;
 
-    Node_result_t call = create_statement_node(tree, OP_CALL);
-    if (call.error != SUCCESS)
+    Node_result_t call = STATEMENT_NODE(OP_CALL);
+    if (call.error != TREE_SUCCESS)
     {
-        ERROR_MESSAGE(PARSER_ERROR, *error);
+        *error = PARSER_ERROR;
+        ERROR_MESSAGE_FRONTEND(PARSER_ERROR);
         return NULL;
     }
     call.node -> right = args;
@@ -448,10 +454,10 @@ Node_t * GetFuncCall_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, Err
 
 
 //PrintStmt   ::= 'print' '{' Expression '}'
-Node_t * GetPrintStmt_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, ErrorCode * error)
+Node_t * GetPrintStmt_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, frontend_err * error)
 {
     assert (tokens && pos && tree);
-    *error = SUCCESS;
+    *error = FRONTEND_SUCCESS;
 
     REQUIRE_TOKEN(TOK_PRINT, current_token(tokens, *pos));
     (*pos)++;
@@ -461,17 +467,18 @@ Node_t * GetPrintStmt_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, Er
     Node_t * expr = GetExpression_tokens(tokens, pos, tree, error);
     if (!expr)
     {
-        DEBUG_PRINT("[SYNTAX ERROR] parser expects expression\n");
         *error = SYNTAX_ERROR;
+        ERROR_MESSAGE_FRONTEND(SYNTAX_ERROR);
         return NULL;
     }
     REQUIRE_TOKEN(TOK_RBRACE, current_token(tokens, *pos));
     (*pos)++;
 
-    Node_result_t print_res = create_statement_node(tree, OP_PRINT);
-    if (print_res.error != SUCCESS) 
+    Node_result_t print_res = STATEMENT_NODE(OP_PRINT);
+    if (print_res.error != TREE_SUCCESS) 
     {
         *error = PARSER_ERROR;
+        ERROR_MESSAGE_FRONTEND(PARSER_ERROR);
         return NULL;
     }    
 
@@ -484,10 +491,10 @@ Node_t * GetPrintStmt_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, Er
 
 
 //InputStmt   ::= 'read' '{' IDENTIFIER '}'
-Node_t * GetInputStmt(TokenList * tokens, size_t * pos, Tree_t * tree, ErrorCode * error)
+Node_t * GetInputStmt(TokenList * tokens, size_t * pos, Tree_t * tree, frontend_err * error)
 {
     assert (tokens && pos && tree);
-    *error = SUCCESS;
+    *error = FRONTEND_SUCCESS;
 
     REQUIRE_TOKEN(TOK_READ, current_token(tokens, *pos));
     (*pos)++;
@@ -498,10 +505,11 @@ Node_t * GetInputStmt(TokenList * tokens, size_t * pos, Tree_t * tree, ErrorCode
     Token * token = current_token(tokens, *pos);
     REQUIRE_TOKEN(TOK_IDENTIFIER, token);
 
-    Node_result_t var_node = create_identifier_node(tree, token->string_value);
-    if (var_node.error != SUCCESS)
+    Node_result_t var_node = ID_NODE(token->string_value);
+    if (var_node.error != TREE_SUCCESS)
     {
-        ERROR_MESSAGE(SYNTAX_ERROR, *error);
+        *error = SYNTAX_ERROR;
+        ERROR_MESSAGE_FRONTEND(SYNTAX_ERROR);
         return NULL;
     }
     (*pos)++;
@@ -509,10 +517,11 @@ Node_t * GetInputStmt(TokenList * tokens, size_t * pos, Tree_t * tree, ErrorCode
     REQUIRE_TOKEN(TOK_RBRACE, current_token(tokens, *pos));
     (*pos)++;
     
-    Node_result_t res = create_operator_node(tree, OP_READ);
-    if (res.error != SUCCESS)
+    Node_result_t res = OPERATOR_NODE(OP_READ);
+    if (res.error != TREE_SUCCESS)
     {
-        *error = TREE_CREATING_NODE_ERROR;
+        *error = CREATING_NODE_ERROR;
+        ERROR_MESSAGE_FRONTEND(CREATING_NODE_ERROR);
         return NULL;
     }
 
@@ -524,19 +533,19 @@ Node_t * GetInputStmt(TokenList * tokens, size_t * pos, Tree_t * tree, ErrorCode
 
 
 // Assignment ::= Identifier '=' Expression
-Node_t * GetAssignment_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, ErrorCode * error)
+Node_t * GetAssignment_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, frontend_err * error)
 {
     assert (tokens && pos && tree);
-    *error = SUCCESS;
+    *error = FRONTEND_SUCCESS;
 
     Token * t = current_token(tokens, *pos);
     REQUIRE_TOKEN(TOK_IDENTIFIER, t);
     (*pos)++;
 
-    Node_result_t id_res = create_identifier_node(tree, t->string_value);
-    if (id_res.error != SUCCESS)    
+    Node_result_t id_res = ID_NODE(t->string_value);
+    if (id_res.error != TREE_SUCCESS)    
     {
-        *error = TREE_CREATING_NODE_ERROR;
+        *error = CREATING_NODE_ERROR;
         return NULL;
     }
 
@@ -546,21 +555,21 @@ Node_t * GetAssignment_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, E
     Node_t * expr = GetExpression_tokens(tokens, pos, tree, error);
     if (!expr)
     {
-        DEBUG_PRINT("[SYNTAX ERROR] parser expects expression after '='\n");
-        ERROR_MESSAGE(SYNTAX_ERROR, *error);
-        destroy_node(id_res.node);
+        *error = ASSIGNMENT_NO_VALUE;
+        ERROR_MESSAGE_FRONTEND(ASSIGNMENT_NO_VALUE);
+        node_dtor(id_res.node);
         return NULL;
     }
 
-    Node_result_t assign_res = create_statement_node(tree, OP_ASSIGNMENT);
-    if (assign_res.error != SUCCESS)    
+    Node_result_t assign_res = STATEMENT_NODE(OP_ASSIGNMENT);
+    if (assign_res.error != TREE_SUCCESS)    
     {
-        destroy_node(id_res.node);
-        destroy_node(expr);
-        *error = TREE_CREATING_NODE_ERROR;
+        node_dtor(id_res.node);
+        node_dtor(expr);
+        *error = CREATING_NODE_ERROR;
+        ERROR_MESSAGE_FRONTEND(CREATING_NODE_ERROR);
         return NULL;
     }
-    DEBUG_PRINT("assignment node created");
 
     assign_res.node -> left = id_res.node;
     assign_res.node -> right = expr;
@@ -572,25 +581,26 @@ Node_t * GetAssignment_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, E
 }
 
 //VarDef      ::= 'ID_def' Var '=' Expression
-Node_t * GetVarDef_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, ErrorCode * error)
+Node_t * GetVarDef_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, frontend_err * error)
 {
     assert (tokens && pos && tree);
-    *error = SUCCESS;
+    *error = FRONTEND_SUCCESS;
     REQUIRE_TOKEN(TOK_ID_DEF, current_token(tokens, *pos));
     (*pos)++;
 
     Token * t = current_token(tokens, *pos);
     if (!t || t -> type != TOK_IDENTIFIER)
     {
-        DEBUG_PRINT("[SYNTAX ERROR] parser expected identifier\n");
-        ERROR_MESSAGE(SYNTAX_ERROR, *error);
+        *error = UNDEFINED_ID;
+        ERROR_MESSAGE_FRONTEND(UNDEFINED_ID);
         return NULL;
     }
 
-    Node_result_t id_res = create_identifier_node(tree, t->string_value);
-    if (id_res.error != SUCCESS)    
+    Node_result_t id_res = ID_NODE(t->string_value);
+    if (id_res.error != TREE_SUCCESS)    
     {
-        *error = TREE_CREATING_NODE_ERROR;
+        *error = CREATING_NODE_ERROR;
+        ERROR_MESSAGE_FRONTEND(CREATING_NODE_ERROR);
         return NULL;
     }
     (*pos)++;
@@ -601,21 +611,21 @@ Node_t * GetVarDef_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, Error
     Node_t * expr = GetExpression_tokens(tokens, pos, tree, error);
     if (!expr)
     {
-        DEBUG_PRINT("[SYNTAX ERROR] parser expects expression after '='\n");
-        ERROR_MESSAGE(SYNTAX_ERROR, *error);
-        destroy_node(id_res.node);
+        *error = ASSIGNMENT_NO_VALUE;
+        ERROR_MESSAGE_FRONTEND(ASSIGNMENT_NO_VALUE);
+        node_dtor(id_res.node);
         return NULL;
     }
 
-    Node_result_t def_res = create_statement_node(tree, OP_VAR_DEF);
-    if (def_res.error != SUCCESS)    
+    Node_result_t def_res = STATEMENT_NODE(OP_VAR_DEF);
+    if (def_res.error != TREE_SUCCESS)    
     {
-        destroy_node(id_res.node);
-        destroy_node(expr);
-        *error = TREE_CREATING_NODE_ERROR;
+        node_dtor(id_res.node);
+        node_dtor(expr);
+        *error = CREATING_NODE_ERROR;
+        ERROR_MESSAGE_FRONTEND(CREATING_NODE_ERROR);
         return NULL;
     }
-    DEBUG_PRINT("var_def node created");
 
     def_res.node -> left = id_res.node;
     def_res.node -> right = expr;
@@ -629,10 +639,10 @@ Node_t * GetVarDef_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, Error
 
 
 // IfStmt ::= "if" '{' Expression '}' Block ('else' Block)?
-Node_t * GetIfStmt_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, ErrorCode * error)
+Node_t * GetIfStmt_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, frontend_err * error)
 {
     assert(tokens && pos && tree);
-    *error = SUCCESS;
+    *error = FRONTEND_SUCCESS;
     REQUIRE_TOKEN(TOK_IF, current_token(tokens, (*pos)));
     (*pos)++;
 
@@ -641,8 +651,8 @@ Node_t * GetIfStmt_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, Error
     Node_t * condition = GetExpression_tokens(tokens, pos, tree, error);
     if (!condition)
     {
-        DEBUG_PRINT("[SYNTAX ERROR] parser expected condition\n");
-        *error = SYNTAX_ERROR;
+        *error = NO_CONDITION;
+        ERROR_MESSAGE_FRONTEND(NO_CONDITION);
         return NULL;
     }
     
@@ -652,8 +662,8 @@ Node_t * GetIfStmt_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, Error
     Node_t * if_body = GetBlock_tokens(tokens, pos, tree, error);
     if (!if_body)
     {
-        DEBUG_PRINT("[SYNTAX ERROR] parser expected block\n");
-        *error = SYNTAX_ERROR;
+        *error = NO_BLOCK;
+        ERROR_MESSAGE_FRONTEND(NO_BLOCK);
         return NULL;
     }
 
@@ -664,23 +674,25 @@ Node_t * GetIfStmt_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, Error
         else_body = GetBlock_tokens(tokens, pos, tree, error);
         if (!else_body)
         {
-            DEBUG_PRINT("[SYNTAX ERROR] parser expected block\n");
-            *error = SYNTAX_ERROR;
+            *error = NO_BLOCK;
+            ERROR_MESSAGE_FRONTEND(NO_BLOCK);
             return NULL;
         }   
     }
 
-    Node_result_t if_res = create_statement_node(tree, OP_IF);
-    if (if_res.error != SUCCESS)    
+    Node_result_t if_res = STATEMENT_NODE(OP_IF);
+    if (if_res.error != TREE_SUCCESS)    
     {
-        *error = TREE_CREATING_NODE_ERROR;
+        *error = CREATING_NODE_ERROR;
+        ERROR_MESSAGE_FRONTEND(CREATING_NODE_ERROR);
         return NULL;
     }
 
-    Node_result_t stmt_res = create_statement_node(tree, OP_STATEMENT);
-    if (stmt_res.error != SUCCESS)  
+    Node_result_t stmt_res = STATEMENT_NODE(OP_STATEMENT);
+    if (stmt_res.error != TREE_SUCCESS)  
     {
-        *error = TREE_CREATING_NODE_ERROR;
+        *error = CREATING_NODE_ERROR;
+        ERROR_MESSAGE_FRONTEND(CREATING_NODE_ERROR);
         return NULL;
     }
 
@@ -701,10 +713,10 @@ Node_t * GetIfStmt_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, Error
 
 
 // WhileStmt ::= "while" '{' Expression '}' Block
-Node_t * GetWhileStmt_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, ErrorCode * error)
+Node_t * GetWhileStmt_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, frontend_err * error)
 {
     assert(tokens && pos && tree);
-    *error = SUCCESS;
+    *error = FRONTEND_SUCCESS;
     
     REQUIRE_TOKEN(TOK_WHILE, current_token(tokens, (*pos)));
     (*pos)++;
@@ -714,7 +726,8 @@ Node_t * GetWhileStmt_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, Er
     Node_t * condition = GetExpression_tokens(tokens, pos, tree, error);
     if (!condition)
     {
-        printf("[SYNTAX ERROR] parser expected condition\n");
+        *error = NO_CONDITION;
+        ERROR_MESSAGE_FRONTEND(NO_CONDITION);
         return NULL;
     }
     
@@ -724,15 +737,16 @@ Node_t * GetWhileStmt_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, Er
    Node_t * body = GetBlock_tokens(tokens, pos, tree, error);
     if (!body)
     {
-        DEBUG_PRINT("[SYNTAX ERROR] parser expected block\n");
-        *error = SYNTAX_ERROR;
+        *error = NO_BLOCK;
+        ERROR_MESSAGE_FRONTEND(NO_BLOCK);
         return NULL;
     }
 
-    Node_result_t while_res = create_statement_node(tree, OP_WHILE);
-    if (while_res.error != SUCCESS)    
+    Node_result_t while_res = STATEMENT_NODE(OP_WHILE);
+    if (while_res.error != TREE_SUCCESS)    
     {
-        *error = TREE_CREATING_NODE_ERROR;
+        *error = CREATING_NODE_ERROR;
+        ERROR_MESSAGE_FRONTEND(CREATING_NODE_ERROR);
         return NULL;
     }
 
@@ -749,10 +763,10 @@ Node_t * GetWhileStmt_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, Er
 }
 
 //Block ::= '{''{' Statement* '}''}'
-Node_t * GetBlock_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, ErrorCode  * error)
+Node_t * GetBlock_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, frontend_err  * error)
 {
     assert(tokens && pos && tree);
-    *error = SUCCESS;
+    *error = FRONTEND_SUCCESS;
 
     REQUIRE_TOKEN(TOK_LBRACE, current_token(tokens, (*pos)));
     (*pos)++;
@@ -772,23 +786,24 @@ Node_t * GetBlock_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, ErrorC
         cur_stmt = GetStatement_tokens(tokens, pos, tree, error);
         if (cur_stmt == NULL)
         {
-            DEBUG_PRINT("[ERROR] Error during parsing statement");
-            destroy_tree(tree, "destroy_frontend_error");
+            tree_dtor(tree, "destroy_frontend_error");
             *error = PARSER_ERROR;
+            ERROR_MESSAGE_FRONTEND(PARSER_ERROR);
             return NULL;
         }
 
-        if (!first_stmt)                                              // проверка на парсинг первого выражения
+        if (!first_stmt)                                                    // проверка на парсинг первого выражения
         {
             first_stmt = cur_stmt;
             prev_stmt = cur_stmt;
         }
         else                                                                // связываем через узел разделитель
         {
-            Node_result_t sep_res = create_statement_node(tree, OP_END);
-            if (sep_res.error != SUCCESS)   
+            Node_result_t sep_res = STATEMENT_NODE(OP_END);
+            if (sep_res.error != TREE_SUCCESS)   
             {
-                *error = TREE_CREATING_NODE_ERROR;
+                *error = CREATING_NODE_ERROR;
+                ERROR_MESSAGE_FRONTEND(CREATING_NODE_ERROR);
                 return NULL;
             }
 
@@ -812,10 +827,9 @@ Node_t * GetBlock_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, ErrorC
         }
         else
         {
-            DEBUG_PRINT("[SYNTAX ERROR] expected ';' oe end\n");
-            DEBUG_PRINT("got token %s at %lu", get_string_token_type(t->type), *pos);
-            destroy_tree(tree, "destroy_frontend_error");
-            *error = SYNTAX_ERROR;
+            *error = FORGOTTEN_SEMICOLON;
+            ERROR_MESSAGE_FRONTEND(FORGOTTEN_SEMICOLON);
+            tree_dtor(tree, "destroy_frontend_error");
             return NULL;
         }
 
@@ -827,10 +841,11 @@ Node_t * GetBlock_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, ErrorC
     REQUIRE_TOKEN(TOK_RBRACE, current_token(tokens, (*pos)));
     (*pos)++;
 
-    Node_result_t block_res = create_statement_node(tree, OP_BLOCK);
-    if (block_res.error != SUCCESS)     
+    Node_result_t block_res = STATEMENT_NODE(OP_BLOCK);
+    if (block_res.error != TREE_SUCCESS)     
     {
-        *error = TREE_CREATING_NODE_ERROR;
+        *error = CREATING_NODE_ERROR;
+        ERROR_MESSAGE_FRONTEND(CREATING_NODE_ERROR);
         return NULL;
     }
    
@@ -843,25 +858,26 @@ Node_t * GetBlock_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, ErrorC
 
 
 // Expression ::= AddSub
-Node_t * GetExpression_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, ErrorCode * error)
+Node_t * GetExpression_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, frontend_err * error)
 {
     assert(tokens && pos && tree);
-    *error = SUCCESS;
+    *error = FRONTEND_SUCCESS;
     return GetEquality_tokens(tokens, pos, tree, error);
 }
 
 
 
 // Equality    ::= Comp ( ('==' | '!=') Comp)
-Node_t * GetEquality_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, ErrorCode * error)
+Node_t * GetEquality_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, frontend_err * error)
 {
     assert(tokens && pos && tree);
-    *error = SUCCESS; 
+    *error = FRONTEND_SUCCESS; 
 
     Node_t * val = GetComp_tokens(tokens, pos, tree, error);
     if (!val)   
     {
         *error = PARSER_ERROR;
+        ERROR_MESSAGE_FRONTEND(PARSER_ERROR);
         return NULL;
     }
 
@@ -874,18 +890,20 @@ Node_t * GetEquality_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, Err
         Node_t * val2 = GetComp_tokens(tokens, pos, tree, error);
         if (!val2)
         {
-            destroy_node(val);
+            node_dtor(val);
             *error = PARSER_ERROR;
+            ERROR_MESSAGE_FRONTEND(PARSER_ERROR);
             return NULL;
         }
 
         Node_result_t res_op = {};
-        res_op = create_operator_node(tree, op);
-        if (res_op.error != SUCCESS)    
+        res_op = OPERATOR_NODE(op);
+        if (res_op.error != TREE_SUCCESS)    
         {
-            destroy_node(val);
-            destroy_node(val2);
-            *error = TREE_CREATING_NODE_ERROR;
+            node_dtor(val);
+            node_dtor(val2);
+            *error = CREATING_NODE_ERROR;
+            ERROR_MESSAGE_FRONTEND(CREATING_NODE_ERROR);
             return NULL;
         }
         
@@ -903,10 +921,10 @@ Node_t * GetEquality_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, Err
 
 
 // Comp        ::= AddSub ( ('<' | '>' | '<=' | '>=') AddSub)*
-Node_t * GetComp_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, ErrorCode * error)
+Node_t * GetComp_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, frontend_err * error)
 {
     assert(tokens && pos && tree);
-    *error = SUCCESS;
+    *error = FRONTEND_SUCCESS;
 
     Node_t * val = GetAddSub_tokens(tokens, pos, tree, error);
     if (!val)   return NULL;
@@ -929,17 +947,19 @@ Node_t * GetComp_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, ErrorCo
         Node_t * val2 = GetAddSub_tokens(tokens, pos, tree, error);
         if (!val2)
         {
-            destroy_node(val);
+            node_dtor(val);
             *error = PARSER_ERROR;
+            ERROR_MESSAGE_FRONTEND(PARSER_ERROR);
             return NULL;
         }
 
-        Node_result_t res_op = create_operator_node(tree, op);
-        if (res_op.error != SUCCESS)    
+        Node_result_t res_op = OPERATOR_NODE(op);
+        if (res_op.error != TREE_SUCCESS)    
         {
-            destroy_node(val);
-            destroy_node(val2);
-            *error = TREE_CREATING_NODE_ERROR;
+            node_dtor(val);
+            node_dtor(val2);
+            *error = CREATING_NODE_ERROR;
+            ERROR_MESSAGE_FRONTEND(CREATING_NODE_ERROR);
             return NULL;
         }
         
@@ -956,15 +976,16 @@ Node_t * GetComp_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, ErrorCo
 
 
 // AddSub ::= MulDiv ( ('+' | '-') MulDiv )*
-Node_t * GetAddSub_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, ErrorCode * error)
+Node_t * GetAddSub_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, frontend_err * error)
 {
     assert(tokens && pos && tree);
-    *error = SUCCESS;
+    *error = FRONTEND_SUCCESS;
 
     Node_t * val = GetMulDiv_tokens(tokens, pos, tree, error);
     if (!val)   
     {
         *error = PARSER_ERROR;
+        ERROR_MESSAGE_FRONTEND(PARSER_ERROR);
         return NULL;
     }
 
@@ -977,22 +998,24 @@ Node_t * GetAddSub_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, Error
         Node_t * val2 = GetMulDiv_tokens(tokens, pos, tree, error);
         if (!val2)
         {
-            destroy_node(val);
+            node_dtor(val);
             *error = PARSER_ERROR;
+            ERROR_MESSAGE_FRONTEND(PARSER_ERROR);
             return NULL;
         }
 
         Node_result_t res_op = {};
         if (op == TOK_PLUS)
-            res_op = create_operator_node(tree, OP_ADD);
+            res_op = OPERATOR_NODE(OP_ADD);
         else    
-            res_op = create_operator_node(tree, OP_SUB);
+            res_op = OPERATOR_NODE(OP_SUB);
         
-        if (res_op.error != SUCCESS)    
+        if (res_op.error != TREE_SUCCESS)    
         {
-            destroy_node(val);
-            destroy_node(val2);
-            *error = TREE_CREATING_NODE_ERROR;
+            node_dtor(val);
+            node_dtor(val2);
+            *error = CREATING_NODE_ERROR;
+            ERROR_MESSAGE_FRONTEND(CREATING_NODE_ERROR);
             return NULL;
         }
         
@@ -1008,10 +1031,10 @@ Node_t * GetAddSub_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, Error
 }
 
 // MulDiv      ::= Pow ( ('*' | '/') Pow )*
-Node_t * GetMulDiv_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, ErrorCode * error)
+Node_t * GetMulDiv_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, frontend_err * error)
 {
     assert(tokens && pos && tree);
-    *error = SUCCESS;
+    *error = FRONTEND_SUCCESS;
 
     Node_t * val = GetPow_tokens(tokens, pos, tree, error);
     if (!val)   return NULL;
@@ -1025,22 +1048,24 @@ Node_t * GetMulDiv_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, Error
         Node_t * val2 = GetPow_tokens(tokens, pos, tree, error);
         if (!val2)
         {
-            destroy_node(val);
+            node_dtor(val);
             *error = PARSER_ERROR;
+            ERROR_MESSAGE_FRONTEND(PARSER_ERROR);
             return NULL;
         }
 
         Node_result_t res_op = {};
         if (op == TOK_MULTIPLY)
-            res_op = create_operator_node(tree, OP_MUL);
+            res_op = OPERATOR_NODE(OP_MUL);
         else    
-            res_op = create_operator_node(tree, OP_DIV);
+            res_op = OPERATOR_NODE(OP_DIV);
         
-        if (res_op.error != SUCCESS)    
+        if (res_op.error != TREE_SUCCESS)    
         {
-            destroy_node(val);
-            destroy_node(val2);
-            *error = TREE_CREATING_NODE_ERROR;
+            node_dtor(val);
+            node_dtor(val2);
+            *error = CREATING_NODE_ERROR;
+            ERROR_MESSAGE_FRONTEND(CREATING_NODE_ERROR);
             return NULL;
         }
         
@@ -1057,10 +1082,10 @@ Node_t * GetMulDiv_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, Error
 
 
 //Pow         ::= Unary ('^' Unary)*
-Node_t * GetPow_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, ErrorCode * error)
+Node_t * GetPow_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, frontend_err * error)
 {
     assert(tokens && pos && tree);
-    * error = SUCCESS;
+    * error = FRONTEND_SUCCESS;
 
     Node_t * val = GetUnary_tokens(tokens, pos, tree, error);
     if (!val)   return NULL;
@@ -1073,18 +1098,20 @@ Node_t * GetPow_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, ErrorCod
         Node_t * val2 = GetUnary_tokens(tokens, pos, tree, error);
         if (!val2)
         {
-            destroy_node(val);
+            node_dtor(val);
             *error = PARSER_ERROR;
+            ERROR_MESSAGE_FRONTEND(PARSER_ERROR);
             return NULL;
         }
 
         Node_result_t res_op = {};
-        res_op = create_operator_node(tree, OP_POW);
-        if (res_op.error != SUCCESS)    
+        res_op = OPERATOR_NODE(OP_POW);
+        if (res_op.error != TREE_SUCCESS)    
         {
-            destroy_node(val);
-            destroy_node(val2);
-            *error = TREE_CREATING_NODE_ERROR;
+            node_dtor(val);
+            node_dtor(val2);
+            *error = CREATING_NODE_ERROR;
+            ERROR_MESSAGE_FRONTEND(CREATING_NODE_ERROR);
             return NULL;
         }
         
@@ -1102,15 +1129,16 @@ Node_t * GetPow_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, ErrorCod
 
 
 // Unary       ::=  ( '+' | '-' | FuncOper )? Primary
-Node_t * GetUnary_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, ErrorCode * error)
+Node_t * GetUnary_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, frontend_err * error)
 {
     assert(tokens && pos && tree);
-    *error = SUCCESS;
+    *error = FRONTEND_SUCCESS;
 
     Token * t = current_token(tokens, *pos);
     if (!t)     
     {
         *error = PARSER_ERROR;
+        ERROR_MESSAGE_FRONTEND(PARSER_ERROR);
         return NULL;
     }
 
@@ -1122,18 +1150,19 @@ Node_t * GetUnary_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, ErrorC
         Node_t * operand = GetPrimaryExpression_tokens(tokens, pos, tree, error);
         if (!operand)
         {
-            DEBUG_PRINT("[SYNTAX ERROR] expected expression after unary '-'/'+'\n");
-            *error = SYNTAX_ERROR;
+            *error = NO_EXPECTED_EXPRESSION;
+            ERROR_MESSAGE_FRONTEND(NO_EXPECTED_EXPRESSION);
             return NULL;
         }
 
         if (sign == TOK_PLUS)
             return operand;
 
-        Node_result_t res = create_operator_node(tree, OP_UNARY_MINUS);
-        if (res.error != SUCCESS)
+        Node_result_t res = OPERATOR_NODE(OP_UNARY_MINUS);
+        if (res.error != TREE_SUCCESS)
         {
-            *error = TREE_CREATING_NODE_ERROR;
+            *error = CREATING_NODE_ERROR;
+            ERROR_MESSAGE_FRONTEND(CREATING_NODE_ERROR);
             return NULL;
         }
         
@@ -1163,15 +1192,15 @@ Node_t * GetUnary_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, ErrorC
         Node_t * prim = GetExpression_tokens(tokens, pos, tree, error);
         if (!prim)
         {
-            DEBUG_PRINT("[SYNTAX ERROR] expected expression after function");
-            *error = PARSER_ERROR;
+            *error = NO_EXPECTED_EXPRESSION;
+            ERROR_MESSAGE_FRONTEND(NO_EXPECTED_EXPRESSION);
             return NULL;
         }
         REQUIRE_TOKEN(TOK_RBRACE, current_token(tokens, *pos));
         (*pos)++;
 
-        Node_result_t res = create_operator_node(tree, op);
-        if (res.error != SUCCESS) return NULL;
+        Node_result_t res = OPERATOR_NODE(op);
+        if (res.error != TREE_SUCCESS) return NULL;
 
         res.node->right = prim;
         prim->prev = res.node;
@@ -1182,13 +1211,11 @@ Node_t * GetUnary_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, ErrorC
 }
 
 
-
-
 // Primary ::= '(' Expression ')' | Number | Identifier | StringLiteral | FuncCall
-Node_t * GetPrimaryExpression_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, ErrorCode * error)
+Node_t * GetPrimaryExpression_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, frontend_err * error)
 {
     assert(tokens && pos && tree);
-    *error = SUCCESS;
+    *error = FRONTEND_SUCCESS;
 
     Token * t = current_token(tokens, *pos);
     if (!t)     return NULL;
@@ -1200,8 +1227,8 @@ Node_t * GetPrimaryExpression_tokens(TokenList * tokens, size_t * pos, Tree_t * 
         Node_t * val = GetExpression_tokens(tokens, pos, tree, error);
         if (val == NULL) 
         {
-            DEBUG_PRINT("[SYNTAX ERROR] parser expected expression\n");
-            *error = SYNTAX_ERROR;
+            *error = NO_EXPECTED_EXPRESSION;
+            ERROR_MESSAGE_FRONTEND(NO_EXPECTED_EXPRESSION);
             return NULL;
         }
 
@@ -1213,8 +1240,8 @@ Node_t * GetPrimaryExpression_tokens(TokenList * tokens, size_t * pos, Tree_t * 
     {
         int value = t->int_value;
         (*pos)++;
-        Node_result_t num_res = create_number_node(tree, value);
-        if (num_res.error != SUCCESS)   return NULL;
+        Node_result_t num_res = NUMBER_NODE(value);
+        if (num_res.error != TREE_SUCCESS)   return NULL;
         return num_res.node;
     }
     else if (t -> type == TOK_IDENTIFIER)
@@ -1224,10 +1251,11 @@ Node_t * GetPrimaryExpression_tokens(TokenList * tokens, size_t * pos, Tree_t * 
             return GetFuncCall_tokens(tokens, pos, tree, error);
 
         (*pos)++;
-        Node_result_t id_res = create_identifier_node(tree, t->string_value);
-        if (id_res.error != SUCCESS)    
+        Node_result_t id_res = ID_NODE(t->string_value);
+        if (id_res.error != TREE_SUCCESS)    
         {
-            *error = TREE_CREATING_NODE_ERROR;
+            *error = CREATING_NODE_ERROR;
+            ERROR_MESSAGE_FRONTEND(CREATING_NODE_ERROR);
             return NULL;
         }
 
@@ -1237,11 +1265,12 @@ Node_t * GetPrimaryExpression_tokens(TokenList * tokens, size_t * pos, Tree_t * 
     {
         char * str = strdup(t->string_value);
         (*pos)++;
-        Node_result_t str_res = create_string_node(tree, str);
+        Node_result_t str_res = STRING_NODE(str);
         free(str);
-        if (str_res.error != SUCCESS)   
+        if (str_res.error != TREE_SUCCESS)   
         {
-            *error = TREE_CREATING_NODE_ERROR;
+            *error = CREATING_NODE_ERROR;
+            ERROR_MESSAGE_FRONTEND(CREATING_NODE_ERROR);
             return NULL;
         }
         return str_res.node;
@@ -1252,9 +1281,8 @@ Node_t * GetPrimaryExpression_tokens(TokenList * tokens, size_t * pos, Tree_t * 
     }
     else
     {
-        printf("[SYNTAX ERROR] Unexpected token\n");
-        *error = SYNTAX_ERROR;
+        *error = UNEXPECTED_SYNTAX;
+        ERROR_MESSAGE_FRONTEND(UNEXPECTED_SYNTAX);
         return NULL;
     }
 }
-

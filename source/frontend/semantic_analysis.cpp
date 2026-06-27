@@ -2,11 +2,10 @@
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
-#include "utils.h"
 #include "semantic_analysis.h"
 #include "tree_structure.h"
 
-#define DISABLE_DEBUG_PRINT
+extern const error_struct frontend_error_list[];
 
 int symbol_table_find(const char * name, SymbolTable * st, st_mode_t mode)
 {
@@ -93,26 +92,28 @@ void symbol_table_destroy(SymbolTable * st)
 }
 
 
-ErrorCode semantic_analysis(Tree_t * tree)
+frontend_err semantic_analysis(Tree_t * tree)
 {
-    assert(tree);
-    assert(tree->root);
+    assert(tree && tree->root);
     DEBUG_PRINT("[INFO] SEMANTIC_ANALYSIS START");
 
-    ErrorCode error = SUCCESS;
+    frontend_err error = FRONTEND_SUCCESS;
 
     SymbolTable * st = st_init();
     if (!st)
     {
-        ERROR_MESSAGE(SEMANTIC_ERROR, error);
-        return error;
+        ERROR_MESSAGE_FRONTEND(SEMANTIC_ERROR);
+        return SEMANTIC_ERROR;
     }
 
 
     // first pass
     error = collect_definitions(tree->root->right, st);
-    if (error != SUCCESS)
+    if (error != FRONTEND_SUCCESS)
+    {
+        ERROR_MESSAGE_FRONTEND(error);
         return error;
+    }
 
     // second pass
     error = check_semantics(tree->root->right, st);
@@ -125,14 +126,14 @@ ErrorCode semantic_analysis(Tree_t * tree)
 }
 
 
-ErrorCode collect_definitions(Node_t * node, SymbolTable * st)
+frontend_err collect_definitions(Node_t * node, SymbolTable * st)
 {
     assert(st);
 
     if (!node)
-        return SUCCESS;
+        return FRONTEND_SUCCESS;
     
-    ErrorCode error = SUCCESS;
+    frontend_err error = FRONTEND_SUCCESS;
 
     if (node->type == STATEMENT && node->value.stmt == OP_FUNC_DEF)
     {
@@ -141,8 +142,8 @@ ErrorCode collect_definitions(Node_t * node, SymbolTable * st)
         if (symbol_table_find(name, st, ST_FUNC) >= 0)
         {
             DEBUG_PRINT("[ERROR] Multuple definition of function %s", name);
-            ERROR_MESSAGE(SEMANTIC_ERROR, error);
-            return error;
+            ERROR_MESSAGE_FRONTEND(SEMANTIC_ERROR);
+            return SEMANTIC_ERROR;
         }
         else
         {
@@ -157,8 +158,8 @@ ErrorCode collect_definitions(Node_t * node, SymbolTable * st)
         if (symbol_table_find(name, st, ST_VAR) >= 0)
         {
             DEBUG_PRINT("[ERROR] Multuple definition of identifier %s", name);
-            ERROR_MESSAGE(SEMANTIC_ERROR, error);
-            return error;
+            ERROR_MESSAGE_FRONTEND(SEMANTIC_ERROR);
+            return SEMANTIC_ERROR;
         }
         else
         {
@@ -172,20 +173,28 @@ ErrorCode collect_definitions(Node_t * node, SymbolTable * st)
     }
 
     error = collect_definitions(node->left, st);
-    if (error != SUCCESS)
+    if (error != FRONTEND_SUCCESS)
+    {
+        ERROR_MESSAGE_FRONTEND(error);
         return error;
+    }
     error = collect_definitions(node->right, st);
+    if (error != FRONTEND_SUCCESS)
+    {
+        ERROR_MESSAGE_FRONTEND(error);
+        return error;
+    }
     
     return error;
 }
 
 
-ErrorCode check_semantics(Node_t * node, SymbolTable * st)
+frontend_err check_semantics(Node_t * node, SymbolTable * st)
 {
     if (!node)
-        return SUCCESS;
+        return FRONTEND_SUCCESS;
 
-    ErrorCode error = SUCCESS;
+    frontend_err error = FRONTEND_SUCCESS;
 
     if (node->type == STATEMENT && node->value.stmt == OP_FUNC_DEF)
     {
@@ -203,8 +212,8 @@ ErrorCode check_semantics(Node_t * node, SymbolTable * st)
                 if (symbol_table_find(name, st, ST_VAR) >= 0)
                 {
                     DEBUG_PRINT("[ERROR] parameter shadows variable %s", name);
-                    ERROR_MESSAGE(SEMANTIC_ERROR, error);
-                    return error;
+                    ERROR_MESSAGE_FRONTEND(SEMANTIC_ERROR);
+                    return SEMANTIC_ERROR;
                 }
 
                 int index = symbol_table_add(name, st, ST_VAR);
@@ -215,8 +224,11 @@ ErrorCode check_semantics(Node_t * node, SymbolTable * st)
         }
         // function body
         error = check_semantics(node->right, st);
-        if (error != SUCCESS)
+        if (error != FRONTEND_SUCCESS)
+        {
+            ERROR_MESSAGE_FRONTEND(error);
             return error;
+        }
 
         // kill local variables
         for (size_t i = old_var_count; i < st[ST_VAR].count; ++i)
@@ -226,7 +238,7 @@ ErrorCode check_semantics(Node_t * node, SymbolTable * st)
         }
         st[ST_VAR].count = old_var_count;
 
-        return SUCCESS;
+        return FRONTEND_SUCCESS;
     }
 
 
@@ -237,15 +249,15 @@ ErrorCode check_semantics(Node_t * node, SymbolTable * st)
         if (index < 0)
         {
             DEBUG_PRINT("[ERROR] Call of undefined function %s\n", name);
-            ERROR_MESSAGE(SEMANTIC_ERROR, error);
-            return error;
+            ERROR_MESSAGE_FRONTEND(SEMANTIC_ERROR);
+            return SEMANTIC_ERROR;
         }
         node->id.id_index = index;
 
         if (node->left)
         {
             error = check_semantics(node->left, st);
-            if (error != SUCCESS)
+            if (error != FRONTEND_SUCCESS)
                 return error;
         }
     }
@@ -256,8 +268,11 @@ ErrorCode check_semantics(Node_t * node, SymbolTable * st)
         if (node->left)
         {
             error = check_semantics(node->left, st);
-            if (error != SUCCESS)
+            if (error != FRONTEND_SUCCESS)
+            {
+                ERROR_MESSAGE_FRONTEND(error);
                 return error;
+            }
         }
     }
 
@@ -267,8 +282,8 @@ ErrorCode check_semantics(Node_t * node, SymbolTable * st)
         if (!node->left || node->left->type != IDENTIFIER)
         {
             DEBUG_PRINT("[ERROR] read statement must have a variable");
-            ERROR_MESSAGE(SEMANTIC_ERROR, error);
-            return error;
+            ERROR_MESSAGE_FRONTEND(SEMANTIC_ERROR);
+            return SEMANTIC_ERROR;
         }
 
         const char * name = node->left->id.name;
@@ -276,8 +291,8 @@ ErrorCode check_semantics(Node_t * node, SymbolTable * st)
         if (index < 0)
         {
             DEBUG_PRINT("[ERROR] read variable '%s' not declared", name);
-            ERROR_MESSAGE(SEMANTIC_ERROR, error);
-            return error;
+            ERROR_MESSAGE_FRONTEND(SEMANTIC_ERROR);
+            return SEMANTIC_ERROR;
         }
         node->left->id.id_index = index;
     }
@@ -290,16 +305,19 @@ ErrorCode check_semantics(Node_t * node, SymbolTable * st)
         if (index < 0)
         {
             DEBUG_PRINT("[ERROR] undefined variable %s", name);
-            ERROR_MESSAGE(SEMANTIC_ERROR, error);
-            return error;
+            ERROR_MESSAGE_FRONTEND(SEMANTIC_ERROR);
+            return SEMANTIC_ERROR;
         }
         node->id.id_index = index;
     }
 
 
     error = check_semantics(node->left, st);
-    if (error != SUCCESS)
+    if (error != FRONTEND_SUCCESS)
+    {
+        ERROR_MESSAGE_FRONTEND(error);
         return error;
+    }
 
     error = check_semantics(node->right, st);
     return error;

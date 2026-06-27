@@ -7,55 +7,64 @@
 #include "tree_structure.h"
 #include "tree_operations.h"
 #include "load_expression.h"
-#include "utils.h"
+#include "optimize_tree.h"
+#include "buffer.h"
 #include "lexer.h"
 #include "errors.h"
 
-#define DISABLE_DEBUG_PRINT
+extern const error_struct optimizer_error_list[];
+extern const error_struct tree_error_list[];
+extern const error_struct frontend_error_list[];
 
-ErrorCode build_middleend_tree(Tree_t * tree, const char * expression_input)
+optimize_err optimizer_dtor(optimizer_t * optimizer);
+
+optimize_err optimize_AST(optimizer_t optimizer);
+
+
+optimize_err optimizer_ctor(char * expression_input, optimizer_t * optimizer)
 {
-    assert(tree);
-
-    ErrorCode error = SUCCESS;
+    assert(optimizer && expression_input);
 
     char * buffer = NULL;
-    error = load_to_buffer(expression_input, &buffer);
-    if (error != SUCCESS)
-        return error;
+    buffer_err b_error = BUFFER_SUCCESS;
+    b_error = buffer_ctor(buffer, expression_input);
+    if (b_error != BUFFER_SUCCESS)
+    {
+        ERROR_MESSAGE_OPTIMIZER(OPTIMIZER_BUFFER_ERROR);
+        return OPTIMIZER_BUFFER_ERROR;
+    }
     DEBUG_PRINT("[DEBUG]: expression has been loaded to buffer\n");
     DEBUG_PRINT("[DEBUG] buffer:\n");
     DEBUG_PRINT("%s\n", buffer);
 
     size_t pos = 0;
-    Node_t * first_node = read_node(buffer, &pos, tree);
+    Node_t * first_node = read_node(buffer, &pos, optimizer->ast_tree);
     if (!first_node)
     {
-        ERROR_MESSAGE(LOADING_EXPRESSION_ERROR, error);
+        ERROR_MESSAGE_OPTIMIZER(OPTIMIZER_LOADING_EXPRESSION_ERROR);
         free(buffer);
-        return error;
+        return OPTIMIZER_LOADING_EXPRESSION_ERROR;
     }
     DEBUG_PRINT("[DEBUG] all nodes was read");
 
-    tree -> root -> right = first_node;
-    error = build_parent_links(tree);
-    if (error != SUCCESS)
+    optimizer->ast_tree->root->right = first_node;
+    tree_err t_error = build_parent_links(optimizer->ast_tree);
+    if (t_error != TREE_SUCCESS)
     {
-        ERROR_MESSAGE(LOADING_EXPRESSION_ERROR, error);
+        ERROR_MESSAGE_OPTIMIZER(OPTIMIZER_LOADING_EXPRESSION_ERROR);
         free(first_node);
         free(buffer);
-        return error;
+        return OPTIMIZER_LOADING_EXPRESSION_ERROR;
     }
     
     free(buffer);
-    return error;
+    return OPTIMIZER_SUCCESS;
 }
 
 
 Node_t * read_node(char * buffer, size_t * pos, Tree_t * tree) 
 {
     assert(buffer && pos && tree);
-    ErrorCode error = SUCCESS;
     
     while (isspace(buffer[*pos])) 
         (*pos)++;
@@ -69,22 +78,22 @@ Node_t * read_node(char * buffer, size_t * pos, Tree_t * tree)
         token_res token = define_token_type(buffer, pos);
         if (token.type == ROOT)
         {
-            ERROR_MESSAGE(LOADING_EXPRESSION_ERROR, error);
+            ERROR_MESSAGE_OPTIMIZER(OPTIMIZER_LOADING_EXPRESSION_ERROR);
             return NULL;
         }
         
         type_t type = token.type;
 
-        Node_result_t current = {.node = NULL, .error = SUCCESS};
+        Node_result_t current = {.node = NULL, .error = TREE_SUCCESS};
         switch (type)
         {
             case IDENTIFIER:  
             {
-                current = create_identifier_node(tree, token.id.name);
+                current = ID_NODE(token.id.name);
                 current.node->id.id_index = token.id.id_index;
-                if (current.error != SUCCESS)
+                if (current.error != TREE_SUCCESS)
                 {
-                    ERROR_MESSAGE(TREE_CREATING_NODE_ERROR, error);
+                    ERROR_MESSAGE_OPTIMIZER(OPTIMIZER_CREATING_NODE_ERROR);
                     return NULL;
                 }
 
@@ -93,30 +102,30 @@ Node_t * read_node(char * buffer, size_t * pos, Tree_t * tree)
             }
             case NUMBER:
             {
-                current = create_number_node(tree, token.value.number);
-                if (current.error != SUCCESS)
+                current = NUMBER_NODE(token.value.number);
+                if (current.error != TREE_SUCCESS)
                 {
-                    ERROR_MESSAGE(TREE_CREATING_NODE_ERROR, error);
+                    ERROR_MESSAGE_OPTIMIZER(OPTIMIZER_CREATING_NODE_ERROR);
                     return NULL;
                 }
                 break;
             }
             case OPERATOR:
             {
-                current = create_operator_node(tree, token.value.op);
-                if (current.error != SUCCESS)
+                current = OPERATOR_NODE(token.value.op);
+                if (current.error != TREE_SUCCESS)
                 {
-                    ERROR_MESSAGE(TREE_CREATING_NODE_ERROR, error);
+                    ERROR_MESSAGE_OPTIMIZER(OPTIMIZER_CREATING_NODE_ERROR);
                     return NULL;
                 }
                 break;
             }
             case STATEMENT:
             {
-                current = create_statement_node(tree, token.value.stmt);
-                if (current.error != SUCCESS)
+                current = STATEMENT_NODE(token.value.stmt);
+                if (current.error != TREE_SUCCESS)
                 {
-                    ERROR_MESSAGE(TREE_CREATING_NODE_ERROR, error);
+                    ERROR_MESSAGE_OPTIMIZER(OPTIMIZER_CREATING_NODE_ERROR);
                     return NULL;
                 }
                 if (token.value.stmt == OP_FUNC_DEF || token.value.stmt == OP_CALL)
@@ -128,10 +137,10 @@ Node_t * read_node(char * buffer, size_t * pos, Tree_t * tree)
             }
             case STRING:
             {
-                current = create_string_node(tree, token.value.string_value);
-                if (current.error != SUCCESS)
+                current = STRING_NODE(token.value.string_value);
+                if (current.error != TREE_SUCCESS)
                 {
-                    ERROR_MESSAGE(TREE_CREATING_NODE_ERROR, error);
+                    ERROR_MESSAGE_OPTIMIZER(OPTIMIZER_CREATING_NODE_ERROR);
                     free((void*)token.value.string_value);
                     return NULL;
                 }
@@ -141,19 +150,19 @@ Node_t * read_node(char * buffer, size_t * pos, Tree_t * tree)
             }
             default:
             {
-                ERROR_MESSAGE(TREE_INVALID_NODE_TYPE, current.error);
+                ERROR_MESSAGE_FRONTEND(INVALID_NODE);
                 return NULL;
                 break;
             }
         }
-        if (current.error == SUCCESS)
+        if (current.error == TREE_SUCCESS)
         {    
             DEBUG_PRINT("[DEBUG] node has been succesfully created: %s", get_string_type(current.node->type));
             tree->tree_size++;
         }
         else 
         {
-            ERROR_MESSAGE(LOADING_EXPRESSION_ERROR, error);
+            ERROR_MESSAGE_OPTIMIZER(OPTIMIZER_LOADING_EXPRESSION_ERROR);
             return NULL;
         }
 
@@ -237,16 +246,16 @@ void savenode(Node_t *node, FILE *f)
 
 
 
-ErrorCode save_tree(Tree_t * tree, const char * filename)
+optimize_err save_tree(Tree_t * tree, const char * filename)
 {
     assert(tree && filename);
-    ErrorCode error = SUCCESS;
+    optimize_err error = OPTIMIZER_SUCCESS;
 
     FILE * file_ptr = fopen(filename, "w");
     if (!file_ptr)
     {
-        ERROR_MESSAGE(OPENING_FILE_ERROR, error);
-        return error;
+        ERROR_MESSAGE_OPTIMIZER(OPTIMIZER_LOADING_EXPRESSION_ERROR);
+        return OPTIMIZER_LOADING_EXPRESSION_ERROR;
     }
 
     savenode(tree->root->right, file_ptr);
