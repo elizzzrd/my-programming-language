@@ -5,12 +5,13 @@
 #include "lexer.h"
 
 
-#define SYNTAX_ANALISYS_ERROR(error) \
+#define SYNTAX_ANALISYS_ERROR(error, tree_root) \
     do { \
-        if (error != FRONTEND_SUCCESS) {\
-            ERROR_MESSAGE_FRONTEND(PARSER_ERROR); \
+        if (error != FRONTEND_SUCCESS || tree_root == NULL) {\
+            ERROR_MESSAGE_FRONTEND(error); \
             DEBUG_PRINT("[ERROR] SYNTAX ANALYSIS END WITH ERROR"); \
             fprintf(stderr, "[ERROR] SYNTAX ANALYSIS END WITH ERROR\n"); \
+            tree_dtor(&tree, "destroy_frontend_error"); \
             token_list_dtor(&token_list); \
             return -1;} \
     } while (0)

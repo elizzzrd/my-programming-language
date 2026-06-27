@@ -1,5 +1,4 @@
 /build
 /logger/dots
 /tests/test_program.cpp
-
-
+/.vscode

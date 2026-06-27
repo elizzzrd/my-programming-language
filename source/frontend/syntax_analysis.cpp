@@ -118,9 +118,7 @@ Node_t * GetProgram_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, fron
 
         if (cur_stmt == NULL)
         {
-            tree_dtor(tree, "destroy_frontend_error");
             *error = PARSER_ERROR;
-            ERROR_MESSAGE_FRONTEND(PARSER_ERROR);
             return NULL;
         }
         
@@ -134,7 +132,6 @@ Node_t * GetProgram_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, fron
             Node_result_t sep_res = STATEMENT_NODE(OP_END);
             if (sep_res.error != TREE_SUCCESS)   
             {
-                ERROR_MESSAGE_FRONTEND(CREATING_NODE_ERROR);
                 *error = CREATING_NODE_ERROR;
                 return NULL;
             }
@@ -158,8 +155,7 @@ Node_t * GetProgram_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, fron
         }
         else
         {
-            ERROR_MESSAGE_FRONTEND(FORGOTTEN_SEMICOLON);
-            *error = SYNTAX_ERROR;
+            *error = FORGOTTEN_SEMICOLON;
             return NULL;
         }
 
@@ -204,7 +200,7 @@ Node_t * GetStatement_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, fr
         else if (next && next->type == TOK_LBRACE)
             return GetFuncCall_tokens(tokens, pos, tree, error);
 
-        ERROR_MESSAGE_FRONTEND(UNEXPECTED_SYNTAX);
+        *error = UNEXPECTED_SYNTAX;
     }
     else if (t -> type == TOK_DEF)
         return GetFuncDef(tokens, pos, tree, error);
@@ -241,7 +237,6 @@ Node_t * GetFuncDef(TokenList * tokens, size_t * pos, Tree_t * tree, frontend_er
         if (!params)
         {
             *error = PARSER_ERROR;
-            ERROR_MESSAGE_FRONTEND(PARSER_ERROR);
             return NULL;
         }
     }
@@ -253,7 +248,6 @@ Node_t * GetFuncDef(TokenList * tokens, size_t * pos, Tree_t * tree, frontend_er
     if (!body)
     {
         *error = PARSER_ERROR;
-        ERROR_MESSAGE_FRONTEND(PARSER_ERROR);
         return NULL;
     }
 
@@ -261,7 +255,8 @@ Node_t * GetFuncDef(TokenList * tokens, size_t * pos, Tree_t * tree, frontend_er
     if (res.error != TREE_SUCCESS)
     {
         *error = PARSER_ERROR;
-        ERROR_MESSAGE_FRONTEND(PARSER_ERROR);
+        if (res.node)
+            node_dtor(res.node);
         return NULL;
     }
     res.node->id.name = strdup(name->string_value);
@@ -286,7 +281,8 @@ Node_t * GetParams_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, front
     if (first_var.error != TREE_SUCCESS)
     {
         *error = SYNTAX_ERROR;
-        ERROR_MESSAGE_FRONTEND(SYNTAX_ERROR);
+        if (first_var.node)
+            node_dtor(first_var.node);
         return NULL;
     }
     (*pos)++;
@@ -296,7 +292,8 @@ Node_t * GetParams_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, front
     if (!list)
     {
         *error = SYNTAX_ERROR;
-        ERROR_MESSAGE_FRONTEND(SYNTAX_ERROR);
+        if (list)
+            node_dtor(list);
         return NULL;
     }
     list -> right = first_var.node;
@@ -313,8 +310,9 @@ Node_t * GetParams_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, front
         Node_result_t var = ID_NODE(t->string_value);
         if (var.error != TREE_SUCCESS)
         {
-            *error = SYNTAX_ERROR;
-            ERROR_MESSAGE_FRONTEND(SYNTAX_ERROR);
+            *error = CREATING_NODE_ERROR;
+            if (var.node)
+                node_dtor(var.node);
             return NULL;
         }
         (*pos)++;
@@ -339,15 +337,15 @@ Node_t * GetArgs_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, fronten
     if (!first_expr)
     {
         *error = SYNTAX_ERROR;
-        ERROR_MESSAGE_FRONTEND(SYNTAX_ERROR);
         return NULL;
     }
 
     Node_t * list = STATEMENT_NODE(OP_ARGS).node;
     if (!list)
     {
-        *error = SYNTAX_ERROR;
-        ERROR_MESSAGE_FRONTEND(SYNTAX_ERROR);
+        *error = CREATING_NODE_ERROR;
+        if (list)
+            node_dtor(list);
         return NULL;
     }
     list->param_count = 1;
@@ -363,7 +361,6 @@ Node_t * GetArgs_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, fronten
         if (!next_expr)
         {
             *error = SYNTAX_ERROR;
-            ERROR_MESSAGE_FRONTEND(SYNTAX_ERROR);
             node_dtor(list);
             return NULL;
         }
@@ -390,7 +387,6 @@ Node_t * GetReturn_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, front
     if (!expr)
     {
         *error = PARSER_ERROR;
-        ERROR_MESSAGE_FRONTEND(PARSER_ERROR);
         return NULL;
     }
 
@@ -398,7 +394,8 @@ Node_t * GetReturn_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, front
     if (res.error != TREE_SUCCESS)
     {
         *error = PARSER_ERROR;
-        ERROR_MESSAGE_FRONTEND(PARSER_ERROR);
+        if (res.node)
+            node_dtor(res.node);
         return NULL;
     }
 
@@ -429,7 +426,6 @@ Node_t * GetFuncCall_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, fro
         if (!args)
         {
             *error = PARSER_ERROR;
-            ERROR_MESSAGE_FRONTEND(PARSER_ERROR);
             return NULL;
         }
     }
@@ -441,7 +437,8 @@ Node_t * GetFuncCall_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, fro
     if (call.error != TREE_SUCCESS)
     {
         *error = PARSER_ERROR;
-        ERROR_MESSAGE_FRONTEND(PARSER_ERROR);
+        if (call.node)  
+            node_dtor(call.node);
         return NULL;
     }
     call.node -> right = args;
@@ -468,7 +465,6 @@ Node_t * GetPrintStmt_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, fr
     if (!expr)
     {
         *error = SYNTAX_ERROR;
-        ERROR_MESSAGE_FRONTEND(SYNTAX_ERROR);
         return NULL;
     }
     REQUIRE_TOKEN(TOK_RBRACE, current_token(tokens, *pos));
@@ -478,7 +474,8 @@ Node_t * GetPrintStmt_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, fr
     if (print_res.error != TREE_SUCCESS) 
     {
         *error = PARSER_ERROR;
-        ERROR_MESSAGE_FRONTEND(PARSER_ERROR);
+        if (print_res.node)
+            node_dtor(print_res.node);
         return NULL;
     }    
 
@@ -509,7 +506,8 @@ Node_t * GetInputStmt(TokenList * tokens, size_t * pos, Tree_t * tree, frontend_
     if (var_node.error != TREE_SUCCESS)
     {
         *error = SYNTAX_ERROR;
-        ERROR_MESSAGE_FRONTEND(SYNTAX_ERROR);
+        if (var_node.node)
+            node_dtor(var_node.node);
         return NULL;
     }
     (*pos)++;
@@ -521,7 +519,8 @@ Node_t * GetInputStmt(TokenList * tokens, size_t * pos, Tree_t * tree, frontend_
     if (res.error != TREE_SUCCESS)
     {
         *error = CREATING_NODE_ERROR;
-        ERROR_MESSAGE_FRONTEND(CREATING_NODE_ERROR);
+        if (res.node)
+            node_dtor(res.node);
         return NULL;
     }
 
@@ -546,6 +545,8 @@ Node_t * GetAssignment_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, f
     if (id_res.error != TREE_SUCCESS)    
     {
         *error = CREATING_NODE_ERROR;
+        if (id_res.node)
+            node_dtor(id_res.node);
         return NULL;
     }
 
@@ -556,7 +557,6 @@ Node_t * GetAssignment_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, f
     if (!expr)
     {
         *error = ASSIGNMENT_NO_VALUE;
-        ERROR_MESSAGE_FRONTEND(ASSIGNMENT_NO_VALUE);
         node_dtor(id_res.node);
         return NULL;
     }
@@ -567,7 +567,8 @@ Node_t * GetAssignment_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, f
         node_dtor(id_res.node);
         node_dtor(expr);
         *error = CREATING_NODE_ERROR;
-        ERROR_MESSAGE_FRONTEND(CREATING_NODE_ERROR);
+        if (assign_res.node)
+            node_dtor(assign_res.node);
         return NULL;
     }
 
@@ -592,7 +593,6 @@ Node_t * GetVarDef_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, front
     if (!t || t -> type != TOK_IDENTIFIER)
     {
         *error = UNDEFINED_ID;
-        ERROR_MESSAGE_FRONTEND(UNDEFINED_ID);
         return NULL;
     }
 
@@ -600,7 +600,8 @@ Node_t * GetVarDef_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, front
     if (id_res.error != TREE_SUCCESS)    
     {
         *error = CREATING_NODE_ERROR;
-        ERROR_MESSAGE_FRONTEND(CREATING_NODE_ERROR);
+        if (id_res.node)
+            node_dtor(id_res.node);
         return NULL;
     }
     (*pos)++;
@@ -612,7 +613,6 @@ Node_t * GetVarDef_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, front
     if (!expr)
     {
         *error = ASSIGNMENT_NO_VALUE;
-        ERROR_MESSAGE_FRONTEND(ASSIGNMENT_NO_VALUE);
         node_dtor(id_res.node);
         return NULL;
     }
@@ -623,7 +623,8 @@ Node_t * GetVarDef_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, front
         node_dtor(id_res.node);
         node_dtor(expr);
         *error = CREATING_NODE_ERROR;
-        ERROR_MESSAGE_FRONTEND(CREATING_NODE_ERROR);
+        if (def_res.node)
+            node_dtor(def_res.node);
         return NULL;
     }
 
@@ -652,7 +653,6 @@ Node_t * GetIfStmt_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, front
     if (!condition)
     {
         *error = NO_CONDITION;
-        ERROR_MESSAGE_FRONTEND(NO_CONDITION);
         return NULL;
     }
     
@@ -663,7 +663,6 @@ Node_t * GetIfStmt_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, front
     if (!if_body)
     {
         *error = NO_BLOCK;
-        ERROR_MESSAGE_FRONTEND(NO_BLOCK);
         return NULL;
     }
 
@@ -675,7 +674,6 @@ Node_t * GetIfStmt_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, front
         if (!else_body)
         {
             *error = NO_BLOCK;
-            ERROR_MESSAGE_FRONTEND(NO_BLOCK);
             return NULL;
         }   
     }
@@ -684,7 +682,8 @@ Node_t * GetIfStmt_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, front
     if (if_res.error != TREE_SUCCESS)    
     {
         *error = CREATING_NODE_ERROR;
-        ERROR_MESSAGE_FRONTEND(CREATING_NODE_ERROR);
+        if (if_res.node)    
+            node_dtor(if_res.node);
         return NULL;
     }
 
@@ -692,7 +691,10 @@ Node_t * GetIfStmt_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, front
     if (stmt_res.error != TREE_SUCCESS)  
     {
         *error = CREATING_NODE_ERROR;
-        ERROR_MESSAGE_FRONTEND(CREATING_NODE_ERROR);
+        if (stmt_res.node)
+            node_dtor(stmt_res.node);
+        if (if_res.node)    
+            node_dtor(if_res.node);
         return NULL;
     }
 
@@ -727,7 +729,6 @@ Node_t * GetWhileStmt_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, fr
     if (!condition)
     {
         *error = NO_CONDITION;
-        ERROR_MESSAGE_FRONTEND(NO_CONDITION);
         return NULL;
     }
     
@@ -738,7 +739,6 @@ Node_t * GetWhileStmt_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, fr
     if (!body)
     {
         *error = NO_BLOCK;
-        ERROR_MESSAGE_FRONTEND(NO_BLOCK);
         return NULL;
     }
 
@@ -746,7 +746,8 @@ Node_t * GetWhileStmt_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, fr
     if (while_res.error != TREE_SUCCESS)    
     {
         *error = CREATING_NODE_ERROR;
-        ERROR_MESSAGE_FRONTEND(CREATING_NODE_ERROR);
+        if (while_res.node)
+            node_dtor(while_res.node);
         return NULL;
     }
 
@@ -786,9 +787,7 @@ Node_t * GetBlock_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, fronte
         cur_stmt = GetStatement_tokens(tokens, pos, tree, error);
         if (cur_stmt == NULL)
         {
-            tree_dtor(tree, "destroy_frontend_error");
             *error = PARSER_ERROR;
-            ERROR_MESSAGE_FRONTEND(PARSER_ERROR);
             return NULL;
         }
 
@@ -803,7 +802,8 @@ Node_t * GetBlock_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, fronte
             if (sep_res.error != TREE_SUCCESS)   
             {
                 *error = CREATING_NODE_ERROR;
-                ERROR_MESSAGE_FRONTEND(CREATING_NODE_ERROR);
+                if (sep_res.node)
+                    node_dtor(sep_res.node);
                 return NULL;
             }
 
@@ -828,8 +828,8 @@ Node_t * GetBlock_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, fronte
         else
         {
             *error = FORGOTTEN_SEMICOLON;
-            ERROR_MESSAGE_FRONTEND(FORGOTTEN_SEMICOLON);
-            tree_dtor(tree, "destroy_frontend_error");
+            if (prev_stmt)
+                node_dtor(prev_stmt);
             return NULL;
         }
 
@@ -845,7 +845,9 @@ Node_t * GetBlock_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, fronte
     if (block_res.error != TREE_SUCCESS)     
     {
         *error = CREATING_NODE_ERROR;
-        ERROR_MESSAGE_FRONTEND(CREATING_NODE_ERROR);
+        if (block_res.node)
+            node_dtor(block_res.node);
+        node_dtor(prev_stmt);
         return NULL;
     }
    
@@ -877,7 +879,6 @@ Node_t * GetEquality_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, fro
     if (!val)   
     {
         *error = PARSER_ERROR;
-        ERROR_MESSAGE_FRONTEND(PARSER_ERROR);
         return NULL;
     }
 
@@ -892,7 +893,6 @@ Node_t * GetEquality_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, fro
         {
             node_dtor(val);
             *error = PARSER_ERROR;
-            ERROR_MESSAGE_FRONTEND(PARSER_ERROR);
             return NULL;
         }
 
@@ -903,7 +903,8 @@ Node_t * GetEquality_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, fro
             node_dtor(val);
             node_dtor(val2);
             *error = CREATING_NODE_ERROR;
-            ERROR_MESSAGE_FRONTEND(CREATING_NODE_ERROR);
+            if (res_op.node)
+                node_dtor(res_op.node);
             return NULL;
         }
         
@@ -949,7 +950,6 @@ Node_t * GetComp_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, fronten
         {
             node_dtor(val);
             *error = PARSER_ERROR;
-            ERROR_MESSAGE_FRONTEND(PARSER_ERROR);
             return NULL;
         }
 
@@ -959,7 +959,8 @@ Node_t * GetComp_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, fronten
             node_dtor(val);
             node_dtor(val2);
             *error = CREATING_NODE_ERROR;
-            ERROR_MESSAGE_FRONTEND(CREATING_NODE_ERROR);
+            if (res_op.node)
+                node_dtor(res_op.node);
             return NULL;
         }
         
@@ -985,7 +986,6 @@ Node_t * GetAddSub_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, front
     if (!val)   
     {
         *error = PARSER_ERROR;
-        ERROR_MESSAGE_FRONTEND(PARSER_ERROR);
         return NULL;
     }
 
@@ -1000,7 +1000,6 @@ Node_t * GetAddSub_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, front
         {
             node_dtor(val);
             *error = PARSER_ERROR;
-            ERROR_MESSAGE_FRONTEND(PARSER_ERROR);
             return NULL;
         }
 
@@ -1015,7 +1014,6 @@ Node_t * GetAddSub_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, front
             node_dtor(val);
             node_dtor(val2);
             *error = CREATING_NODE_ERROR;
-            ERROR_MESSAGE_FRONTEND(CREATING_NODE_ERROR);
             return NULL;
         }
         
@@ -1050,7 +1048,6 @@ Node_t * GetMulDiv_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, front
         {
             node_dtor(val);
             *error = PARSER_ERROR;
-            ERROR_MESSAGE_FRONTEND(PARSER_ERROR);
             return NULL;
         }
 
@@ -1065,7 +1062,6 @@ Node_t * GetMulDiv_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, front
             node_dtor(val);
             node_dtor(val2);
             *error = CREATING_NODE_ERROR;
-            ERROR_MESSAGE_FRONTEND(CREATING_NODE_ERROR);
             return NULL;
         }
         
@@ -1100,7 +1096,6 @@ Node_t * GetPow_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, frontend
         {
             node_dtor(val);
             *error = PARSER_ERROR;
-            ERROR_MESSAGE_FRONTEND(PARSER_ERROR);
             return NULL;
         }
 
@@ -1111,7 +1106,8 @@ Node_t * GetPow_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, frontend
             node_dtor(val);
             node_dtor(val2);
             *error = CREATING_NODE_ERROR;
-            ERROR_MESSAGE_FRONTEND(CREATING_NODE_ERROR);
+            if (res_op.node)
+                node_dtor(res_op.node);
             return NULL;
         }
         
@@ -1138,7 +1134,6 @@ Node_t * GetUnary_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, fronte
     if (!t)     
     {
         *error = PARSER_ERROR;
-        ERROR_MESSAGE_FRONTEND(PARSER_ERROR);
         return NULL;
     }
 
@@ -1151,7 +1146,6 @@ Node_t * GetUnary_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, fronte
         if (!operand)
         {
             *error = NO_EXPECTED_EXPRESSION;
-            ERROR_MESSAGE_FRONTEND(NO_EXPECTED_EXPRESSION);
             return NULL;
         }
 
@@ -1162,7 +1156,8 @@ Node_t * GetUnary_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, fronte
         if (res.error != TREE_SUCCESS)
         {
             *error = CREATING_NODE_ERROR;
-            ERROR_MESSAGE_FRONTEND(CREATING_NODE_ERROR);
+            if (res.node)
+                node_dtor(res.node);
             return NULL;
         }
         
@@ -1193,7 +1188,6 @@ Node_t * GetUnary_tokens(TokenList * tokens, size_t * pos, Tree_t * tree, fronte
         if (!prim)
         {
             *error = NO_EXPECTED_EXPRESSION;
-            ERROR_MESSAGE_FRONTEND(NO_EXPECTED_EXPRESSION);
             return NULL;
         }
         REQUIRE_TOKEN(TOK_RBRACE, current_token(tokens, *pos));
@@ -1228,7 +1222,6 @@ Node_t * GetPrimaryExpression_tokens(TokenList * tokens, size_t * pos, Tree_t * 
         if (val == NULL) 
         {
             *error = NO_EXPECTED_EXPRESSION;
-            ERROR_MESSAGE_FRONTEND(NO_EXPECTED_EXPRESSION);
             return NULL;
         }
 
@@ -1255,7 +1248,6 @@ Node_t * GetPrimaryExpression_tokens(TokenList * tokens, size_t * pos, Tree_t * 
         if (id_res.error != TREE_SUCCESS)    
         {
             *error = CREATING_NODE_ERROR;
-            ERROR_MESSAGE_FRONTEND(CREATING_NODE_ERROR);
             return NULL;
         }
 
@@ -1270,7 +1262,6 @@ Node_t * GetPrimaryExpression_tokens(TokenList * tokens, size_t * pos, Tree_t * 
         if (str_res.error != TREE_SUCCESS)   
         {
             *error = CREATING_NODE_ERROR;
-            ERROR_MESSAGE_FRONTEND(CREATING_NODE_ERROR);
             return NULL;
         }
         return str_res.node;
@@ -1282,7 +1273,6 @@ Node_t * GetPrimaryExpression_tokens(TokenList * tokens, size_t * pos, Tree_t * 
     else
     {
         *error = UNEXPECTED_SYNTAX;
-        ERROR_MESSAGE_FRONTEND(UNEXPECTED_SYNTAX);
         return NULL;
     }
 }

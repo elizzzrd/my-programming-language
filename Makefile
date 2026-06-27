@@ -1,14 +1,9 @@
-# ============================================================
-# Компиляторы и флаги
-# ============================================================
 CXX := g++
 CC := gcc
 NASM := nasm
 
-# Санитайзеры (включены, но можно отключить для релиза)
 SANITIZERS := -fsanitize=address,alignment,bool,bounds,enum,float-cast-overflow,float-divide-by-zero,integer-divide-by-zero,leak,nonnull-attribute,null,object-size,return,returns-nonnull-attribute,shift,signed-integer-overflow,undefined,unreachable,vla-bound,vptr
 
-# Флаги компиляции
 CXXFLAGS := -g -DDEBUG -ggdb3 -std=c++17 -O0 -Wall -Wextra -Weffc++ \
     -Waggressive-loop-optimizations -Wc++14-compat -Wmissing-declarations \
     -Wcast-align -Wcast-qual -Wchar-subscripts -Wconditionally-supported \
@@ -25,24 +20,18 @@ CXXFLAGS := -g -DDEBUG -ggdb3 -std=c++17 -O0 -Wall -Wextra -Weffc++ \
     -fstrict-overflow -flto-odr-type-merging -fno-omit-frame-pointer \
     -Wlarger-than=8192 -Wstack-usage=8192 -Werror=vla
 
-# Исправление: убираем -pie (оставляем только -no-pie в LDFLAGS)
 CXXFLAGS += -fno-pie
 
-# Флаги для ассемблера
 NASMFLAGS := -f elf64 -g -F dwarf
 
-# Флаги линковки
 LDFLAGS := -lm -no-pie
 
-# ============================================================
-# Директории
-# ============================================================
 SRC_DIR := source
 BUILD_DIR := build
 OBJ_DIR := $(BUILD_DIR)/obj
 BIN_DIR := $(BUILD_DIR)/bin
 
-# Поддиректории исходников
+
 FRONTEND_DIR := $(SRC_DIR)/frontend
 BACKEND_DIR := $(SRC_DIR)/backend
 BACKEND_X64_DIR := $(SRC_DIR)/backend_x86_64
@@ -51,59 +40,48 @@ COMMON_DIR := $(SRC_DIR)/common
 PROCESSOR_DIR := $(SRC_DIR)/processor
 EXE_DIR := exe
 
-# Директории заголовков
+
 INC_DIRS := headers/backend_h headers/middleend_h headers/frontend_h \
             headers/processor_h headers/common_h headers/backend-x64_h
 INCLUDES := $(addprefix -I,$(INC_DIRS))
 
-# ============================================================
-# Исполняемые файлы
-# ============================================================
+
 FRONTEND_PROG := $(BIN_DIR)/frontend
 MIDDLEEND_PROG := $(BIN_DIR)/middleend
 BACKEND_PROG := $(BIN_DIR)/backend
 BACKEND_X64_PROG := $(BIN_DIR)/backend_x64
 
-# ============================================================
-# Исходные файлы (все .cpp из поддиректорий)
-# ============================================================
+
 COMMON_SOURCES := $(wildcard $(FRONTEND_DIR)/*.cpp) \
                   $(wildcard $(COMMON_DIR)/*.cpp) \
                   $(wildcard $(MIDDLEEND_DIR)/*.cpp) \
                   $(wildcard $(BACKEND_DIR)/*.cpp) \
                   $(wildcard $(BACKEND_X64_DIR)/*.cpp)
 
-# Убираем дубликаты
+
 COMMON_SOURCES := $(sort $(COMMON_SOURCES))
 
-# Списки исходников для каждого исполняемого файла
+
 FRONTEND_SOURCES := $(EXE_DIR)/frontend.cpp $(COMMON_SOURCES)
 MIDDLEEND_SOURCES := $(EXE_DIR)/middleend.cpp $(COMMON_SOURCES)
 BACKEND_SOURCES := $(EXE_DIR)/backend.cpp $(COMMON_SOURCES) \
                    $(wildcard $(PROCESSOR_DIR)/*.cpp)
 BACKEND_X64_SOURCES := $(EXE_DIR)/backend-x64.cpp $(COMMON_SOURCES)
 
-# ============================================================
-# Функция: преобразование .cpp в .o с сохранением структуры
-# ============================================================
 define cpp_to_obj
 $(OBJ_DIR)/$(patsubst $(SRC_DIR)/%,%,$(patsubst $(EXE_DIR)/%,exe/%,$(1:.cpp=.o)))
 endef
 
-# Преобразование списков исходников в объектные файлы
+
 FRONTEND_OBJECTS := $(foreach src,$(FRONTEND_SOURCES),$(call cpp_to_obj,$(src)))
 MIDDLEEND_OBJECTS := $(foreach src,$(MIDDLEEND_SOURCES),$(call cpp_to_obj,$(src)))
 BACKEND_OBJECTS := $(foreach src,$(BACKEND_SOURCES),$(call cpp_to_obj,$(src)))
 BACKEND_X64_OBJECTS := $(foreach src,$(BACKEND_X64_SOURCES),$(call cpp_to_obj,$(src)))
 
-# ============================================================
-# Правила сборки
-# ============================================================
 
-# Цель по умолчанию
 all: $(FRONTEND_PROG) $(MIDDLEEND_PROG) $(BACKEND_PROG) $(BACKEND_X64_PROG)
 
-# Сборка исполняемых файлов
+
 $(FRONTEND_PROG): $(FRONTEND_OBJECTS) | $(BIN_DIR)
 	@echo "Linking $@..."
 	@$(CXX) $^ $(SANITIZERS) $(LDFLAGS) -o $@
@@ -120,23 +98,20 @@ $(BACKEND_X64_PROG): $(BACKEND_X64_OBJECTS) | $(BIN_DIR)
 	@echo "Linking $@..."
 	@$(CXX) $^ $(SANITIZERS) $(LDFLAGS) -o $@
 
-# ============================================================
-# Правила компиляции
-# ============================================================
 
-# Правило для файлов из exe/ (компилируются в obj/exe/)
+
 $(OBJ_DIR)/exe/%.o: $(EXE_DIR)/%.cpp | $(OBJ_DIR)/exe
 	@mkdir -p $(dir $@)
 	@echo "Compiling $<..."
 	@$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
 
-# Правило для файлов из source/ (сохраняет структуру)
+
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIR)
 	@mkdir -p $(dir $@)
 	@echo "Compiling $<..."
 	@$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
 
-# Создание директорий
+
 $(BIN_DIR):
 	@mkdir -p $@
 
@@ -146,9 +121,7 @@ $(OBJ_DIR):
 $(OBJ_DIR)/exe:
 	@mkdir -p $@
 
-# ============================================================
-# Запуск
-# ============================================================
+
 
 frontend: $(FRONTEND_PROG)
 middleend: $(MIDDLEEND_PROG)
@@ -175,9 +148,7 @@ run_backend:
 run_backend_x64:
 	@./$(BACKEND_X64_PROG)
 
-# ============================================================
-# Сборка NASM-программы
-# ============================================================
+
 
 OUTPUT_DIR := output
 NASM_PROG := $(OUTPUT_DIR)/nasm_output
@@ -191,7 +162,7 @@ nasm: $(ASM_FILE)
 	@echo "Running $(NASM_PROG)..."
 	@./$(NASM_PROG)
 
-# Зависимость: если .asm обновлён, пересобираем
+
 $(ASM_FILE): $(BACKEND_X64_PROG)
 	@echo "Generating $(ASM_FILE)..."
 	@./$(BACKEND_X64_PROG)
@@ -199,9 +170,6 @@ $(ASM_FILE): $(BACKEND_X64_PROG)
 nasm_clean:
 	@rm -f $(OUTPUT_DIR)/nasm_output.asm $(OUTPUT_DIR)/nasm_output.o $(OUTPUT_DIR)/nasm_output
 
-# ============================================================
-# Очистка и обслуживание
-# ============================================================
 
 clean:
 	@rm -rf $(BUILD_DIR)
@@ -213,7 +181,7 @@ logger-clean:
 	@mkdir -p output/
 	@echo "Logger and output directories cleaned."
 
-# Полная пересборка
+
 rebuild: clean logger-clean all
 
 .PHONY: all clean rebuild frontend middleend backend run logger-clean \

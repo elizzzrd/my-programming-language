@@ -33,7 +33,7 @@ int main(void)
     
     size_t pos = 0;
     Node_t * tree_root = GetProgram_tokens(&token_list, &pos, &tree, &error);
-    SYNTAX_ANALISYS_ERROR(error);
+    SYNTAX_ANALISYS_ERROR(error, tree_root);
     tree.root->right = tree_root;
     t_error = build_parent_links(&tree);
     BUILDING_FRONTEND_TREE_ERROR(t_error);

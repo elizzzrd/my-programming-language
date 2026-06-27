@@ -10,7 +10,7 @@ ID_def f = a / b;
 ID_def g = a ^ b;
 
 print{c};
-print{d};
+print{d}
 print{e};
 print{f};
 print{g};
@@ -19,7 +19,7 @@ $
 
 exe/frontend.cpp:22: main: [INFO] LEXICAL_ANALYSIS END
 source/frontend/lexer.cpp:318: lexer_dump: [========================== LEXER DUMP ==========================]
-source/frontend/lexer.cpp:319: lexer_dump: token_list.count = 72, token_list->capacity = 128
+source/frontend/lexer.cpp:319: lexer_dump: token_list.count = 71, token_list->capacity = 128
 
 source/frontend/lexer.cpp:322: lexer_dump: token_0, TOK_ID_DEF, 0, ID_def
 source/frontend/lexer.cpp:322: lexer_dump: token_1, TOK_IDENTIFIER, 0, a
@@ -75,259 +75,29 @@ source/frontend/lexer.cpp:322: lexer_dump: token_50, TOK_PRINT, 0, print
 source/frontend/lexer.cpp:322: lexer_dump: token_51, TOK_LBRACE, 0, {
 source/frontend/lexer.cpp:322: lexer_dump: token_52, TOK_IDENTIFIER, 0, d
 source/frontend/lexer.cpp:322: lexer_dump: token_53, TOK_RBRACE, 0, }
-source/frontend/lexer.cpp:322: lexer_dump: token_54, TOK_SEMICOLON, 0, ;
-source/frontend/lexer.cpp:322: lexer_dump: token_55, TOK_PRINT, 0, print
-source/frontend/lexer.cpp:322: lexer_dump: token_56, TOK_LBRACE, 0, {
-source/frontend/lexer.cpp:322: lexer_dump: token_57, TOK_IDENTIFIER, 0, e
-source/frontend/lexer.cpp:322: lexer_dump: token_58, TOK_RBRACE, 0, }
-source/frontend/lexer.cpp:322: lexer_dump: token_59, TOK_SEMICOLON, 0, ;
-source/frontend/lexer.cpp:322: lexer_dump: token_60, TOK_PRINT, 0, print
-source/frontend/lexer.cpp:322: lexer_dump: token_61, TOK_LBRACE, 0, {
-source/frontend/lexer.cpp:322: lexer_dump: token_62, TOK_IDENTIFIER, 0, f
-source/frontend/lexer.cpp:322: lexer_dump: token_63, TOK_RBRACE, 0, }
-source/frontend/lexer.cpp:322: lexer_dump: token_64, TOK_SEMICOLON, 0, ;
-source/frontend/lexer.cpp:322: lexer_dump: token_65, TOK_PRINT, 0, print
-source/frontend/lexer.cpp:322: lexer_dump: token_66, TOK_LBRACE, 0, {
-source/frontend/lexer.cpp:322: lexer_dump: token_67, TOK_IDENTIFIER, 0, g
-source/frontend/lexer.cpp:322: lexer_dump: token_68, TOK_RBRACE, 0, }
-source/frontend/lexer.cpp:322: lexer_dump: token_69, TOK_SEMICOLON, 0, ;
-source/frontend/lexer.cpp:322: lexer_dump: token_70, TOK_END, 0, $
-source/frontend/lexer.cpp:322: lexer_dump: token_71, TOK_EOF, 0, 
+source/frontend/lexer.cpp:322: lexer_dump: token_54, TOK_PRINT, 0, print
+source/frontend/lexer.cpp:322: lexer_dump: token_55, TOK_LBRACE, 0, {
+source/frontend/lexer.cpp:322: lexer_dump: token_56, TOK_IDENTIFIER, 0, e
+source/frontend/lexer.cpp:322: lexer_dump: token_57, TOK_RBRACE, 0, }
+source/frontend/lexer.cpp:322: lexer_dump: token_58, TOK_SEMICOLON, 0, ;
+source/frontend/lexer.cpp:322: lexer_dump: token_59, TOK_PRINT, 0, print
+source/frontend/lexer.cpp:322: lexer_dump: token_60, TOK_LBRACE, 0, {
+source/frontend/lexer.cpp:322: lexer_dump: token_61, TOK_IDENTIFIER, 0, f
+source/frontend/lexer.cpp:322: lexer_dump: token_62, TOK_RBRACE, 0, }
+source/frontend/lexer.cpp:322: lexer_dump: token_63, TOK_SEMICOLON, 0, ;
+source/frontend/lexer.cpp:322: lexer_dump: token_64, TOK_PRINT, 0, print
+source/frontend/lexer.cpp:322: lexer_dump: token_65, TOK_LBRACE, 0, {
+source/frontend/lexer.cpp:322: lexer_dump: token_66, TOK_IDENTIFIER, 0, g
+source/frontend/lexer.cpp:322: lexer_dump: token_67, TOK_RBRACE, 0, }
+source/frontend/lexer.cpp:322: lexer_dump: token_68, TOK_SEMICOLON, 0, ;
+source/frontend/lexer.cpp:322: lexer_dump: token_69, TOK_END, 0, $
+source/frontend/lexer.cpp:322: lexer_dump: token_70, TOK_EOF, 0, 
 source/frontend/lexer.cpp:326: lexer_dump: [========================== LEXER DUMP ==========================]
 source/frontend/syntax_analysis.cpp:108: GetProgram_tokens: 
 [INFO] SYNTAX_ANALYSIS START
-source/frontend/syntax_analysis.cpp:171: GetProgram_tokens: all expression was parsed in tree
-source/common/tree_operations.cpp:181: build_parent_links: [INFO] start build parent links
+exe/frontend.cpp:36: main: [ERROR] SYNTAX ANALYSIS END WITH ERROR
+source/common/tree_dump.cpp:94: tree_graph_dump: [INFO] Starting graph dump to logger/dots/tree1.dot and logger/pics/graph_tree_destroy_frontend_error_1.png
 
-source/common/tree_operations.cpp:190: build_parent_links: [INFO] end build parent links
+source/common/tree_dump.cpp:141: tree_graph_dump: Graph dump completed: logger/dots/tree1.dot and logger/pics/graph_tree_destroy_frontend_error_1.png have been created
 
-exe/frontend.cpp:39: main: [INFO] SYNTAX_ANALYSIS END
-exe/frontend.cpp:39: main: [INFO] EXPRESSION HAS BEEN LOADED SUCCESSFULLY
-
-source/frontend/semantic_analysis.cpp:98: semantic_analysis: [INFO] SEMANTIC_ANALYSIS START
-exe/frontend.cpp:49: main: [INFO] SEMANTIC_ANALYSIS END
-source/common/tree_dump.cpp:94: tree_graph_dump: [INFO] Starting graph dump to logger/dots/tree1.dot and logger/pics/graph_tree_frontend_1.png
-
-source/common/tree_dump.cpp:141: tree_graph_dump: Graph dump completed: logger/dots/tree1.dot and logger/pics/graph_tree_frontend_1.png have been created
-
-source/frontend/load_expression.cpp:263: save_tree: [INFO] TREE SAVED IN output/ast_output_frontend.txt
-source/common/tree_dump.cpp:94: tree_graph_dump: [INFO] Starting graph dump to logger/dots/tree2.dot and logger/pics/graph_tree_destroy_frontend_2.png
-
-source/common/tree_dump.cpp:141: tree_graph_dump: Graph dump completed: logger/dots/tree2.dot and logger/pics/graph_tree_destroy_frontend_2.png have been created
-
-source/common/tree_operations.cpp:70: tree_dtor: [INFO] Tree_destroy_frontend was successfully destroyed
-exe/middleend.cpp:13: main: [INFO] MIDDLEEND START
-
-source/frontend/load_expression.cpp:33: optimizer_ctor: [DEBUG]: expression has been loaded to buffer
-
-source/frontend/load_expression.cpp:34: optimizer_ctor: [DEBUG] buffer:
-
-source/frontend/load_expression.cpp:35: optimizer_ctor: (op_end(op_end(op_end(op_end(op_end(op_end(op_end(op_end(op_end(op_end(op_end(var_def(a##0 nil nil)(10 nil nil))(var_def(b##1 nil nil)(3 nil nil)))(var_def(c##2 nil nil)(+(a##0 nil nil)(b##1 nil nil))))(var_def(d##3 nil nil)(-(a##0 nil nil)(b##1 nil nil))))(var_def(e##4 nil nil)(*(a##0 nil nil)(b##1 nil nil))))(var_def(f##5 nil nil)(/(a##0 nil nil)(b##1 nil nil))))(var_def(g##6 nil nil)(^(a##0 nil nil)(b##1 nil nil))))(print(c##2 nil nil)))(print(d##3 nil nil)))(print(e##4 nil nil)))(print(f##5 nil nil)))(print(g##6 nil nil)))
-
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: STATEMENT
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: STATEMENT
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: STATEMENT
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: STATEMENT
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: STATEMENT
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: STATEMENT
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: STATEMENT
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: STATEMENT
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: STATEMENT
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: STATEMENT
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: STATEMENT
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: STATEMENT
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: IDENTIFIER
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: NUMBER
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: STATEMENT
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: IDENTIFIER
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: NUMBER
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: STATEMENT
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: IDENTIFIER
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: OPERATOR
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: IDENTIFIER
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: IDENTIFIER
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: STATEMENT
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: IDENTIFIER
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: OPERATOR
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: IDENTIFIER
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: IDENTIFIER
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: STATEMENT
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: IDENTIFIER
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: OPERATOR
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: IDENTIFIER
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: IDENTIFIER
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: STATEMENT
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: IDENTIFIER
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: OPERATOR
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: IDENTIFIER
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: IDENTIFIER
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: STATEMENT
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: IDENTIFIER
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: OPERATOR
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: IDENTIFIER
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: IDENTIFIER
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: STATEMENT
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: IDENTIFIER
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: STATEMENT
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: IDENTIFIER
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: STATEMENT
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: IDENTIFIER
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: STATEMENT
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: IDENTIFIER
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: STATEMENT
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: IDENTIFIER
-source/frontend/load_expression.cpp:45: optimizer_ctor: [DEBUG] all nodes was read
-source/common/tree_operations.cpp:181: build_parent_links: [INFO] start build parent links
-
-source/common/tree_operations.cpp:190: build_parent_links: [INFO] end build parent links
-
-source/common/tree_dump.cpp:150: tree_graph_optimizer: [INFO] Starting graph dump in middleend to logger/dots/middleend_tree1.dot and logger/pics/graph_middleend_tree1.png
-
-source/common/tree_operations.cpp:181: build_parent_links: [INFO] start build parent links
-
-source/common/tree_operations.cpp:190: build_parent_links: [INFO] end build parent links
-
-source/common/tree_dump.cpp:207: tree_graph_optimizer: [INFO] Graph dump of middleend tree completed: logger/dots/middleend_tree1.dot and logger/pics/graph_middleend_tree1.png have been created
-
-source/frontend/load_expression.cpp:263: save_tree: [INFO] TREE SAVED IN output/ast_output_middleend.txt
-source/common/tree_dump.cpp:94: tree_graph_dump: [INFO] Starting graph dump to logger/dots/tree1.dot and logger/pics/graph_tree_destroy_middleend_1.png
-
-source/common/tree_dump.cpp:141: tree_graph_dump: Graph dump completed: logger/dots/tree1.dot and logger/pics/graph_tree_destroy_middleend_1.png have been created
-
-source/common/tree_operations.cpp:70: tree_dtor: [INFO] Tree_destroy_middleend was successfully destroyed
-exe/middleend.cpp:35: main: [INFO] MIDDLEEND END
-
-exe/backend-x64.cpp:13: main: [INFO] BACKEND-x64 START
-source/frontend/load_expression.cpp:33: optimizer_ctor: [DEBUG]: expression has been loaded to buffer
-
-source/frontend/load_expression.cpp:34: optimizer_ctor: [DEBUG] buffer:
-
-source/frontend/load_expression.cpp:35: optimizer_ctor: (op_end(op_end(op_end(op_end(op_end(op_end(op_end(op_end(op_end(op_end(op_end(var_def(a##0 nil nil)(10 nil nil))(var_def(b##1 nil nil)(3 nil nil)))(var_def(c##2 nil nil)(+(a##0 nil nil)(b##1 nil nil))))(var_def(d##3 nil nil)(-(a##0 nil nil)(b##1 nil nil))))(var_def(e##4 nil nil)(*(a##0 nil nil)(b##1 nil nil))))(var_def(f##5 nil nil)(/(a##0 nil nil)(b##1 nil nil))))(var_def(g##6 nil nil)(^(a##0 nil nil)(b##1 nil nil))))(print(c##2 nil nil)))(print(d##3 nil nil)))(print(e##4 nil nil)))(print(f##5 nil nil)))(print(g##6 nil nil)))
-
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: STATEMENT
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: STATEMENT
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: STATEMENT
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: STATEMENT
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: STATEMENT
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: STATEMENT
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: STATEMENT
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: STATEMENT
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: STATEMENT
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: STATEMENT
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: STATEMENT
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: STATEMENT
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: IDENTIFIER
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: NUMBER
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: STATEMENT
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: IDENTIFIER
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: NUMBER
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: STATEMENT
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: IDENTIFIER
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: OPERATOR
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: IDENTIFIER
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: IDENTIFIER
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: STATEMENT
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: IDENTIFIER
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: OPERATOR
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: IDENTIFIER
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: IDENTIFIER
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: STATEMENT
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: IDENTIFIER
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: OPERATOR
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: IDENTIFIER
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: IDENTIFIER
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: STATEMENT
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: IDENTIFIER
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: OPERATOR
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: IDENTIFIER
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: IDENTIFIER
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: STATEMENT
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: IDENTIFIER
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: OPERATOR
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: IDENTIFIER
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: IDENTIFIER
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: STATEMENT
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: IDENTIFIER
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: STATEMENT
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: IDENTIFIER
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: STATEMENT
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: IDENTIFIER
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: STATEMENT
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: IDENTIFIER
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: STATEMENT
-source/frontend/load_expression.cpp:159: read_node: [DEBUG] node has been succesfully created: IDENTIFIER
-source/frontend/load_expression.cpp:45: optimizer_ctor: [DEBUG] all nodes was read
-source/common/tree_operations.cpp:181: build_parent_links: [INFO] start build parent links
-
-source/common/tree_operations.cpp:190: build_parent_links: [INFO] end build parent links
-
-source/common/tree_dump.cpp:94: tree_graph_dump: [INFO] Starting graph dump to logger/dots/tree1.dot and logger/pics/graph_tree_backend_1.png
-
-source/common/tree_dump.cpp:141: tree_graph_dump: Graph dump completed: logger/dots/tree1.dot and logger/pics/graph_tree_backend_1.png have been created
-
-exe/backend-x64.cpp:34: main: [DEBUG] backend tree was build successfully
-source/backend_x86_64/translate_to_nasm.cpp:48: translate_to_nasm: [DEBUG] variables initialized
-source/backend_x86_64/translate_to_nasm.cpp:55: translate_to_nasm: [DEBUG] valiables collected
-source/backend_x86_64/translate_to_nasm.cpp:57: translate_to_nasm: [DEBUG] offsets done
-source/backend_x86_64/translate_to_nasm.cpp:65: translate_to_nasm: [INFO] TRANSLATION START
-
-source/backend_x86_64/translate_to_nasm.cpp:457: emit_expression: [DEBUG] emit_expression: type = NUMBER
-source/backend_x86_64/translate_to_nasm.cpp:457: emit_expression: [DEBUG] emit_expression: type = NUMBER
-source/backend_x86_64/translate_to_nasm.cpp:457: emit_expression: [DEBUG] emit_expression: type = OPERATOR
-source/backend_x86_64/translate_to_nasm.cpp:457: emit_expression: [DEBUG] emit_expression: type = IDENTIFIER
-source/backend_x86_64/translate_to_nasm.cpp:482: emit_expression: a -- 0
-
-source/backend_x86_64/translate_to_nasm.cpp:457: emit_expression: [DEBUG] emit_expression: type = IDENTIFIER
-source/backend_x86_64/translate_to_nasm.cpp:482: emit_expression: b -- 1
-
-source/backend_x86_64/translate_to_nasm.cpp:457: emit_expression: [DEBUG] emit_expression: type = OPERATOR
-source/backend_x86_64/translate_to_nasm.cpp:457: emit_expression: [DEBUG] emit_expression: type = IDENTIFIER
-source/backend_x86_64/translate_to_nasm.cpp:482: emit_expression: a -- 0
-
-source/backend_x86_64/translate_to_nasm.cpp:457: emit_expression: [DEBUG] emit_expression: type = IDENTIFIER
-source/backend_x86_64/translate_to_nasm.cpp:482: emit_expression: b -- 1
-
-source/backend_x86_64/translate_to_nasm.cpp:457: emit_expression: [DEBUG] emit_expression: type = OPERATOR
-source/backend_x86_64/translate_to_nasm.cpp:457: emit_expression: [DEBUG] emit_expression: type = IDENTIFIER
-source/backend_x86_64/translate_to_nasm.cpp:482: emit_expression: a -- 0
-
-source/backend_x86_64/translate_to_nasm.cpp:457: emit_expression: [DEBUG] emit_expression: type = IDENTIFIER
-source/backend_x86_64/translate_to_nasm.cpp:482: emit_expression: b -- 1
-
-source/backend_x86_64/translate_to_nasm.cpp:457: emit_expression: [DEBUG] emit_expression: type = OPERATOR
-source/backend_x86_64/translate_to_nasm.cpp:457: emit_expression: [DEBUG] emit_expression: type = IDENTIFIER
-source/backend_x86_64/translate_to_nasm.cpp:482: emit_expression: a -- 0
-
-source/backend_x86_64/translate_to_nasm.cpp:457: emit_expression: [DEBUG] emit_expression: type = IDENTIFIER
-source/backend_x86_64/translate_to_nasm.cpp:482: emit_expression: b -- 1
-
-source/backend_x86_64/translate_to_nasm.cpp:457: emit_expression: [DEBUG] emit_expression: type = OPERATOR
-source/backend_x86_64/translate_to_nasm.cpp:457: emit_expression: [DEBUG] emit_expression: type = IDENTIFIER
-source/backend_x86_64/translate_to_nasm.cpp:482: emit_expression: a -- 0
-
-source/backend_x86_64/translate_to_nasm.cpp:457: emit_expression: [DEBUG] emit_expression: type = IDENTIFIER
-source/backend_x86_64/translate_to_nasm.cpp:482: emit_expression: b -- 1
-
-source/backend_x86_64/translate_to_nasm.cpp:457: emit_expression: [DEBUG] emit_expression: type = IDENTIFIER
-source/backend_x86_64/translate_to_nasm.cpp:482: emit_expression: c -- 2
-
-source/backend_x86_64/translate_to_nasm.cpp:457: emit_expression: [DEBUG] emit_expression: type = IDENTIFIER
-source/backend_x86_64/translate_to_nasm.cpp:482: emit_expression: d -- 3
-
-source/backend_x86_64/translate_to_nasm.cpp:457: emit_expression: [DEBUG] emit_expression: type = IDENTIFIER
-source/backend_x86_64/translate_to_nasm.cpp:482: emit_expression: e -- 4
-
-source/backend_x86_64/translate_to_nasm.cpp:457: emit_expression: [DEBUG] emit_expression: type = IDENTIFIER
-source/backend_x86_64/translate_to_nasm.cpp:482: emit_expression: f -- 5
-
-source/backend_x86_64/translate_to_nasm.cpp:457: emit_expression: [DEBUG] emit_expression: type = IDENTIFIER
-source/backend_x86_64/translate_to_nasm.cpp:482: emit_expression: g -- 6
-
-source/backend_x86_64/translate_to_nasm.cpp:115: translate_to_nasm: [DEBUG] TRANSLATION COMPLETED
-source/common/tree_dump.cpp:94: tree_graph_dump: [INFO] Starting graph dump to logger/dots/tree2.dot and logger/pics/graph_tree_destroy_backend_2.png
-
-source/common/tree_dump.cpp:141: tree_graph_dump: Graph dump completed: logger/dots/tree2.dot and logger/pics/graph_tree_destroy_backend_2.png have been created
-
-source/common/tree_operations.cpp:70: tree_dtor: [INFO] Tree_destroy_backend was successfully destroyed
-exe/backend-x64.cpp:41: main: [INFO] BACKEND END
-
+source/common/tree_operations.cpp:70: tree_dtor: [INFO] Tree_destroy_frontend_error was successfully destroyed
